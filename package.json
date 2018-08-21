@@ -1,0 +1,22 @@
+{
+  "name": "itm",
+  "version": "0.1.0",
+  "description": "angular module for efficient item management",
+  "main": "lib/itm.module.js",
+  "scripts": {
+    "test": "test/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guduf/itm.git"
+  },
+  "keywords": [
+    "angular"
+  ],
+  "author": "guduf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/guduf/itm/issues"
+  },
+  "homepage": "https://github.com/guduf/itm#readme"
+}
