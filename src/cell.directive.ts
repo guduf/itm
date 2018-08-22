@@ -21,9 +21,9 @@ abstract class AbstactItmCellDirective<I extends Itm = Itm> implements OnInit {
   column: ItmColumn;
 
   constructor(
-    private _viewContainerRef: ViewContainerRef,
     private _componentFactoryResolver: ComponentFactoryResolver,
-    private _injector: Injector
+    private _injector: Injector,
+    private _viewContainerRef: ViewContainerRef,
   ) { }
 
   ngOnInit() {

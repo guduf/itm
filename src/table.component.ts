@@ -8,17 +8,23 @@ import { ItmColumn, ItmColumnDef } from './column';
   selector: 'itm-table',
   templateUrl: './table.component.html'
 })
+/**
+ * Exported component to display ItmTable
+ */
 export class ItmTableComponent<I extends Itm = Itm> implements OnChanges {
   @Input()
-  /** The value is used as data source for MatTable. */
+  /** Data source for MatTable and provider for ItmHeaderCellComponent. */
   itemsChanges: ItmsChanges<I>;
 
-  columns: ItmColumnDef[];
-
-  displayedColumns: string[];
-
   @Input()
+  /** The table definition to configure the MatTable */
   table: ItmTable;
+
+  /** The columns transcluded to the MatTable */
+  columns: ItmColumn[];
+
+  /** The keys of the columns to display */
+  displayedColumns: string[];
 
   ngOnChanges({table: tableChanges}: SimpleChanges) {
     if (!tableChanges) return;
@@ -26,6 +32,5 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges {
       typeof def === 'string' ? {key: def} : def
     ));
     this.displayedColumns = this.columns.map(({key}) => key);
-    console.log(this);
   }
 }
