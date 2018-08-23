@@ -6,5 +6,5 @@ export function isConstructor(value: any): boolean {
 /** A class object declared as entry component. */
 export type CmpClass = any;
 
-/** A plain object used as data for ItmColumn. */
+/** A plain object used as data for ItmColumnDef. */
 export interface ItmColumnData { [key: string]: any; }

@@ -9,7 +9,7 @@ import {
   StaticProvider
 } from '@angular/core';
 
-import { ItmColumn } from './column';
+import { ItmColumnDef } from './column';
 import { ItmDefaultCellComponent } from './default-cell.component';
 import { ItmDefaultHeaderCellComponent } from './default-header-cell.component';
 import { Itm, ItmsChanges } from './itm';
@@ -18,7 +18,7 @@ import { CmpClass } from './utils';
 @Injectable()
 abstract class AbstactItmCellDirective<I extends Itm = Itm> implements OnInit {
   /** The column of the cell. */
-  column: ItmColumn;
+  column: ItmColumnDef;
 
   constructor(
     private _componentFactoryResolver: ComponentFactoryResolver,
@@ -28,7 +28,7 @@ abstract class AbstactItmCellDirective<I extends Itm = Itm> implements OnInit {
 
   ngOnInit() {
     const providers: StaticProvider[] = [
-      {provide: ItmColumn, useValue: this.column},
+      {provide: ItmColumnDef, useValue: this.column},
       ...this._loadProviders()
     ];
     const cmpClass: CmpClass = (
@@ -49,7 +49,7 @@ abstract class AbstactItmCellDirective<I extends Itm = Itm> implements OnInit {
 export class ItmCellDirective<I extends Itm = Itm> extends AbstactItmCellDirective {
   // tslint:disable-next-line:no-input-rename
   @Input('itmCell')
-  column: ItmColumn;
+  column: ItmColumnDef;
 
   @Input()
   /** The item of the cell. */
@@ -66,7 +66,7 @@ export class ItmCellDirective<I extends Itm = Itm> extends AbstactItmCellDirecti
 export class ItmHeaderCellDirective<I extends Itm = Itm> extends AbstactItmCellDirective<I> {
   // tslint:disable-next-line:no-input-rename
   @Input('itmHeaderCell')
-  column: ItmColumn;
+  column: ItmColumnDef;
 
   @Input()
   /** The items changes of the table. */

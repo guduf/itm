@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Observable, isObservable, of } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
-import { ItmColumn, ItmDefaultHeaderColumnData } from './column';
+import { ItmColumnDef, ItmDefaultHeaderColumnData } from './column';
 import { Itm, ItmsChanges } from './itm';
 
 @Component({
@@ -11,14 +11,14 @@ import { Itm, ItmsChanges } from './itm';
 })
 /**
  * Entry component created by HeaderCellDirective
- * when no component class is specified as header for the ItmColumn. */
+ * when no component class is specified as header for the ItmColumnDef. */
 export class ItmDefaultHeaderCellComponent<I extends Itm = Itm> {
   /** The heading changes to display. */
   headingChanges: Observable<string>;
 
   constructor(
     itemsChanges: ItmsChanges<I>,
-    column: ItmColumn<ItmDefaultHeaderColumnData<I>>
+    column: ItmColumnDef<ItmDefaultHeaderColumnData<I>>
   ) {
     this.headingChanges = itemsChanges.pipe(flatMap(items => {
       const res = column.data.setHeadingChanges(items);

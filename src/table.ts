@@ -1,10 +1,10 @@
 import { Itm } from './itm';
-import { ItmColumnDef } from './column';
+import { ItmColumnConfig } from './column-config';
 
 /** The ItmTableComponent is the lowest component used to display tables by this module. */
-export class ItmTable<I extends Itm = Itm> {
+export class ItmTableConfig<I extends Itm = Itm> {
   /** The columns displayed by the table. */
-  columns: (string | ItmColumnDef)[];
+  columns: (string | ItmColumnConfig)[];
 
   /** The anchor target attribute. */
   linkTarget?: 'self' | 'blank';

@@ -2,11 +2,9 @@
   <!-- Columns -->
   <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
     <th mat-header-cell *matHeaderCellDef>
-        <pre>{{column | json}}</pre>
       <ng-container [itmHeaderCell]="column" [itemsChanges]="itemsChanges"></ng-container>
     </th>
     <td mat-cell *matCellDef="let item">
-      <pre>{{item | json}}</pre>
       <ng-container [itmCell]="column" [item]="item"></ng-container>
     </td>
   </ng-container>

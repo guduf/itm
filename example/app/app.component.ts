@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ItmTable } from 'src/table';
+import { ItmTableConfig } from 'src/table';
 import { Itms } from 'src/itm';
 import { of } from 'rxjs';
 import { ItmsChanges, Itm } from '../../src/itm';
@@ -14,7 +14,7 @@ export class AppComponent {
 
   itemsChanges: ItmsChanges = of([{id: 42}]);
 
-  table: ItmTable = {
+  table: ItmTableConfig = {
     columns: [
       {
         key: 'id',

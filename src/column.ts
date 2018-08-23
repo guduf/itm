@@ -3,18 +3,18 @@ import { Observable } from 'rxjs';
 import { Itms, Itm } from './itm';
 import { CmpClass, isConstructor, ItmColumnData } from './utils';
 
-/** Data for the injected ItmColumn for ItmDefaultCellComponent. */
+/** Data for the injected ItmColumnDef for ItmDefaultCellComponent. */
 export interface ItmDefaultColumnData<I extends Itm = Itm> {
   setValueChanges: ((item: I) => (string | Observable<string>));
 }
 
-/** Data for the injected ItmColumn for ItmDefaultHeaderCellComponent. */
+/** Data for the injected ItmColumnDef for ItmDefaultHeaderCellComponent. */
 export interface ItmDefaultHeaderColumnData<I extends Itm = Itm> extends ItmColumnData {
   setHeadingChanges: ((items: Itms<I>) => (string | Observable<string>));
 }
 
-/** The definition of a column used by ItmTable. */
-export interface ItmColumnDef<D extends ItmColumnData = ItmColumnData> {
+/** The config of a column used to create ItmColumnDef. */
+export interface ItmColumnConfig<D extends ItmColumnData = ItmColumnData> {
   /** Used by MatTable but also as default value for the attr and the header. */
   key: string;
   /** Used by MatTable. */
@@ -47,7 +47,8 @@ export interface ItmColumnDef<D extends ItmColumnData = ItmColumnData> {
   data?: D;
 }
 
-export class ItmColumn<D extends ItmColumnData = ItmColumnData> implements ItmColumnDef<D> {
+/** The definition of a column used by ItmTableComponent */
+export class ItmColumnDef<D extends ItmColumnData = ItmColumnData> implements ItmColumnConfig<D> {
   key: string;
   sortable?: true;
   size: number;
@@ -56,13 +57,12 @@ export class ItmColumn<D extends ItmColumnData = ItmColumnData> implements ItmCo
   header: CmpClass;
   data: D;
 
-  constructor(def: ItmColumnDef) {
-    if (typeof def === 'string') def = {key: def};
-    if (!def.key) throw new TypeError('Missing key on ItmColumn');
-    this.key = def.key;
-    if (def.sortable) this.sortable = true;
-    this.size = def.size || 1;
-    this.grow = def.grow || 0;
+  constructor(def: ItmColumnConfig) {
+    if (def.key && typeof def.key === 'string') this.key = def.key;
+    else throw new TypeError('InvalidItmColumnConfig : Expected [key] as string for column config');
+    if (def.sortable === true) this.sortable = true;
+    this.size = (def.size && typeof def.size === 'number') ? def.size : 1;
+    this.grow = (def.grow && typeof def.grow === 'number') ? def.grow : 0;
     this.cell = isConstructor(def.cell) ? def.cell : null;
     if (!this.cell) {
       const setValueChanges: (item: Itm) => (string | Observable<string>) = (
