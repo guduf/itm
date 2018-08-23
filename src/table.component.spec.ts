@@ -1,22 +1,45 @@
-import { SimpleChange, ValueProvider } from '@angular/core';
+import { SimpleChange, ValueProvider, Directive, Input } from '@angular/core';
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { MatTableModule, MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 
-import { ItmCellDirectiveMock, ItmHeaderCellDirectiveMock } from './cell.directive.mock.spec';
+import { Itm, ItmsChanges } from './itm';
+import { ItmColumnDef } from './column';
 import { ItmTableConfig } from './table';
 import { ItmTableComponent } from './table.component';
+
+@Directive({selector: '[itmCell]'})
+// tslint:disable-next-line:directive-class-suffix
+export class ItmCellDirective<I extends Itm = Itm> {
+  // tslint:disable-next-line:no-input-rename
+  @Input('itmCell')
+  column: ItmColumnDef;
+
+  @Input()
+  item: Itm;
+}
+
+@Directive({selector: '[itmHeaderCell]'})
+// tslint:disable-next-line:directive-class-suffix
+export class ItmHeaderCellDirective<I extends Itm = Itm> {
+  // tslint:disable-next-line:no-input-rename
+  @Input('itmHeaderCell')
+  column: ItmColumnDef;
+
+  @Input()
+  itemsChanges: ItmsChanges<I>;
+}
 
 describe('ItmTableComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [MatTableModule],
       declarations: [
-        ItmCellDirectiveMock,
-        ItmHeaderCellDirectiveMock,
+        ItmCellDirective,
+        ItmHeaderCellDirective,
         ItmTableComponent
-      ],
+      ]
     }).compileComponents();
   }));
 
@@ -71,7 +94,7 @@ describe('ItmTableComponent', () => {
     const debugMatCell = debugElement.query(By.directive(MatCell));
     const providerToken = debugMatCell.childNodes[0].providerTokens[0];
     // tslint:disable-next-line:max-line-length
-    expect(providerToken).toBe(ItmCellDirectiveMock, 'Expected ItmCellDirectiveMock as provider token of the first node of the first MatCell');
+    expect(providerToken).toBe(ItmCellDirective, 'Expected ItmCellDirective as provider token of the first node of the first MatCell');
   }));
 
   // tslint:disable-next-line:max-line-length
@@ -80,7 +103,7 @@ describe('ItmTableComponent', () => {
     const debugMatHeaderCell = debugElement.query(By.directive(MatHeaderCell));
     const providerToken = debugMatHeaderCell.childNodes[0].providerTokens[0];
     // tslint:disable-next-line:max-line-length
-    expect(providerToken).toBe(ItmHeaderCellDirectiveMock, 'Expected ItmHeaderCellDirectiveMock as provider token of the first node of the first MatHeaderCell');
+    expect(providerToken).toBe(ItmHeaderCellDirective, 'Expected ItmHeaderCellDirective as provider token of the first node of the first MatHeaderCell');
   }));
 
   it('should remain columns untouched when itemChanges changes', async(() => {
@@ -91,14 +114,5 @@ describe('ItmTableComponent', () => {
     componentInstance.ngOnChanges({});
     fixture.detectChanges();
     expect(componentInstance.columns).toBe(columns, 'Expected instance column identical');
-  }));
-
-  // tslint:disable-next-line:max-line-length
-  it('should input column and itemChanges on HeaderCell', async(() => {
-    const {debugElement} = setupMinimalTableWithInputs();
-    const debugMatHeaderCell = debugElement.query(By.directive(MatHeaderCell));
-    const providerToken = debugMatHeaderCell.childNodes[0].providerTokens[0];
-    // tslint:disable-next-line:max-line-length
-    expect(providerToken).toBe(ItmHeaderCellDirectiveMock, 'Expected ItmHeaderCellDirectiveMock as provider token of the first node of the first MatHeaderCell');
   }));
 });
