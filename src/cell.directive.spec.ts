@@ -10,7 +10,7 @@ import { ItmConfig } from './itm-config';
 
 @Component({template: ''})
 export class ItmCellMockComponent {
-  constructor(public itm: Itm, public column: ItmColumnDef) { }
+  constructor(public item: Itm, public column: ItmColumnDef) { }
 }
 
 @Component({template: ''})
@@ -22,7 +22,7 @@ export class ItmCellDirectiveHotTestComponent {
   itmCellDirective: ItmCellDirective;
   readonly columnWithComp = new ItmColumnDef({key: 'id', cell: ItmCellMockComponent});
   readonly defaultColumn = new ItmColumnDef({key: 'id'});
-  readonly itm: Itm = {id: 42};
+  readonly item: Itm = {id: 42};
 }
 
 describe('ItmCellDirective', () => {
@@ -70,15 +70,21 @@ describe('ItmCellDirective', () => {
   }));
 
   it('should throw a error when initiated with missing inputs', async(() => {
-    const {componentInstance} = TestBed.createComponent(ItmCellDirectiveHotTestComponent);
-    const itmCellDir = componentInstance.itmCellDirective;
-    expect(() => itmCellDir.ngOnInit()).toThrowError(TypeError);
+    const fun = () => setup(
+      '<ng-container [itmCell]="null" [column]="null"></ng-container>'
+    );
+    expect(fun).toThrowError(TypeError);
   }));
 
-  it('should provide a Itm and a ItmColumnDef in cell component provider', async(() => {
+  it('should provide correct Itm and ItmColumnDef in cell component injector', async(() => {
     const {debugElement} = setup(
       '<ng-container [itmCell]="item" [column]="columnWithComp"></ng-container>'
     );
-    expect(debugElement.query(By.directive(ItmCellMockComponent))).toBeTruthy();
+    const debugCell = debugElement.query(By.directive(ItmCellMockComponent));
+    expect(debugCell).toBeTruthy();
+    const cellInstance: ItmCellMockComponent = debugCell.componentInstance;
+    const hostInstance: ItmCellDirectiveHotTestComponent = debugElement.componentInstance;
+    expect(cellInstance.column).toBe(hostInstance.columnWithComp);
+    expect(cellInstance.item).toBe(hostInstance.item);
   }));
 });
