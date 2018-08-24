@@ -5,13 +5,13 @@ import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/t
 import { of } from 'rxjs';
 
 import { ItmDefaultCellMockComponent } from './cell.directive.spec';
-import { ItmColumnDef } from './column';
+import { ItmColumnDef } from './column-def';
 import { ItmsChanges } from './itm';
 import { ItmConfig } from './itm-config';
 import { ItmHeaderCellDirective } from './header-cell.directive';
 
 @Component({
-  template: '<ng-container [itmHeaderCell]="column" [itemsChanges]="itemsChanges"></ng-container>'
+  template: '<ng-container [itmHeaderCell]="itemsChanges" [column]="column"></ng-container>'
 })
 export class ItmHeaderCellDirectiveHotTestComponent {
   @ViewChild(ItmHeaderCellDirective)

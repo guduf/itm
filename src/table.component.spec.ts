@@ -5,7 +5,7 @@ import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 
 import { Itm, ItmsChanges } from './itm';
-import { ItmColumnDef } from './column';
+import { ItmColumnDef } from './column-def';
 import { ItmTableConfig } from './table';
 import { ItmTableComponent } from './table.component';
 

@@ -1,10 +1,10 @@
-/** Checks if a object is a class object with constructor. */
-export function isConstructor(value: any): boolean {
-  return typeof value === 'function' && /^\s*class\s+/.test(value.toString());
+/** Checks if a class as been decorated with a component template. Only works with NG5+. */
+export function isComponentType(value: any): boolean {
+  try {
+    if (typeof value['__annotations__'][0].template !== 'string') throw new TypeError();
+  }
+  catch (err) { return false; }
+  return true;
 }
 
-/** A class object declared as entry component. */
-export type CmpClass = any;
-
-/** A plain object used as data for ItmColumnDef. */
-export interface ItmColumnData { [key: string]: any; }
+export interface ComponentType { new(...args: any[]); }

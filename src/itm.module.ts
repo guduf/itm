@@ -36,7 +36,7 @@ const DEFAULT_CONFIG: ItmConfig = {
 
 export const ITM_CONFIG = new InjectionToken('ITM_CONFIG');
 
-const configFactory = (config?: ItmConfig) => ({...DEFAULT_CONFIG, ...config});
+const configFactory = (config: ItmConfig = {}) => ({...DEFAULT_CONFIG, ...config});
 
 const PROVIDERS = [
   {provide: ItmConfig, deps: [[Optional(), ITM_CONFIG]], useFactory: configFactory}

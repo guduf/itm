@@ -1,7 +1,10 @@
 import { Observable } from 'rxjs';
 
 import { Itm, Itms } from './itm';
-import { ItmColumnData, CmpClass } from './utils';
+import { ComponentType } from './utils';
+
+/** A plain object used as data for ItmColumnDef. */
+export interface ItmColumnData { [key: string]: any; }
 
 /** The definition of a column used by ItmTableConfig. */
 export interface ItmColumnConfig<D extends ItmColumnData = ItmColumnData> {
@@ -19,7 +22,7 @@ export interface ItmColumnConfig<D extends ItmColumnData = ItmColumnData> {
    * In case of string, the value is used as the attribute for default cell. */
   cell?: (
     string |
-    CmpClass |
+    ComponentType |
     ((item: Itm) => (string | Observable<string>))
   );
   /**
@@ -29,7 +32,7 @@ export interface ItmColumnConfig<D extends ItmColumnData = ItmColumnData> {
    * In case of false, none header is displayed. */
   header?: (
     string |
-    CmpClass |
+    ComponentType |
     ((items: Itms) => (string | Observable<string>)) |
     false
   );

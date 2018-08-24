@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Observable, isObservable, of } from 'rxjs';
 
-import { ItmColumnDef, ItmDefaultColumnData } from './column';
+import { ItmColumnDef, ItmDefaultColumnData } from './column-def';
 import { Itm } from './itm';
 
 @Component({

@@ -2,7 +2,7 @@ import { Component, OnChanges, SimpleChanges, Input } from '@angular/core';
 
 import { Itm, ItmsChanges } from './itm';
 import { ItmTableConfig } from './table';
-import { ItmColumnDef } from './column';
+import { ItmColumnDef } from './column-def';
 
 @Component({
   selector: 'itm-table',

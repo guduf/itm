@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Observable, isObservable, of } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
-import { ItmColumnDef, ItmDefaultHeaderColumnData } from './column';
+import { ItmColumnDef, ItmDefaultHeaderColumnData } from './column-def';
 import { Itm, ItmsChanges } from './itm';
 
 @Component({
