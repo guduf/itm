@@ -1,40 +1,41 @@
 import { SimpleChange, ValueProvider, Directive, Input } from '@angular/core';
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
-import { MatTableModule, MatTable, MatCell, MatHeaderCell } from '@angular/material';
+import { MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 
 import { Itm, ItmsChanges } from './itm';
 import { ItmColumnDef } from './column-def';
-import { ItmTableConfig } from './table';
+import { ItmTableConfig } from './table-config';
 import { ItmTableComponent } from './table.component';
+import { ItmMaterialModule } from './material.module';
 
 @Directive({selector: '[itmCell]'})
 // tslint:disable-next-line:directive-class-suffix
 export class ItmCellDirective<I extends Itm = Itm> {
-  // tslint:disable-next-line:no-input-rename
-  @Input('itmCell')
+  @Input()
   column: ItmColumnDef;
 
-  @Input()
+  // tslint:disable-next-line:no-input-rename
+  @Input('itmCell')
   item: Itm;
 }
 
 @Directive({selector: '[itmHeaderCell]'})
 // tslint:disable-next-line:directive-class-suffix
 export class ItmHeaderCellDirective<I extends Itm = Itm> {
-  // tslint:disable-next-line:no-input-rename
-  @Input('itmHeaderCell')
+  @Input()
   column: ItmColumnDef;
 
-  @Input()
+  // tslint:disable-next-line:no-input-rename
+  @Input('itmHeaderCell')
   itemsChanges: ItmsChanges<I>;
 }
 
 describe('ItmTableComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [MatTableModule],
+      imports: [ItmMaterialModule],
       declarations: [
         ItmCellDirective,
         ItmHeaderCellDirective,
@@ -54,43 +55,50 @@ describe('ItmTableComponent', () => {
     expect(queryRes).toBeTruthy('expected element that have the MatTable directive');
   }));
 
-  function setupMinimalTableWithInputs(
-    ...providers: ValueProvider[]
+  function setupTable(
+    config: ItmTableConfig = {columns: ['id']},
+    itemsChanges: ItmsChanges = of([{id: 63}]),
+    providers: ValueProvider[] = []
   ): ComponentFixture<ItmTableComponent> {
     for (const provider of providers)
       TestBed.overrideProvider(provider.provide, {useValue: provider.useValue});
     const fixture = TestBed.createComponent(ItmTableComponent);
     const {componentInstance} = fixture;
-    const config: ItmTableConfig = {columns: ['id']};
-    const previousValue = componentInstance.table;
-    componentInstance.itemsChanges = of([{id: 42}]);
+    const {itemsChanges: previousItemsChanges, table: previousTable} = componentInstance;
+    componentInstance.itemsChanges = itemsChanges;
+    const itemChangesChanges: SimpleChange = {
+      previousValue: previousItemsChanges,
+      currentValue: componentInstance.itemsChanges,
+      firstChange: true,
+      isFirstChange : () => true
+    };
     componentInstance.table = config;
     const tableChange: SimpleChange = {
-      previousValue,
+      previousValue: previousTable,
       currentValue: componentInstance.table,
       firstChange: true,
       isFirstChange : () => true
     };
-    componentInstance.ngOnChanges({table: tableChange});
+    componentInstance.ngOnChanges({table: tableChange, itemChanges: itemChangesChanges});
     fixture.detectChanges();
     return fixture;
   }
 
   it('should display a MatCell with valid table config', async(() => {
-    const {debugElement} = setupMinimalTableWithInputs();
+    const {debugElement} = setupTable();
     const debugMatCell = debugElement.query(By.directive(MatCell));
     expect(debugMatCell).toBeTruthy('Expected MatCell directive');
   }));
 
   it('should display a MatHeaderCell with valid table config', async(() => {
-    const {debugElement} = setupMinimalTableWithInputs();
+    const {debugElement} = setupTable();
     const debugMatHeaderCell = debugElement.query(By.directive(MatHeaderCell));
     expect(debugMatHeaderCell).toBeTruthy('Expected MatHeaderCell directive');
   }));
 
   // tslint:disable-next-line:max-line-length
   it('should display a ItmCellDirective with valid table config', async(() => {
-    const {debugElement} = setupMinimalTableWithInputs();
+    const {debugElement} = setupTable();
     const debugMatCell = debugElement.query(By.directive(MatCell));
     const providerToken = debugMatCell.childNodes[0].providerTokens[0];
     // tslint:disable-next-line:max-line-length
@@ -99,7 +107,7 @@ describe('ItmTableComponent', () => {
 
   // tslint:disable-next-line:max-line-length
   it('should display a ItmHeaderCellDirective with valid table config', async(() => {
-    const {debugElement} = setupMinimalTableWithInputs();
+    const {debugElement} = setupTable();
     const debugMatHeaderCell = debugElement.query(By.directive(MatHeaderCell));
     const providerToken = debugMatHeaderCell.childNodes[0].providerTokens[0];
     // tslint:disable-next-line:max-line-length
@@ -107,7 +115,17 @@ describe('ItmTableComponent', () => {
   }));
 
   it('should remain columns untouched when itemChanges changes', async(() => {
-    const fixture = setupMinimalTableWithInputs();
+    const fixture = setupTable();
+    const {componentInstance} = fixture;
+    const {columns} = componentInstance;
+    componentInstance.itemsChanges = of([]);
+    componentInstance.ngOnChanges({});
+    fixture.detectChanges();
+    expect(componentInstance.columns).toBe(columns, 'Expected instance column identical');
+  }));
+
+  it('should remain columns untouched when itemChanges changes', async(() => {
+    const fixture = setupTable();
     const {componentInstance} = fixture;
     const {columns} = componentInstance;
     componentInstance.itemsChanges = of([]);

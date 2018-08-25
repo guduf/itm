@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { NgModule, InjectionToken, Optional } from '@angular/core';
-import { MatTableModule } from '@angular/material';
 
 import { ItmCellDirective } from './cell.directive';
 import { ItmDefaultCellComponent } from './default-cell.component';
@@ -8,10 +7,11 @@ import { ItmDefaultHeaderCellComponent } from './default-header-cell.component';
 import { ItmHeaderCellDirective } from './header-cell.directive';
 import { ItmConfig } from './itm-config';
 import { ItmTableComponent } from './table.component';
+import { ItmMaterialModule } from './material.module';
 
 const IMPORTS = [
   CommonModule,
-  MatTableModule
+  ItmMaterialModule
 ];
 
 const ENTRY_COMPONENTS = [
@@ -39,7 +39,7 @@ export const ITM_CONFIG = new InjectionToken('ITM_CONFIG');
 const configFactory = (config: ItmConfig = {}) => ({...DEFAULT_CONFIG, ...config});
 
 const PROVIDERS = [
-  {provide: ItmConfig, deps: [[Optional(), ITM_CONFIG]], useFactory: configFactory}
+  {provide: ItmConfig, deps: [[new Optional(), ITM_CONFIG]], useFactory: configFactory}
 ];
 
 @NgModule({
