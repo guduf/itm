@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 export abstract class Itm {
   /** The primary key of the item. */
   id: string | number;
+
+  [key: string]: any;
 }
 
 /** Represents a array of generic items. */

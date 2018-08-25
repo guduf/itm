@@ -21,7 +21,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   @Input()
   /** The table definition to configure the MatTable */
-  table: ItmTableConfig;
+  table: ItmTableConfig<I>;
 
   @Input()
   /** The color of the material components inside the table */
@@ -36,6 +36,9 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   /** The keys of the columns to display */
   displayedColumns: string[];
+
+  /** The selection of items in its current state */
+  get selection(): Set<I> { return this._selectionSub.value; }
 
   /** The boolean or function to determine if the selection column is displayed */
   private _canSelect: boolean | ((item: I) => (boolean | Observable<boolean>));

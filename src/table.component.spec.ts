@@ -4,11 +4,12 @@ import { MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 
-import { Itm, ItmsChanges } from './itm';
+import { Itm, ItmsChanges, Itms } from './itm';
 import { ItmColumnDef } from './column-def';
 import { ItmTableConfig } from './table-config';
 import { ItmTableComponent } from './table.component';
 import { ItmMaterialModule } from './material.module';
+import { click } from './helpers.spec';
 
 @Directive({selector: '[itmCell]'})
 // tslint:disable-next-line:directive-class-suffix
@@ -55,14 +56,14 @@ describe('ItmTableComponent', () => {
     expect(queryRes).toBeTruthy('expected element that have the MatTable directive');
   }));
 
-  function setupTable(
-    config: ItmTableConfig = {columns: ['id']},
-    itemsChanges: ItmsChanges = of([{id: 63}]),
+  function setupTable<I extends Itm = Itm>(
+    config: ItmTableConfig<I> = {columns: ['id']},
+    itemsChanges: ItmsChanges<I> = of([{id: 63} as I]),
     providers: ValueProvider[] = []
-  ): ComponentFixture<ItmTableComponent> {
+  ): ComponentFixture<ItmTableComponent<I>> {
     for (const provider of providers)
       TestBed.overrideProvider(provider.provide, {useValue: provider.useValue});
-    const fixture = TestBed.createComponent(ItmTableComponent);
+    const fixture = TestBed.createComponent<ItmTableComponent<I>>(ItmTableComponent);
     const {componentInstance} = fixture;
     const {itemsChanges: previousItemsChanges, table: previousTable} = componentInstance;
     componentInstance.itemsChanges = itemsChanges;
@@ -130,7 +131,43 @@ describe('ItmTableComponent', () => {
     const {columns} = componentInstance;
     componentInstance.itemsChanges = of([]);
     componentInstance.ngOnChanges({});
-    fixture.detectChanges();
     expect(componentInstance.columns).toBe(columns, 'Expected instance column identical');
+  }));
+
+  it('should show the selection column as first if the canSelect is true', async(() => {
+    const fixture = setupTable({columns: ['id'], canSelect: true});
+    const debugMatCell = fixture.debugElement.query(By.directive(MatCell));
+    const matCellElem: HTMLTableCellElement = debugMatCell.nativeElement;
+    expect(matCellElem.classList.contains('mat-column-itm-selection')).toBeTruthy();
+    expect(debugMatCell.query(By.css('button'))).toBeTruthy();
+  }));
+
+  it('should toggle the item selection when clicking on the right selection button', async(() => {
+    const data: Itms = [{id: 63}];
+    const fixture = setupTable({columns: ['id'], canSelect: true}, of(data));
+    const debugSelectionButton = fixture.debugElement
+      .query(By.directive(MatCell))
+      .query(By.css('button'));
+    expect(fixture.componentInstance.selection.size).toBe(0);
+    click(debugSelectionButton);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.selection.size).toBe(1);
+    expect(fixture.componentInstance.selection.has(data[0])).toBe(true);
+    click(debugSelectionButton);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.selection.size).toBe(0);
+  }));
+
+  it('should not create the selection button if the item is not selectable', async(() => {
+    const fixture = setupTable<{ id: number; isSelectable: boolean; }>(
+      {columns: ['isSelectable'], canSelect: itm => itm.isSelectable},
+      of([
+        {id: 63, isSelectable: true},
+        {id: 64, isSelectable: false}
+      ])
+    );
+    const debugMatCells = fixture.debugElement.queryAll(By.directive(MatCell));
+    expect(debugMatCells[0].query(By.css('button'))).toBeTruthy();
+    expect(debugMatCells[1].query(By.css('button'))).toBeFalsy();
   }));
 });
