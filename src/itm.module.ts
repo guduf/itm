@@ -5,7 +5,7 @@ import { ItmCellDirective } from './cell.directive';
 import { ItmDefaultCellComponent } from './default-cell.component';
 import { ItmDefaultHeaderCellComponent } from './default-header-cell.component';
 import { ItmHeaderCellDirective } from './header-cell.directive';
-import { ItmConfig } from './itm-config';
+import { ItmConfig } from './config';
 import { ItmTableComponent } from './table.component';
 import { ItmMaterialModule } from './material.module';
 
@@ -29,9 +29,11 @@ const EXPORTED_DECLARATIONS = [
   ItmTableComponent
 ];
 
-const DEFAULT_CONFIG: ItmConfig = {
+export const DEFAULT_CONFIG: ItmConfig = {
   defaultCellComp: ItmDefaultCellComponent,
-  defaultHeaderCellComp: ItmDefaultHeaderCellComponent
+  defaultHeaderCellComp: ItmDefaultHeaderCellComponent,
+  selectedRowIcon: 'check_box',
+  unselectedRowIcon: 'check_box_outline_blank'
 };
 
 export const ITM_CONFIG = new InjectionToken('ITM_CONFIG');

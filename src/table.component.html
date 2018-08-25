@@ -9,7 +9,7 @@
         mat-icon-button [color]="color"
         (click)="toggleItemSelection(item)">
         <mat-icon>
-          {{isSelected(item) ? 'check_box' : 'check_box_outline_blank'}}
+          {{isSelected(item) ? config.selectedRowIcon : config.unselectedRowIcon}}
         </mat-icon>
       </button>
     </td>

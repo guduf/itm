@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 
 import { ItmColumnDef } from './column-def';
-import { ItmConfig } from './itm-config';
+import { ItmConfig } from './config';
 import { ComponentType } from './utils';
 
 @Injectable()

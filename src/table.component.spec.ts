@@ -10,6 +10,8 @@ import { ItmTableConfig } from './table-config';
 import { ItmTableComponent } from './table.component';
 import { ItmMaterialModule } from './material.module';
 import { click } from './helpers.spec';
+import { ItmConfig } from './config';
+import { DEFAULT_CONFIG } from './itm.module';
 
 @Directive({selector: '[itmCell]'})
 // tslint:disable-next-line:directive-class-suffix
@@ -36,11 +38,16 @@ export class ItmHeaderCellDirective<I extends Itm = Itm> {
 describe('ItmTableComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [ItmMaterialModule],
+      imports: [
+        ItmMaterialModule
+      ],
       declarations: [
         ItmCellDirective,
         ItmHeaderCellDirective,
         ItmTableComponent
+      ],
+      providers: [
+        {provide: ItmConfig, useValue: DEFAULT_CONFIG}
       ]
     }).compileComponents();
   }));
@@ -142,7 +149,7 @@ describe('ItmTableComponent', () => {
     expect(debugMatCell.query(By.css('button'))).toBeTruthy();
   }));
 
-  it('should toggle the item selection when clicking on the right selection button', async(() => {
+  it('should toggle the item selection when clicking on the selection button', async(() => {
     const data: Itms = [{id: 63}];
     const fixture = setupTable({columns: ['id'], canSelect: true}, of(data));
     const debugSelectionButton = fixture.debugElement
@@ -169,5 +176,24 @@ describe('ItmTableComponent', () => {
     const debugMatCells = fixture.debugElement.queryAll(By.directive(MatCell));
     expect(debugMatCells[0].query(By.css('button'))).toBeTruthy();
     expect(debugMatCells[1].query(By.css('button'))).toBeFalsy();
+  }));
+
+  it('should toggle the icon and the row class when selection changes', async(() => {
+    const fixture = setupTable({columns: ['id'], canSelect: true});
+    const debugMatCell = fixture.debugElement.query(By.directive(MatCell));
+    const matCellElem: HTMLTableCellElement = debugMatCell.nativeElement;
+    const debugButton = debugMatCell.query(By.css('button'));
+    const buttonElem: HTMLButtonElement = debugButton.nativeElement;
+    const config = fixture.debugElement.injector.get(ItmConfig);
+    expect(matCellElem.classList.contains('itm-selected')).toBe(false);
+    expect(buttonElem.textContent).toContain(config.unselectedRowIcon);
+    click(debugButton);
+    fixture.detectChanges();
+    expect(matCellElem.classList.contains('itm-selected')).toBe(true);
+    expect(buttonElem.textContent).toContain(config.selectedRowIcon);
+    click(debugButton);
+    fixture.detectChanges();
+    expect(matCellElem.classList.contains('itm-selected')).toBe(false);
+    expect(buttonElem.textContent).toContain(config.unselectedRowIcon);
   }));
 });

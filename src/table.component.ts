@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { ItmColumnDef } from './column-def';
 import { Itm, Itms, ItmsChanges } from './itm';
 import { ItmTableConfig } from './table-config';
+import { ItmConfig } from './config';
 
 @Component({
   selector: 'itm-table',
@@ -53,6 +54,8 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   private _selectionSubscr = this._selectionSub.subscribe(
     selection => this.selectionChanges.next(Array.from(selection))
   );
+
+  constructor(readonly config: ItmConfig) { }
 
   ngOnChanges({table: tableChanges}: SimpleChanges) {
     if (!tableChanges) return;

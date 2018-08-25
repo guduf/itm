@@ -7,7 +7,7 @@ import { of } from 'rxjs';
 import { ItmDefaultCellMockComponent } from './cell.directive.spec';
 import { ItmColumnDef } from './column-def';
 import { ItmsChanges } from './itm';
-import { ItmConfig } from './itm-config';
+import { ItmConfig } from './config';
 import { ItmHeaderCellDirective } from './header-cell.directive';
 
 @Component({
