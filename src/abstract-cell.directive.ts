@@ -29,7 +29,11 @@ export abstract class AbstractItmCellDirective implements OnInit {
   /** Create the component in the MatTableCell */
   protected _createCellComponent(component: ComponentType, providers: StaticProvider[] = []): void {
     if (!(this.column instanceof ItmColumnDef)) throw new TypeError('Expected column input');
-    providers = [...providers, {provide: ItmColumnDef, useValue: this.column}];
+    providers = [
+      {provide: ItmColumnDef, useValue: this.column},
+      this.column.providers,
+      ...providers
+    ];
     const injector = Injector.create(providers, this._injector);
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory(component);
     this._viewContainerRef.clear();

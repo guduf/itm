@@ -1,34 +1,24 @@
-import { Component, HostBinding } from '@angular/core';
-import { Observable, isObservable, of } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
-
-import { ItmColumnDef, ItmDefaultHeaderColumnData } from './column-def';
-import { Itm, ItmsChanges } from './item';
+import { Component, HostBinding, Inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ITM_DEFAULT_HEADER_CELL_VALUE_CHANGES } from './column-def';
 
 const SELECTOR = 'itm-default-header-cell';
 
 @Component({
   selector: SELECTOR,
-  template: `{{headingChanges | async}}`
+  template: `{{valueChanges | async}}`
 })
 /**
- * Entry component created by HeaderCellDirective
- * when no component class is specified as header for the ItmColumnDef. */
-export class ItmDefaultHeaderCellComponent<I extends Itm = Itm> {
-  /** The heading changes to display. */
-  headingChanges: Observable<string>;
-
+ * Entry component created by ItmHeaderCellDirective
+ * when no component class is specified as cell for the ItmColumnDef. */
+export class ItmDefaultHeaderCellComponent {
   @HostBinding('class')
   /** The css class attached to the host */
   get hostClass() { return SELECTOR; }
 
   constructor(
-    itemsChanges: ItmsChanges<I>,
-    column: ItmColumnDef<ItmDefaultHeaderColumnData<I>>
-  ) {
-    this.headingChanges = itemsChanges.pipe(flatMap(items => {
-      const res = column.data.setHeadingChanges(items);
-      return isObservable(res) ? res : of(res);
-    }));
-  }
+    @Inject(ITM_DEFAULT_HEADER_CELL_VALUE_CHANGES)
+    /** The value changes to display. */
+    public valueChanges: Observable<string>
+  ) { }
 }

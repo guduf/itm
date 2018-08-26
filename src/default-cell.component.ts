@@ -1,8 +1,7 @@
-import { Component, HostBinding } from '@angular/core';
-import { Observable, isObservable, of } from 'rxjs';
+import { Component, HostBinding, Inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
-import { ItmColumnDef, ItmDefaultColumnData } from './column-def';
-import { Itm } from './item';
+import { ITM_DEFAULT_CELL_VALUE_CHANGES } from './column-def';
 
 const SELECTOR = 'itm-default-cell';
 
@@ -18,14 +17,9 @@ export class ItmDefaultCellComponent {
   /** The css class attached to the host */
   get hostClass() { return SELECTOR; }
 
-  /** The value changes to display. */
-  valueChanges: Observable<string>;
-
   constructor(
-    item: Itm,
-    column: ItmColumnDef<ItmDefaultColumnData>
-  ) {
-    const res = column.data.setValueChanges(item);
-    this.valueChanges = isObservable(res) ? res : of(res);
-  }
+    @Inject(ITM_DEFAULT_CELL_VALUE_CHANGES)
+    /** The value changes to display. */
+    public valueChanges: Observable<string>
+  ) { }
 }

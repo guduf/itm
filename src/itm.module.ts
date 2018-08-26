@@ -8,6 +8,7 @@ import { ItmHeaderCellDirective } from './header-cell.directive';
 import { ItmConfig } from './config';
 import { ItmTableComponent } from './table.component';
 import { ItmMaterialModule } from './material.module';
+import { ItmDefaultActionsCellComponent } from './default-actions-cell.component';
 
 const IMPORTS = [
   CommonModule,
@@ -22,7 +23,8 @@ const ENTRY_COMPONENTS = [
 const DECLARATIONS = [
   ItmCellDirective,
   ItmDefaultCellComponent,
-  ItmHeaderCellDirective
+  ItmHeaderCellDirective,
+  ItmDefaultActionsCellComponent
 ];
 
 const EXPORTED_DECLARATIONS = [

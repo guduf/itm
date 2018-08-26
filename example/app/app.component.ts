@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { Itms, ItmsSource } from 'src/itm';
+import { Itms, ItmsSource } from 'src/item';
 import { ItmTableConfig } from 'src/table-config';
 
 @Component({
@@ -19,7 +19,10 @@ export class AppComponent {
     columns: [
       {
         key: 'id',
-        header: (items: Itms) => `${items.length} item${items.length > 1 ? 's' : ''}`
+        header: (items: Itms) => {
+          console.log(items);
+          return `${items.length} item${items.length > 1 ? 's' : ''}`;
+        }
       },
     ],
     canSelect: true,

@@ -18,6 +18,12 @@
       </button>
     </td>
   </ng-container>
+  <!-- Selection -->
+  <ng-container matColumnDef="itm-actions">
+    <th *matHeaderCellDef mat-header-cell></th>
+    <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell">
+    </td>
+  </ng-container>
 
   <!-- Columns -->
   <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">

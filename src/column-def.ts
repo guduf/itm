@@ -1,28 +1,29 @@
-import { Observable } from 'rxjs';
+import { StaticProvider, InjectionToken } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { flatMap } from 'rxjs/operators';
 
-import { Itms, Itm } from './item';
-import { ItmColumnData, ItmColumnConfig } from './column-config';
+import { ItmColumnConfig } from './column-config';
+import { Itm, ItmValuePipe, deferValuePipe, ItmsValuePipe, ItmsChanges } from './item';
 import { ComponentType, isComponentType } from './utils';
 
-/** Data for the injected ItmColumnDef for ItmDefaultCellComponent. */
-export interface ItmDefaultColumnData<I extends Itm = Itm> {
-  setValueChanges: ((item: I) => (string | Observable<string>));
-}
+export const ITM_DEFAULT_CELL_VALUE_CHANGES = new InjectionToken('ITM_DEFAULT_CELL_VALUE_CHANGES');
 
-/** Data for the injected ItmColumnDef for ItmDefaultHeaderCellComponent. */
-export interface ItmDefaultHeaderColumnData<I extends Itm = Itm> extends ItmColumnData {
-  setHeadingChanges: ((items: Itms<I>) => (string | Observable<string>));
-}
+export const ITM_DEFAULT_HEADER_CELL_VALUE_CHANGES = (
+  new InjectionToken('ITM_DEFAULT_HEADER_CELL_VALUE_CHANGES')
+);
 
 /** The definition of a column used by ItmTableComponent */
-export class ItmColumnDef<D extends ItmColumnData = ItmColumnData> implements ItmColumnConfig<D> {
+export class ItmColumnDef implements ItmColumnConfig {
   readonly key: string;
   readonly sortable?: true;
   readonly size: number;
   readonly grow: number;
   readonly cell: ComponentType;
   readonly header: ComponentType;
-  readonly data: D;
+
+  readonly noCell: boolean;
+  readonly noHeaderCell: boolean;
+  readonly providers: StaticProvider[] = [];
 
   constructor(cfg: ItmColumnConfig) {
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
@@ -31,26 +32,35 @@ export class ItmColumnDef<D extends ItmColumnData = ItmColumnData> implements It
     this.size = (cfg.size && typeof cfg.size === 'number') ? cfg.size : 1;
     this.grow = (cfg.grow && typeof cfg.grow === 'number') ? cfg.grow : 0;
     this.cell = isComponentType(cfg.cell) ? cfg.cell as ComponentType : null;
-    if (!this.cell) {
-      const setValueChanges: (item: Itm) => (string | Observable<string>) = (
-        typeof cfg.cell === 'function' ? cfg.cell as (item: Itm) => (string | Observable<string>) :
-        typeof cfg.cell === 'string' ? itm => itm[cfg.cell as string] :
-          itm => itm[this.key]
+    if (!this.cell && cfg.cell === false) this.noCell = true;
+    else if (!this.cell) {
+      const cellValuePipe: ItmValuePipe<string> = (
+        !cfg.cell ? item => of(item[this.key]) :
+        typeof cfg.cell === 'string' ? item => of(item[cfg.cell as string]) :
+          deferValuePipe(cfg.cell as ItmValuePipe<string>)
       );
-      // WORKAROUND remove any type
-      (this.data as any) = {...(this.data as any), setValueChanges} as ItmDefaultColumnData;
+      this.providers.push({
+        provide: ITM_DEFAULT_CELL_VALUE_CHANGES,
+        deps: [Itm],
+        useFactory: cellValuePipe
+      });
     }
     this.header = isComponentType(cfg.header) ? cfg.header as ComponentType : null;
-    if (!this.header) {
-      const setHeadingChanges: (items: Itms) => (string | Observable<string>) = (
-        (cfg.header as false) === false ? null :
-        // tslint:disable-next-line:max-line-length
-        typeof cfg.header === 'function' ? cfg.header as (items: Itms) => (string | Observable<string>) :
-        typeof cfg.header === 'string' ? () => cfg.header as string :
-          () => this.key
+    if (!this.header && cfg.header === false) this.noHeaderCell = true;
+    else if (!this.header) {
+      const headerCellValuePipe: (itemsChanges: ItmsChanges) => Observable<string> = (
+        typeof cfg.header === 'string' ? () => of(cfg.header as string) :
+        typeof cfg.header === 'function' ?
+          itemChanges => itemChanges.pipe(
+            flatMap(items => deferValuePipe(cfg.header as ItmsValuePipe<string>)(items))
+          ) :
+          () => of(this.key)
       );
-      // WORKAROUND remove any type
-      (this.data as any) = {...(this.data as any), setHeadingChanges} as ItmDefaultHeaderColumnData;
+      this.providers.push({
+        provide: ITM_DEFAULT_HEADER_CELL_VALUE_CHANGES,
+        deps: [ItmsChanges],
+        useFactory: headerCellValuePipe
+      });
     }
   }
 }
