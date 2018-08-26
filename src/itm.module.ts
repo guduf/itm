@@ -32,8 +32,9 @@ const EXPORTED_DECLARATIONS = [
 export const DEFAULT_CONFIG: ItmConfig = {
   defaultCellComp: ItmDefaultCellComponent,
   defaultHeaderCellComp: ItmDefaultHeaderCellComponent,
-  selectedRowIcon: 'check_box',
-  unselectedRowIcon: 'check_box_outline_blank'
+  selectedCheckBoxIcon: 'check_box',
+  unselectedCheckBoxIcon: 'check_box_outline_blank',
+  indeterminateCheckBoxIcon: 'indeterminate_check_box'
 };
 
 export const ITM_CONFIG = new InjectionToken('ITM_CONFIG');

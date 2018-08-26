@@ -16,13 +16,13 @@ export interface ItmDefaultHeaderColumnData<I extends Itm = Itm> extends ItmColu
 
 /** The definition of a column used by ItmTableComponent */
 export class ItmColumnDef<D extends ItmColumnData = ItmColumnData> implements ItmColumnConfig<D> {
-  key: string;
-  sortable?: true;
-  size: number;
-  grow: number;
-  cell: ComponentType;
-  header: ComponentType;
-  data: D;
+  readonly key: string;
+  readonly sortable?: true;
+  readonly size: number;
+  readonly grow: number;
+  readonly cell: ComponentType;
+  readonly header: ComponentType;
+  readonly data: D;
 
   constructor(cfg: ItmColumnConfig) {
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;

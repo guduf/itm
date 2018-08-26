@@ -1,0 +1,9 @@
+@import './default-cell.component';
+
+@mixin itm-core($config: null) {
+  @if $config == null {
+    $config: mat-typography-config();
+  }
+
+  @include itm-default-cell($config);
+}

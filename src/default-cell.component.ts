@@ -1,17 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { Observable, isObservable, of } from 'rxjs';
 
 import { ItmColumnDef, ItmDefaultColumnData } from './column-def';
 import { Itm } from './itm';
 
+const SELECTOR = 'itm-default-cell';
+
 @Component({
-  selector: 'itm-default-cell',
-  template: '{{valueChanges | async}}'
+  selector: SELECTOR,
+  template: `{{valueChanges | async}}`
 })
 /**
  * Entry component created by CellDirective
  * when no component class is specified as cell for the ItmColumnDef. */
 export class ItmDefaultCellComponent {
+  @HostBinding('class')
+  /** The css class attached to the host */
+  get hostClass() { return SELECTOR; }
+
   /** The value changes to display. */
   valueChanges: Observable<string>;
 

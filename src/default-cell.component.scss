@@ -1,0 +1,8 @@
+@mixin itm-default-cell($config) {
+  .itm-default-cell {
+    @extend .mat-body-1;
+
+    display: inline-block;
+    min-height: mat-line-height($config, body-1) * 2;
+  }
+}

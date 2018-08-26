@@ -13,3 +13,6 @@ export abstract class Itms<I extends Itm = Itm> extends Array<I> { }
 
 /** Represents a observable of a array of generic items. */
 export abstract class ItmsChanges<I extends Itm = Itm> extends Observable<I[]> { }
+
+/** Represents a observable or a value of a array of generic items. */
+export type ItmsSource<I extends Itm = Itm> = Itms<I> | ItmsChanges<I>;

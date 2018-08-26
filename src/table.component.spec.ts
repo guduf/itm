@@ -1,15 +1,16 @@
-import { SimpleChange, ValueProvider, Directive, Input } from '@angular/core';
+// tslint:disable:max-line-length
+import { ValueProvider, Directive, Input } from '@angular/core';
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
-import { of } from 'rxjs';
+import { of, BehaviorSubject } from 'rxjs';
 
-import { Itm, ItmsChanges, Itms } from './itm';
+import { Itm, ItmsChanges, Itms, ItmsSource } from './itm';
 import { ItmColumnDef } from './column-def';
 import { ItmTableConfig } from './table-config';
 import { ItmTableComponent } from './table.component';
 import { ItmMaterialModule } from './material.module';
-import { click } from './helpers.spec';
+import { click, changeInputs } from './helpers.spec';
 import { ItmConfig } from './config';
 import { DEFAULT_CONFIG } from './itm.module';
 
@@ -64,31 +65,14 @@ describe('ItmTableComponent', () => {
   }));
 
   function setupTable<I extends Itm = Itm>(
-    config: ItmTableConfig<I> = {columns: ['id']},
-    itemsChanges: ItmsChanges<I> = of([{id: 63} as I]),
+    table: ItmTableConfig<I> = {columns: ['id']},
+    itemsSource: ItmsSource<I> = [{id: 63} as I],
     providers: ValueProvider[] = []
   ): ComponentFixture<ItmTableComponent<I>> {
     for (const provider of providers)
       TestBed.overrideProvider(provider.provide, {useValue: provider.useValue});
     const fixture = TestBed.createComponent<ItmTableComponent<I>>(ItmTableComponent);
-    const {componentInstance} = fixture;
-    const {itemsChanges: previousItemsChanges, table: previousTable} = componentInstance;
-    componentInstance.itemsChanges = itemsChanges;
-    const itemChangesChanges: SimpleChange = {
-      previousValue: previousItemsChanges,
-      currentValue: componentInstance.itemsChanges,
-      firstChange: true,
-      isFirstChange : () => true
-    };
-    componentInstance.table = config;
-    const tableChange: SimpleChange = {
-      previousValue: previousTable,
-      currentValue: componentInstance.table,
-      firstChange: true,
-      isFirstChange : () => true
-    };
-    componentInstance.ngOnChanges({table: tableChange, itemChanges: itemChangesChanges});
-    fixture.detectChanges();
+    changeInputs(fixture, {itemsSource, table});
     return fixture;
   }
 
@@ -109,7 +93,6 @@ describe('ItmTableComponent', () => {
     const {debugElement} = setupTable();
     const debugMatCell = debugElement.query(By.directive(MatCell));
     const providerToken = debugMatCell.childNodes[0].providerTokens[0];
-    // tslint:disable-next-line:max-line-length
     expect(providerToken).toBe(ItmCellDirective, 'Expected ItmCellDirective as provider token of the first node of the first MatCell');
   }));
 
@@ -118,7 +101,6 @@ describe('ItmTableComponent', () => {
     const {debugElement} = setupTable();
     const debugMatHeaderCell = debugElement.query(By.directive(MatHeaderCell));
     const providerToken = debugMatHeaderCell.childNodes[0].providerTokens[0];
-    // tslint:disable-next-line:max-line-length
     expect(providerToken).toBe(ItmHeaderCellDirective, 'Expected ItmHeaderCellDirective as provider token of the first node of the first MatHeaderCell');
   }));
 
@@ -126,7 +108,7 @@ describe('ItmTableComponent', () => {
     const fixture = setupTable();
     const {componentInstance} = fixture;
     const {columns} = componentInstance;
-    componentInstance.itemsChanges = of([]);
+    componentInstance.itemsSource = [];
     componentInstance.ngOnChanges({});
     fixture.detectChanges();
     expect(componentInstance.columns).toBe(columns, 'Expected instance column identical');
@@ -136,22 +118,29 @@ describe('ItmTableComponent', () => {
     const fixture = setupTable();
     const {componentInstance} = fixture;
     const {columns} = componentInstance;
-    componentInstance.itemsChanges = of([]);
+    componentInstance.itemsSource = [];
     componentInstance.ngOnChanges({});
     expect(componentInstance.columns).toBe(columns, 'Expected instance column identical');
   }));
 
-  it('should show the selection column as first if the canSelect is true', async(() => {
+  it('should show the selection column as first when canSelect is true', async(() => {
     const fixture = setupTable({columns: ['id'], canSelect: true});
     const debugMatCell = fixture.debugElement.query(By.directive(MatCell));
     const matCellElem: HTMLTableCellElement = debugMatCell.nativeElement;
-    expect(matCellElem.classList.contains('mat-column-itm-selection')).toBeTruthy();
+    expect(matCellElem.classList.contains('itm-selection-cell')).toBeTruthy();
     expect(debugMatCell.query(By.css('button'))).toBeTruthy();
   }));
 
+  it('should hide the selection column if the canSelect is false', async(() => {
+    const fixture = setupTable({columns: ['id'], canSelect: false});
+    const debugMatCell = fixture.debugElement.query(By.directive(MatCell));
+    const matCellElem: HTMLTableCellElement = debugMatCell.nativeElement;
+    expect(matCellElem.classList.contains('itm-selection-cell')).toBeFalsy();
+  }));
+
   it('should toggle the item selection when clicking on the selection button', async(() => {
-    const data: Itms = [{id: 63}];
-    const fixture = setupTable({columns: ['id'], canSelect: true}, of(data));
+    const itemSource: Itms = [{id: 63}];
+    const fixture = setupTable({columns: ['id'], canSelect: true}, itemSource);
     const debugSelectionButton = fixture.debugElement
       .query(By.directive(MatCell))
       .query(By.css('button'));
@@ -159,13 +148,13 @@ describe('ItmTableComponent', () => {
     click(debugSelectionButton);
     fixture.detectChanges();
     expect(fixture.componentInstance.selection.size).toBe(1);
-    expect(fixture.componentInstance.selection.has(data[0])).toBe(true);
+    expect(fixture.componentInstance.selection.has(itemSource[0])).toBe(true);
     click(debugSelectionButton);
     fixture.detectChanges();
     expect(fixture.componentInstance.selection.size).toBe(0);
   }));
 
-  it('should not create the selection button if the item is not selectable', async(() => {
+  it('should not disable the selection button if the item is not selectable', async(() => {
     const fixture = setupTable<{ id: number; isSelectable: boolean; }>(
       {columns: ['isSelectable'], canSelect: itm => itm.isSelectable},
       of([
@@ -178,22 +167,63 @@ describe('ItmTableComponent', () => {
     expect(debugMatCells[1].query(By.css('button'))).toBeFalsy();
   }));
 
-  it('should toggle the icon and the row class when selection changes', async(() => {
-    const fixture = setupTable({columns: ['id'], canSelect: true});
+  it('should toggle selection and icon on button click', async(() => {
+    const testItem = {id: 63};
+    const fixture = setupTable({columns: ['id'], canSelect: true}, [testItem]);
     const debugMatCell = fixture.debugElement.query(By.directive(MatCell));
-    const matCellElem: HTMLTableCellElement = debugMatCell.nativeElement;
     const debugButton = debugMatCell.query(By.css('button'));
-    const buttonElem: HTMLButtonElement = debugButton.nativeElement;
-    const config = fixture.debugElement.injector.get(ItmConfig);
-    expect(matCellElem.classList.contains('itm-selected')).toBe(false);
-    expect(buttonElem.textContent).toContain(config.unselectedRowIcon);
+    expect(fixture.componentInstance.selection.size).toBeFalsy('Expected empty selection after start');
     click(debugButton);
     fixture.detectChanges();
-    expect(matCellElem.classList.contains('itm-selected')).toBe(true);
-    expect(buttonElem.textContent).toContain(config.selectedRowIcon);
+    const selection = fixture.componentInstance.selection;
+    expect(selection.size === 1).toBeTruthy('Expected selection with only one item after the first click');
+    expect(selection.has(testItem)).toBeTruthy('Expected selection has the data source item after the first click');
     click(debugButton);
     fixture.detectChanges();
-    expect(matCellElem.classList.contains('itm-selected')).toBe(false);
-    expect(buttonElem.textContent).toContain(config.unselectedRowIcon);
+    expect(fixture.componentInstance.selection.size).toBeFalsy('Expected empty selection after the second click');
   }));
+
+  it('should disable the selection cell button when the item is not toggable', async(() => {
+    const data = [{id: 63}, {id: 64}, {id: 65}];
+    const fixture = setupTable({columns: ['id'], canSelect: true, selectionLimit: 2}, data);
+    function getDisabledProperties(): boolean[] {
+      return fixture.debugElement
+        .queryAll(By.css('.itm-selection-cell'))
+        .map(debugButton => {
+          const isDisabled = debugButton.query(By.css('button')).properties['disabled'];
+          expect(isDisabled).toBeDefined('Expected disabled property on button');
+          return isDisabled;
+        });
+    }
+    const round1 = getDisabledProperties();
+    expect(round1.reduce((acc, val) => acc || val, false)).toBeFalsy('Expected all buttons enabled for round 1');
+    changeInputs(fixture, {table: {columns: ['id'], canSelect: ({id}) => (id === 63)}});
+    const round2 = getDisabledProperties();
+    expect(round2[0]).toBeFalsy('Expected first button enabled for round 2');
+    expect(round2.slice(1).reduce((acc, val) => acc && val, true)).toBeTruthy('Expected second and third buttons disabled for round 2');
+    changeInputs(fixture, {table: {columns: ['id'], canSelect: ({id}) => (id < 65), selectionLimit: 1}});
+    const round3 = getDisabledProperties();
+    expect(round3[2]).toBeTruthy('Expected third button disabled for round 3');
+    expect(round3.slice(0, 2).reduce((acc, val) => acc || val, false)).toBeFalsy('Expected first and second buttons enabled for round 3');
+    fixture.componentInstance.toggleItemSelection(data[1]);
+    fixture.detectChanges();
+    const round4 = getDisabledProperties();
+    expect(round4[1]).toBeFalsy('Expected second button enabled for round 4');
+    expect(round4[0] && round4[2]).toBeTruthy('Expected first and third buttons disabled for round 4');
+  }));
+
+
+  it('should toggle the selectable items when one pipe of the emits', async(() => {
+    const subject = new BehaviorSubject(true);
+    const fixture = setupTable({columns: ['id'], canSelect: () => subject});
+    const debugButton = fixture.debugElement.query(By.directive(MatCell)).query(By.css('button'));
+    const round1 = debugButton.properties['disabled'];
+    expect(round1).toBeDefined('Expected disabled property on button for round 1');
+    expect(round1).toBeFalsy('Expected enabled button for round 1');
+    subject.next(false);
+    fixture.detectChanges();
+    const round2 = debugButton.properties['disabled'];
+    expect(round2).toBeDefined('Expected disabled property on butto for round 2n');
+    expect(round2).toBeTruthy('Expected disabled button for round 2');
+}));
 });

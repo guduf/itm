@@ -1,30 +1,29 @@
 import { Component } from '@angular/core';
+
+import { Itms, ItmsSource } from 'src/itm';
 import { ItmTableConfig } from 'src/table-config';
-import { Itms } from 'src/itm';
-import { of } from 'rxjs';
-import { ItmsChanges, Itm } from '../../src/itm';
 
 @Component({
   selector: 'app-root',
   template: `
-    <itm-table [table]="table" [itemsChanges]="itemsChanges"></itm-table>
+    <itm-table [table]="table" [itemsSource]="itemsSource" color="primary"></itm-table>
   `,
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   title = 'itm';
 
-  itemsChanges: ItmsChanges = of([{id: 42}]);
+  itemsSource: ItmsSource = [{id: 63}, {id: 64}, {id: 65}];
 
   table: ItmTableConfig = {
     columns: [
       {
         key: 'id',
-        cell: ({id}: Itm) => `#${id}`,
         header: (items: Itms) => `${items.length} item${items.length > 1 ? 's' : ''}`
-      }
+      },
     ],
     canSelect: true,
+    selectionLimit: 3,
     setRowClass: () => 'foo'
   };
 }

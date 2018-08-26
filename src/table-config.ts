@@ -10,9 +10,12 @@ export class ItmTableConfig<I extends Itm = Itm> {
   /** The anchor target attribute. Default: 'blank'*/
   linkTarget?: 'self' | 'blank';
 
-  /** The function returns the CSS class added to the MatRowElement. Default: null*/
+  /** The function returns the CSS class added to the MatRowElement. Default: undefined */
   setRowClass?: ((item: I) => (string | Observable<string>));
 
-  /** The function returns the CSS class added to the MatRowElement. Default: false*/
+  /** The function returns the CSS class added to the MatRowElement. Default: false */
   canSelect?: boolean | ((item: I) => (boolean | Observable<boolean>));
+
+  /** The number limit of items that can be selected. Default: undefined*/
+  selectionLimit?: number;
 }

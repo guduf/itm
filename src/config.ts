@@ -7,9 +7,13 @@ export class ItmConfig {
   /**
    * The icon to display in the button of selection column when item is selected.
    * Default: 'check_box' */
-  selectedRowIcon?: string;
+  selectedCheckBoxIcon?: string;
   /**
    * The icon to display in the button of selection column when item is not selected.
    * Default: 'check_box_outline_blank' */
-  unselectedRowIcon?: string;
+  unselectedCheckBoxIcon?: string;
+  /**
+   * The icon to display in the header button of selection column when some items are selected.
+   * Default: 'indeterminate_check_box' */
+  indeterminateCheckBoxIcon?: string;
 }

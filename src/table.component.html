@@ -1,19 +1,24 @@
 <mat-table [dataSource]="itemsChanges">
   <!-- Selection -->
   <ng-container matColumnDef="itm-selection">
-    <th *matHeaderCellDef mat-header-cell>
-      <mat-icon>check_box_outline_blank</mat-icon>
-    </th>
-    <td *matCellDef="let item" mat-cell [ngClass]="setRowClass(item) | async">
-      <button *ngIf="isSelectable(item) | async"
+    <th *matHeaderCellDef mat-header-cell [ngClass]="selectionHeaderCellNgClass">
+      <button
         mat-icon-button [color]="color"
+        [disabled]="!isAllItemsToggable"
+        (click)="toggleAllSelection()">
+        <mat-icon>{{selectionHeaderCellIcon}}</mat-icon>
+      </button>
+    </th>
+    <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell">
+      <button
+        mat-icon-button [color]="color"
+        [disabled]="!isToggable(item)"
         (click)="toggleItemSelection(item)">
-        <mat-icon>
-          {{isSelected(item) ? config.selectedRowIcon : config.unselectedRowIcon}}
-        </mat-icon>
+        <mat-icon>{{getSelectionCellIcon(item)}}</mat-icon>
       </button>
     </td>
   </ng-container>
+
   <!-- Columns -->
   <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
     <th *matHeaderCellDef mat-header-cell>
@@ -24,6 +29,7 @@
     </td>
   </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  <!-- Rows -->
+  <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+  <tr *matRowDef="let item; columns: displayedColumns;" mat-row></tr>
 </mat-table>

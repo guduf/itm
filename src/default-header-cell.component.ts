@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { Observable, isObservable, of } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
 import { ItmColumnDef, ItmDefaultHeaderColumnData } from './column-def';
 import { Itm, ItmsChanges } from './itm';
 
+const SELECTOR = 'itm-default-header-cell';
+
 @Component({
-  selector: 'itm-default-header-cell',
-  template: '{{headingChanges | async}}'
+  selector: SELECTOR,
+  template: `{{headingChanges | async}}`
 })
 /**
  * Entry component created by HeaderCellDirective
@@ -15,6 +17,10 @@ import { Itm, ItmsChanges } from './itm';
 export class ItmDefaultHeaderCellComponent<I extends Itm = Itm> {
   /** The heading changes to display. */
   headingChanges: Observable<string>;
+
+  @HostBinding('class')
+  /** The css class attached to the host */
+  get hostClass() { return SELECTOR; }
 
   constructor(
     itemsChanges: ItmsChanges<I>,
