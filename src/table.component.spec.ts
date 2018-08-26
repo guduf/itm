@@ -1,5 +1,5 @@
 // tslint:disable:max-line-length
-import { ValueProvider, Directive, Input } from '@angular/core';
+import { ValueProvider, Directive, Input, DebugElement } from '@angular/core';
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
@@ -129,19 +129,24 @@ describe('ItmTableComponent', () => {
     const fixture = setupTable({columns: ['id']});
     const rowEl: HTMLTableRowElement = fixture.debugElement.query(By.css('tr.itm-row')).nativeElement;
     expect(rowEl.classList.contains(expectedClass)).toBeFalsy('Expected not contains the class for round0');
+
     changeInputs(fixture, {table: {columns: ['id'], setRowClass: () => expectedClass}});
     expect(rowEl.classList.contains(expectedClass)).toBeTruthy('Expected contains the class for round1');
+
     const secondClass = 'sed-modi-culpa';
     const subject = new BehaviorSubject(secondClass);
     const fetcher = () => subject;
     changeInputs(fixture, {table: {columns: ['id'], setRowClass: fetcher}});
     expect(rowEl.classList.contains(expectedClass)).toBeFalsy('Expected not contains the first class for round2');
     expect(rowEl.classList.contains(secondClass)).toBeTruthy('Expected contains the second class for round3');
+
     subject.next('');
     fixture.detectChanges();
     expect(rowEl.classList.contains(secondClass)).toBeFalsy('Expected not contains the second class for round3');
+
     changeInputs(fixture, {table: {columns: ['id'], setRowClass: fetcher, canSelect: true}});
     expect(rowEl.classList.contains(selectedClass)).toBeFalsy('Expected not contains the selected class for round4');
+
     fixture.componentInstance.toggleAllSelection();
     fixture.detectChanges();
   }));
@@ -168,10 +173,12 @@ describe('ItmTableComponent', () => {
       .query(By.directive(MatCell))
       .query(By.css('button'));
     expect(fixture.componentInstance.selection.size).toBe(0);
+
     click(debugSelectionButton);
     fixture.detectChanges();
     expect(fixture.componentInstance.selection.size).toBe(1);
     expect(fixture.componentInstance.selection.has(itemSource[0])).toBe(true);
+
     click(debugSelectionButton);
     fixture.detectChanges();
     expect(fixture.componentInstance.selection.size).toBe(0);
@@ -196,11 +203,13 @@ describe('ItmTableComponent', () => {
     const debugMatCell = fixture.debugElement.query(By.directive(MatCell));
     const debugButton = debugMatCell.query(By.css('button'));
     expect(fixture.componentInstance.selection.size).toBeFalsy('Expected empty selection after start');
+
     click(debugButton);
     fixture.detectChanges();
     const selection = fixture.componentInstance.selection;
     expect(selection.size === 1).toBeTruthy('Expected selection with only one item after the first click');
     expect(selection.has(testItem)).toBeTruthy('Expected selection has the data source item after the first click');
+
     click(debugButton);
     fixture.detectChanges();
     expect(fixture.componentInstance.selection.size).toBeFalsy('Expected empty selection after the second click');
@@ -209,6 +218,7 @@ describe('ItmTableComponent', () => {
   it('should disable the selection cell button when the item is not toggable', async(() => {
     const data = [{id: 63}, {id: 64}, {id: 65}];
     const fixture = setupTable({columns: ['id'], canSelect: true, selectionLimit: 2}, data);
+
     function getDisabledProperties(): boolean[] {
       return fixture.debugElement
         .queryAll(By.css('td.itm-selection-cell'))
@@ -218,16 +228,20 @@ describe('ItmTableComponent', () => {
           return isDisabled;
         });
     }
+
     const round1 = getDisabledProperties();
     expect(round1.reduce((acc, val) => acc || val, false)).toBeFalsy('Expected all buttons enabled for round 1');
+
     changeInputs(fixture, {table: {columns: ['id'], canSelect: ({id}) => (id === 63)}});
     const round2 = getDisabledProperties();
     expect(round2[0]).toBeFalsy('Expected first button enabled for round 2');
     expect(round2.slice(1).reduce((acc, val) => acc && val, true)).toBeTruthy('Expected second and third buttons disabled for round 2');
+
     changeInputs(fixture, {table: {columns: ['id'], canSelect: ({id}) => (id < 65), selectionLimit: 1}});
     const round3 = getDisabledProperties();
     expect(round3[2]).toBeTruthy('Expected third button disabled for round 3');
     expect(round3.slice(0, 2).reduce((acc, val) => acc || val, false)).toBeFalsy('Expected first and second buttons enabled for round 3');
+
     fixture.componentInstance.toggleItemSelection(data[1]);
     fixture.detectChanges();
     const round4 = getDisabledProperties();
@@ -245,8 +259,49 @@ describe('ItmTableComponent', () => {
     expect(round1).toBeFalsy('Expected enabled button for round 1');
     subject.next(false);
     fixture.detectChanges();
+
     const round2 = debugButton.properties['disabled'];
     expect(round2).toBeDefined('Expected disabled property on butto for round 2n');
     expect(round2).toBeTruthy('Expected disabled button for round 2');
-}));
+  }));
+
+  it('should set the right icons and class when selection changes', async(() => {
+    const {selectedCheckBoxIcon, unselectedCheckBoxIcon, indeterminateCheckBoxIcon} = DEFAULT_CONFIG;
+    const fixture = setupTable({columns: ['id'], canSelect: true}, [{id: 63}, {id: 64}]);
+    const {componentInstance: tableInstance} = fixture;
+    function getElements() {
+      const headerButtonElem = fixture.debugElement.query(By.css('th.itm-selection-header-cell > button')).nativeElement as HTMLButtonElement;
+      const buttonElems = fixture.debugElement.queryAll(By.css('td.itm-selection-cell > button')).map(el => el.nativeElement as HTMLButtonElement);
+      const rowElems = fixture.debugElement.queryAll(By.css('tr.itm-row')).map(el => el.nativeElement as HTMLTableRowElement);
+      return {headerButtonElem, buttonElems, rowElems};
+    }
+
+    const round0 = getElements();
+    expect(round0.headerButtonElem.textContent).toContain(unselectedCheckBoxIcon, 'Expected header button unchecked for round0');
+    expect(round0.buttonElems[0].textContent).toContain(unselectedCheckBoxIcon, 'Expected first button button unchecked for round0');
+    expect(round0.rowElems[0].classList.contains('itm-row-selected')).toBeFalsy('Expected first row not selected for round0');
+    expect(round0.buttonElems[1].textContent).toContain(selectedCheckBoxIcon, 'Expected second button button unchecked for round0');
+    expect(round0.rowElems[1].classList.contains('itm-row-selected')).toBeFalsy('Expected second row not selected for round0');
+
+    tableInstance.toggleItemSelection(tableInstance.items[0]);
+    fixture.detectChanges();
+
+    const round1 = getElements();
+    expect(round1.headerButtonElem.textContent).toContain(indeterminateCheckBoxIcon, 'Expected header button inderminate for round1');
+    expect(round1.buttonElems[0].textContent).toContain(selectedCheckBoxIcon, 'Expected first button button checked for round1');
+    expect(round1.rowElems[0].classList.contains('itm-row-selected')).toBeTruthy('Expected first row selected for round1');
+    expect(round1.buttonElems[1].textContent).toContain(selectedCheckBoxIcon, 'Expected second button button unchecked for round1');
+    expect(round1.rowElems[1].classList.contains('itm-row-selected')).toBeFalsy('Expected second row not selected for round1');
+
+    tableInstance.toggleItemSelection(tableInstance.items[1]);
+    fixture.detectChanges();
+
+    const round2 = getElements();
+    expect(round2.headerButtonElem.textContent).toContain(selectedCheckBoxIcon, 'Expected header button checked for round2');
+    expect(round2.buttonElems[0].textContent).toContain(selectedCheckBoxIcon, 'Expected first button button checked for round2');
+    expect(round2.rowElems[0].classList.contains('itm-row-selected')).toBeTruthy('Expected first row selected for round2');
+    expect(round2.buttonElems[1].textContent).toContain(selectedCheckBoxIcon, 'Expected second button button checked for round2');
+    expect(round2.rowElems[1].classList.contains('itm-row-selected')).toBeTruthy('Expected second row selected for round2');
+
+  }));
 });
