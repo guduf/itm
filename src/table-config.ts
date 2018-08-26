@@ -1,4 +1,4 @@
-import { Itm } from './itm';
+import { Itm } from './item';
 import { ItmColumnConfig } from './column-config';
 import { Observable } from 'rxjs';
 

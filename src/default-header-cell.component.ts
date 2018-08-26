@@ -3,7 +3,7 @@ import { Observable, isObservable, of } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
 import { ItmColumnDef, ItmDefaultHeaderColumnData } from './column-def';
-import { Itm, ItmsChanges } from './itm';
+import { Itm, ItmsChanges } from './item';
 
 const SELECTOR = 'itm-default-header-cell';
 

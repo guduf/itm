@@ -5,7 +5,7 @@ import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/t
 
 import { ItmCellDirective } from './cell.directive';
 import { ItmColumnDef } from './column-def';
-import { Itm } from './itm';
+import { Itm } from './item';
 import { ItmConfig } from './config';
 
 @Component({template: ''})

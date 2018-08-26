@@ -1,7 +1,7 @@
 import { Directive, Input, OnInit } from '@angular/core';
 
 import { AbstractItmCellDirective } from './abstract-cell.directive';
-import { ItmsChanges } from './itm';
+import { ItmsChanges } from './item';
 
 @Directive({selector: '[itmHeaderCell]'})
 // tslint:disable-next-line:max-line-length

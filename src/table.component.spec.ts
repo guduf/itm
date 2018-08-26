@@ -5,7 +5,7 @@ import { MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { of, BehaviorSubject } from 'rxjs';
 
-import { Itm, ItmsChanges, Itms, ItmsSource } from './itm';
+import { Itm, ItmsChanges, Itms, ItmsSource } from './item';
 import { ItmColumnDef } from './column-def';
 import { ItmTableConfig } from './table-config';
 import { ItmTableComponent } from './table.component';

@@ -2,7 +2,7 @@ import { Component, HostBinding } from '@angular/core';
 import { Observable, isObservable, of } from 'rxjs';
 
 import { ItmColumnDef, ItmDefaultColumnData } from './column-def';
-import { Itm } from './itm';
+import { Itm } from './item';
 
 const SELECTOR = 'itm-default-cell';
 

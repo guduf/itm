@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable, of, Subscription, from, merge } from 'rxjs
 import { map, mergeMap, reduce, first, tap, skip, startWith, distinctUntilChanged } from 'rxjs/operators';
 
 import { ItmColumnDef } from './column-def';
-import { Itm, Itms, ItmsChanges, ItmsSource } from './itm';
+import { Itm, Itms, ItmsChanges, ItmsSource } from './item';
 import { ItmTableConfig } from './table-config';
 import { ItmConfig } from './config';
 

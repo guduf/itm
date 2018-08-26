@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-import { Itms, Itm } from './itm';
+import { Itms, Itm } from './item';
 import { ItmColumnData, ItmColumnConfig } from './column-config';
 import { ComponentType, isComponentType } from './utils';
 

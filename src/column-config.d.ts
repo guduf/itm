@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-import { Itm, Itms } from './itm';
+import { Itm, Itms } from './item';
 import { ComponentType } from './utils';
 
 /** A plain object used as data for ItmColumnDef. */
