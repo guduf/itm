@@ -1,7 +1,8 @@
 // tslint:disable-next-line:max-line-length
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subscription, from, merge } from 'rxjs';
-import { map, mergeMap, reduce, first, tap, distinct, skip } from 'rxjs/operators';
+// tslint:disable-next-line:max-line-length
+import { map, mergeMap, reduce, first, tap, skip, startWith, distinctUntilChanged } from 'rxjs/operators';
 
 import { ItmColumnDef } from './column-def';
 import { Itm, Itms, ItmsChanges, ItmsSource } from './itm';
@@ -85,7 +86,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   private _canSelect: boolean | ((item: I) => (boolean | Observable<boolean>));
 
   /** see [[ItmTableComponent.setRowClass]] */
-  private _setRowClass: ((item: I) => (string | Observable<string>));
+  private _setRowClass: ((item: I) => (string | Observable<string>)) = (() => '');
 
   /** The selection of items saved as behavior subject */
   private readonly _itemsChanges = new BehaviorSubject<Itms<I>>(null);
@@ -126,7 +127,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
         selectablesMarkedForChanges = true;
       }
       if (previous.setRowClass !== setRowClass) (
-        this._setRowClass = typeof setRowClass === 'function' ? setRowClass : () => ''
+        this._setRowClass = typeof setRowClass === 'function' ? setRowClass : (() => '')
       );
       if (previous.selectionLimit !== selectionLimit) this.selectionLimit = selectionLimit || 0;
       if (previous.columns !== columns) {
@@ -181,10 +182,14 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   /** Set CSS class on the item row */
   setRowClass(item: I): Observable<string> {
-    if (!this._setRowClass) return null;
-    const res = this._setRowClass(item);
-    const obs = res instanceof Observable ? res : of(res);
-    return obs.pipe(map(value => value + (this.isSelected(item) ? ' itm-selected' : '')));
+    let res: Observable<string>;
+    try { res = (this._setRowClass as ((item: I) => (Observable<string>)))(item); }
+    catch (err) { console.error(err); }
+    if (res instanceof Observable) res = res.pipe(startWith(''), distinctUntilChanged());
+    else res = of(res);
+    return res.pipe(
+      map(value => ('itm-row ' + (this.isSelected(item) ? 'itm-row-selected ' : '') + value))
+    );
   }
 
   /** Adds the item to the selection or remove it if selected */
@@ -212,12 +217,14 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
       const selectableChanges: Observable<boolean>[] = [];
       this._selectablesChangeSubscr = from(this.items)
         .pipe(
-          distinct(),
+          distinctUntilChanged(),
           mergeMap(item => {
             let res: Observable<boolean>;
             try { res = (this._canSelect as ((item: I) => (Observable<boolean>)))(item); }
             catch (err) { console.error(err); }
-            if (res instanceof Observable) selectableChanges.push(res.pipe(skip(1)));
+            if (res instanceof Observable) (
+              selectableChanges.push(res.pipe(skip(1), distinctUntilChanged()))
+            );
             else res = of(res);
             return res.pipe(first(), map(isSelectable => isSelectable ? item : null));
           }),

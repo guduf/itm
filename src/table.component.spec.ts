@@ -123,6 +123,29 @@ describe('ItmTableComponent', () => {
     expect(componentInstance.columns).toBe(columns, 'Expected instance column identical');
   }));
 
+  it('should assign the expected class to the row', async(() => {
+    const expectedClass = 'qui-harum-sit';
+    const selectedClass = 'itm-row-selected';
+    const fixture = setupTable({columns: ['id']});
+    const rowEl: HTMLTableRowElement = fixture.debugElement.query(By.css('tr.itm-row')).nativeElement;
+    expect(rowEl.classList.contains(expectedClass)).toBeFalsy('Expected not contains the class for round0');
+    changeInputs(fixture, {table: {columns: ['id'], setRowClass: () => expectedClass}});
+    expect(rowEl.classList.contains(expectedClass)).toBeTruthy('Expected contains the class for round1');
+    const secondClass = 'sed-modi-culpa';
+    const subject = new BehaviorSubject(secondClass);
+    const fetcher = () => subject;
+    changeInputs(fixture, {table: {columns: ['id'], setRowClass: fetcher}});
+    expect(rowEl.classList.contains(expectedClass)).toBeFalsy('Expected not contains the first class for round2');
+    expect(rowEl.classList.contains(secondClass)).toBeTruthy('Expected contains the second class for round3');
+    subject.next('');
+    fixture.detectChanges();
+    expect(rowEl.classList.contains(secondClass)).toBeFalsy('Expected not contains the second class for round3');
+    changeInputs(fixture, {table: {columns: ['id'], setRowClass: fetcher, canSelect: true}});
+    expect(rowEl.classList.contains(selectedClass)).toBeFalsy('Expected not contains the selected class for round4');
+    fixture.componentInstance.toggleAllSelection();
+    fixture.detectChanges();
+  }));
+
   it('should show the selection column as first when canSelect is true', async(() => {
     const fixture = setupTable({columns: ['id'], canSelect: true});
     const debugMatCell = fixture.debugElement.query(By.directive(MatCell));
@@ -188,7 +211,7 @@ describe('ItmTableComponent', () => {
     const fixture = setupTable({columns: ['id'], canSelect: true, selectionLimit: 2}, data);
     function getDisabledProperties(): boolean[] {
       return fixture.debugElement
-        .queryAll(By.css('.itm-selection-cell'))
+        .queryAll(By.css('td.itm-selection-cell'))
         .map(debugButton => {
           const isDisabled = debugButton.query(By.css('button')).properties['disabled'];
           expect(isDisabled).toBeDefined('Expected disabled property on button');

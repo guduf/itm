@@ -24,12 +24,12 @@
     <th *matHeaderCellDef mat-header-cell>
       <ng-container [itmHeaderCell]="itemsChanges" [column]="column"></ng-container>
     </th>
-    <td *matCellDef="let item" mat-cell [ngClass]="setRowClass(item) | async">
+    <td *matCellDef="let item" mat-cell>
       <ng-container [itmCell]="item" [column]="column"></ng-container>
     </td>
   </ng-container>
 
   <!-- Rows -->
   <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-  <tr *matRowDef="let item; columns: displayedColumns;" mat-row></tr>
+  <tr *matRowDef="let item; columns: displayedColumns;" mat-row [ngClass]="setRowClass(item) | async"></tr>
 </mat-table>
