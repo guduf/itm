@@ -1,14 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { NgModule, InjectionToken, Optional } from '@angular/core';
 
+import { ItmActionsCellDirective } from './actions-cell.directive';
+import { ItmButtonComponent } from './button.component';
 import { ItmCellDirective } from './cell.directive';
+import { ItmConfig } from './config';
+import { ItmDefaultActionsCellComponent } from './default-actions-cell.component';
 import { ItmDefaultCellComponent } from './default-cell.component';
 import { ItmDefaultHeaderCellComponent } from './default-header-cell.component';
 import { ItmHeaderCellDirective } from './header-cell.directive';
-import { ItmConfig } from './config';
-import { ItmTableComponent } from './table.component';
 import { ItmMaterialModule } from './material.module';
-import { ItmDefaultActionsCellComponent } from './default-actions-cell.component';
+import { ItmTableComponent } from './table.component';
+import { ItmButtonsComponent } from './buttons.component';
 
 const IMPORTS = [
   CommonModule,
@@ -16,11 +19,13 @@ const IMPORTS = [
 ];
 
 const ENTRY_COMPONENTS = [
+  ItmDefaultActionsCellComponent,
   ItmDefaultCellComponent,
   ItmDefaultHeaderCellComponent
 ];
 
 const DECLARATIONS = [
+  ItmActionsCellDirective,
   ItmCellDirective,
   ItmDefaultCellComponent,
   ItmHeaderCellDirective,
@@ -28,10 +33,13 @@ const DECLARATIONS = [
 ];
 
 const EXPORTED_DECLARATIONS = [
+  ItmButtonComponent,
+  ItmButtonsComponent,
   ItmTableComponent
 ];
 
 export const DEFAULT_CONFIG: ItmConfig = {
+  defaultActionsCellComp: ItmDefaultActionsCellComponent,
   defaultCellComp: ItmDefaultCellComponent,
   defaultHeaderCellComp: ItmDefaultHeaderCellComponent,
   selectedCheckBoxIcon: 'check_box',

@@ -1,0 +1,13 @@
+
+<ng-container [ngSwitch]="mode">
+  <button *ngSwitchCase="'menu'" mat-menu-item (click)="emitEvent($event)">
+    {{actionDef.key}}
+  </button>
+  <button *ngSwitchCase="'icon'" mat-icon-button (click)="emitEvent($event)">
+    <mat-icon>{{actionDef.icon}}</mat-icon>
+  </button>
+  <button *ngSwitchDefault mat-button (click)="emitEvent($event)">
+    <mat-icon>{{actionDef.icon}}</mat-icon>
+    <span>{{actionDef.key}}</span>
+  </button>
+</ng-container>

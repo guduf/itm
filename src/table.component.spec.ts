@@ -13,6 +13,7 @@ import { ItmMaterialModule } from './material.module';
 import { click, changeInputs } from './helpers.spec';
 import { ItmConfig } from './config';
 import { DEFAULT_CONFIG } from './itm.module';
+import { ItmActionsCellDirective } from './actions-cell.directive';
 
 @Directive({selector: '[itmCell]'})
 // tslint:disable-next-line:directive-class-suffix
@@ -43,6 +44,7 @@ describe('ItmTableComponent', () => {
         ItmMaterialModule
       ],
       declarations: [
+        ItmActionsCellDirective,
         ItmCellDirective,
         ItmHeaderCellDirective,
         ItmTableComponent

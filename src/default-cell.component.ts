@@ -14,7 +14,7 @@ const SELECTOR = 'itm-default-cell';
  * when no component class is specified as cell for the ItmColumnDef. */
 export class ItmDefaultCellComponent {
   @HostBinding('class')
-  /** The css class attached to the host */
+  /** The css class attached to the host. */
   get hostClass() { return SELECTOR; }
 
   constructor(

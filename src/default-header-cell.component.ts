@@ -13,7 +13,7 @@ const SELECTOR = 'itm-default-header-cell';
  * when no component class is specified as cell for the ItmColumnDef. */
 export class ItmDefaultHeaderCellComponent {
   @HostBinding('class')
-  /** The css class attached to the host */
+  /** The css class attached to the host. */
   get hostClass() { return SELECTOR; }
 
   constructor(
