@@ -1,9 +1,15 @@
-@import './default-cell.component';
+@import './button';
+@import './default-cell';
+@import './slot';
+@import './table';
 
 @mixin itm-core($config: null) {
   @if $config == null {
     $config: mat-typography-config();
   }
 
+  @include itm-slot($config);
   @include itm-default-cell($config);
+  @include itm-button($config);
+  @include itm-table($config);
 }

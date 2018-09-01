@@ -1,0 +1,143 @@
+// tslint:disable:quotemark
+
+export const DATA = [{
+  "id": 1,
+  "firstName": "Homer",
+  "lastName": "Deem",
+  "email": "hdeem0@cbsnews.com",
+  "gender": "Male",
+  "ipAddress": "161.249.54.250"
+}, {
+  "id": 2,
+  "firstName": "Andrej",
+  "lastName": "Tottle",
+  "email": "atottle1@dyndns.org",
+  "gender": "Male",
+  "ipAddress": "66.53.72.245"
+}, {
+  "id": 3,
+  "firstName": "Barthel",
+  "lastName": "Brea",
+  "email": "bbrea2@java.com",
+  "gender": "Male",
+  "ipAddress": "39.83.80.119"
+}, {
+  "id": 4,
+  "firstName": "Florry",
+  "lastName": "O'Corrane",
+  "email": "focorrane3@wix.com",
+  "gender": "Female",
+  "ipAddress": "126.100.46.220"
+}, {
+  "id": 5,
+  "firstName": "Faythe",
+  "lastName": "Hupka",
+  "email": "fhupka4@si.edu",
+  "gender": "Female",
+  "ipAddress": "154.220.43.6"
+}, {
+  "id": 6,
+  "firstName": "Jeralee",
+  "lastName": "Iacovazzi",
+  "email": "jiacovazzi5@baidu.com",
+  "gender": "Female",
+  "ipAddress": "18.190.42.69"
+}, {
+  "id": 7,
+  "firstName": "Van",
+  "lastName": "Greenrodd",
+  "email": "vgreenrodd6@intel.com",
+  "gender": "Female",
+  "ipAddress": "179.171.77.25"
+}, {
+  "id": 8,
+  "firstName": "Randy",
+  "lastName": "Dubery",
+  "email": "rdubery7@oracle.com",
+  "gender": "Female",
+  "ipAddress": "158.210.71.7"
+}, {
+  "id": 9,
+  "firstName": "Giuditta",
+  "lastName": "Chishull",
+  "email": "gchishull8@umich.edu",
+  "gender": "Female",
+  "ipAddress": "246.185.7.30"
+}, {
+  "id": 10,
+  "firstName": "Nixie",
+  "lastName": "Goodbairn",
+  "email": "ngoodbairn9@columbia.edu",
+  "gender": "Female",
+  "ipAddress": "144.95.144.225"
+}, {
+  "id": 11,
+  "firstName": "Brock",
+  "lastName": "Deere",
+  "email": "bdeerea@so-net.ne.jp",
+  "gender": "Male",
+  "ipAddress": "166.105.90.121"
+}, {
+  "id": 12,
+  "firstName": "Abie",
+  "lastName": "Kincla",
+  "email": "akinclab@yelp.com",
+  "gender": "Male",
+  "ipAddress": "21.43.221.167"
+}, {
+  "id": 13,
+  "firstName": "Janey",
+  "lastName": "Walcot",
+  "email": "jwalcotc@storify.com",
+  "gender": "Female",
+  "ipAddress": "102.174.204.103"
+}, {
+  "id": 14,
+  "firstName": "Ainslee",
+  "lastName": "Tassell",
+  "email": "atasselld@accuweather.com",
+  "gender": "Female",
+  "ipAddress": "83.52.150.135"
+}, {
+  "id": 15,
+  "firstName": "Lillian",
+  "lastName": "Sandbrook",
+  "email": "lsandbrooke@vinaora.com",
+  "gender": "Female",
+  "ipAddress": "213.55.125.246"
+}, {
+  "id": 16,
+  "firstName": "Orton",
+  "lastName": "Dorward",
+  "email": "odorwardf@kickstarter.com",
+  "gender": "Male",
+  "ipAddress": "86.226.242.149"
+}, {
+  "id": 17,
+  "firstName": "Noak",
+  "lastName": "Hickenbottom",
+  "email": "nhickenbottomg@google.cn",
+  "gender": "Male",
+  "ipAddress": "51.81.211.28"
+}, {
+  "id": 18,
+  "firstName": "Stanislaus",
+  "lastName": "Gendrich",
+  "email": "sgendrichh@google.de",
+  "gender": "Male",
+  "ipAddress": "170.205.156.148"
+}, {
+  "id": 19,
+  "firstName": "Gabbie",
+  "lastName": "Matus",
+  "email": "gmatusi@unesco.org",
+  "gender": "Female",
+  "ipAddress": "72.94.183.177"
+}, {
+  "id": 20,
+  "firstName": "Sonni",
+  "lastName": "Grist",
+  "email": "sgristj@nifty.com",
+  "gender": "Female",
+  "ipAddress": "182.251.125.132"
+}];

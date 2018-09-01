@@ -1,0 +1,65 @@
+@mixin itm-table($config) {
+  .itm-table {
+    @extend .mat-body-1;
+
+    display: block;
+    position: relative;
+
+    & > .mat-table {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  tr.mat-row.itm-row,
+  tr.mat-header-row.itm-header-row {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  %itm-cell {
+    @extend .itm-slot;
+
+    display: flex;
+    overflow: hidden;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+
+  td.mat-cell.itm-selection-cell,
+  th.mat-header-cell.itm-selection-header-cell {
+    @extend %itm-cell;
+    @extend .itm-slot-1;
+
+    padding-right: 9px;
+
+    &:first-of-type {
+      padding-left: 12px;
+    }
+  }
+
+  th.mat-header-cell.itm-selection-header-cell {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  td.mat-cell.itm-action-cell,
+  th.mat-header-cell.itm-action-header-cell {
+    @extend %itm-cell;
+
+    justify-content: flex-end;
+
+    &:last-of-type {
+      padding-right: 12px;
+    }
+  }
+
+  td.mat-cell.itm-cell,
+  th.mat-header-cell.itm-header-cell {
+    @extend %itm-cell;
+
+    flex-grow: 1;
+  }
+}

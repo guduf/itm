@@ -1,16 +1,18 @@
 // tslint:disable-next-line:max-line-length
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, HostBinding } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subscription, from, merge } from 'rxjs';
 import { map, mergeMap, reduce, first, tap, skip, distinctUntilChanged } from 'rxjs/operators';
 
 import { ItmColumnDef } from './column-def';
 import { ItmConfig } from './config';
-import { Itm, Itms, ItmsChanges, ItmsSource, ItmValuePipe, deferValuePipe } from './item';
+import { Itm, ItmsChanges, ItmsSource, deferPipe, ItmPipe } from './item';
 import { ItmTableConfig } from './table-config';
 import { ItmActionConfig, ItmActionEvent } from './action';
 
+const SELECTOR = 'itm-table';
+
 @Component({
-  selector: 'itm-table',
+  selector: SELECTOR,
   templateUrl: './table.component.html'
 })
 /**
@@ -31,7 +33,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   @Output()
   /** Emits selected items changes. */
-  readonly selectionChanges = new EventEmitter<Itms<I>>();
+  readonly selectionChanges = new EventEmitter<I[]>();
 
   @Output()
   /** Emitter of action events */
@@ -52,6 +54,25 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   /** The observable of items changes. */
   readonly itemsChanges: ItmsChanges<I>;
 
+  @HostBinding('class')
+  get hostClass() {
+    return SELECTOR;
+  }
+
+  get actionCellClass() {
+    const size  = Math.ceil(this.actions.length * 40 / 60);
+    return `itm-action-cell itm-slot-${size}`;
+  }
+
+  get actionHeaderCellClass() {
+    const size  = Math.ceil(this.actions.length * 40 / 60);
+    return `itm-action-header-cell itm-slot-${size}`;
+  }
+
+  get headerRowClass() {
+    return 'itm-header-row';
+  }
+
   /** Determines if all selectables items are selected observing selection limit. */
   get isAllSelected(): boolean {
     if (this.selection.size >= this.items.length) return true;
@@ -62,7 +83,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     ));
   }
 
-  /** Determines if the "toggle all" action is enabled. */
+  /** Determines if is possible to select or unselect all items. */
   get isAllItemsToggable(): boolean {
     return (
       Boolean(this.selection.size) ||
@@ -71,11 +92,16 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     );
   }
 
-  /** The items currently displayed in the table. */
-  get items(): Itms<I> { return this._itemsChanges.getValue(); }
+  /** The current items currently of the table. */
+  get items(): I[] { return this._itemsChanges.getValue(); }
 
-  /** The selection of items in its current state. */
+  /** The current selection of items. */
   get selection(): Set<I> { return this._selectionChanges.getValue(); }
+
+  /** The CSS class of the selection cells. */
+  get selectionCellClass(): string {
+    return `itm-selection-cell`;
+  }
 
   /** Returns the icon of the selection header cell. */
   get selectionHeaderCellIcon(): string {
@@ -88,18 +114,18 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   }
 
   /** The CSS class of the selection header cell. */
-  get selectionHeaderCellNgClass(): string {
+  get selectionHeaderCellClass(): string {
     return 'itm-selection-header-cell';
   }
 
   /** The boolean or function to determine if the selection column is displayed. */
-  private _canSelect: boolean | ItmValuePipe<boolean>;
+  private _canSelect: boolean | ItmPipe<I, boolean>;
 
   /** see [[ItmTableComponent.setRowClass]]. */
-  private _setRowClass: false | ItmValuePipe<string>;
+  private _setRowClass: false | ItmPipe<I, string>;
 
   /** The selection of items saved as behavior subject. */
-  private readonly _itemsChanges = new BehaviorSubject<Itms<I>>(null);
+  private readonly _itemsChanges = new BehaviorSubject<I[]>(null);
 
   /** The subscription on items source. */
   private _itemsSubscr: Subscription;
@@ -135,13 +161,13 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
       if (previous.canSelect !== canSelect) {
         this._canSelect = (
           canSelect === true ? true :
-          typeof canSelect === 'function' ? deferValuePipe(canSelect) :
+          typeof canSelect === 'function' ? deferPipe(canSelect) :
           false
         );
         selectablesMarkedForChanges = true;
       }
       if (previous.setRowClass !== setRowClass) this._setRowClass = (
-        typeof setRowClass === 'function' ? deferValuePipe(setRowClass) : false
+        typeof setRowClass === 'function' ? deferPipe(setRowClass) : false
       );
       if (previous.selectionLimit !== selectionLimit) this.selectionLimit = selectionLimit || 0;
       if (previous.columns !== columns) {
@@ -189,6 +215,14 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     return this._selectionChanges.value.has(item);
   }
 
+  getCellClass(column: ItmColumnDef) {
+    return `itm-cell itm-slot-${column.size}`;
+  }
+
+  getHeaderCellClass(column: ItmColumnDef) {
+    return `itm-header-cell itm-slot-${column.size}`;
+  }
+
   /** The icon of the selection cell. */
   getSelectionCellIcon(item: I) {
     const {selectedCheckBoxIcon, unselectedCheckBoxIcon} = this._config;
@@ -196,7 +230,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   }
 
   /** Set CSS class on the item row. */
-  setRowClass(item: I): Observable<string> {
+  getRowClass(item: I): Observable<string> {
     return (typeof this._setRowClass === 'function' ? this._setRowClass(item) : of('')).pipe(
       map(value => ('itm-row ' + (this.isSelected(item) ? 'itm-row-selected ' : '') + value))
     );
@@ -205,7 +239,8 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   /** Adds the item to the selection or removes it if selected. */
   toggleItemSelection(item: I): void {
     const selection = this._selectionChanges.value;
-    if (selection.has(item)) selection.delete(item); else selection.add(item);
+    if (selection.has(item)) selection.delete(item);
+    else selection.add(item);
     this._selectionChanges.next(new Set(selection));
   }
 

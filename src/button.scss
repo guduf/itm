@@ -1,0 +1,14 @@
+@mixin itm-button($config) {
+  .itm-button {
+    .mat-button-wrapper > span {
+      vertical-align: middle;
+      text-transform: uppercase;
+    }
+
+    &:not(.itm-button-icon):not(.itm-button-menu) {
+      .mat-button-wrapper > span {
+        padding-left: 12px;
+      }
+    }
+  }
+}

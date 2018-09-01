@@ -1,7 +1,7 @@
 <mat-table [dataSource]="itemsChanges">
   <!-- Selection -->
   <ng-container matColumnDef="itm-selection">
-    <th *matHeaderCellDef mat-header-cell [ngClass]="selectionHeaderCellNgClass">
+    <th *matHeaderCellDef mat-header-cell [ngClass]="selectionHeaderCellClass">
       <button
         mat-icon-button [color]="color"
         [disabled]="!isAllItemsToggable"
@@ -9,7 +9,7 @@
         <mat-icon>{{selectionHeaderCellIcon}}</mat-icon>
       </button>
     </th>
-    <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell">
+    <td *matCellDef="let item" mat-cell [ngClass]="selectionCellClass">
       <button
         mat-icon-button [color]="color"
         [disabled]="!isToggable(item)"
@@ -20,23 +20,23 @@
   </ng-container>
   <!-- Actions -->
   <ng-container matColumnDef="itm-actions">
-    <th *matHeaderCellDef mat-header-cell></th>
-    <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell">
+    <th *matHeaderCellDef mat-header-cell [ngClass]="actionHeaderCellClass"></th>
+    <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell" [ngClass]="actionCellClass">
       <ng-container [itmActionsCell]="item" [actions]="actions" [eventEmitter]="event"></ng-container>
     </td>
   </ng-container>
 
   <!-- Columns -->
   <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
-    <th *matHeaderCellDef mat-header-cell>
+    <th *matHeaderCellDef mat-header-cell [ngClass]="getHeaderCellClass(column)">
       <ng-container [itmHeaderCell]="itemsChanges" [column]="column"></ng-container>
     </th>
-    <td *matCellDef="let item" mat-cell>
+    <td *matCellDef="let item" mat-cell [ngClass]="getCellClass(column)">
       <ng-container [itmCell]="item" [column]="column"></ng-container>
     </td>
   </ng-container>
 
   <!-- Rows -->
-  <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-  <tr *matRowDef="let item; columns: displayedColumns;" mat-row [ngClass]="setRowClass(item) | async"></tr>
+  <tr *matHeaderRowDef="displayedColumns" mat-header-row [ngClass]="headerRowClass"></tr>
+  <tr *matRowDef="let item; columns: displayedColumns;" mat-row [ngClass]="getRowClass(item) | async"></tr>
 </mat-table>

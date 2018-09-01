@@ -1,11 +1,11 @@
 // tslint:disable:max-line-length
-import { ValueProvider, Directive, Input, DebugElement } from '@angular/core';
+import { ValueProvider, Directive, Input } from '@angular/core';
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { of, BehaviorSubject } from 'rxjs';
 
-import { Itm, ItmsChanges, Itms, ItmsSource } from './item';
+import { Itm, ItmsChanges, ItmsSource } from './item';
 import { ItmColumnDef } from './column-def';
 import { ItmTableConfig } from './table-config';
 import { ItmTableComponent } from './table.component';
@@ -17,7 +17,7 @@ import { ItmActionsCellDirective } from './actions-cell.directive';
 
 @Directive({selector: '[itmCell]'})
 // tslint:disable-next-line:directive-class-suffix
-export class ItmCellDirective<I extends Itm = Itm> {
+export class ItmCellDirective {
   @Input()
   column: ItmColumnDef;
 
@@ -116,15 +116,6 @@ describe('ItmTableComponent', () => {
     expect(componentInstance.columns).toBe(columns, 'Expected instance column identical');
   }));
 
-  it('should remain columns untouched when itemChanges changes', async(() => {
-    const fixture = setupTable();
-    const {componentInstance} = fixture;
-    const {columns} = componentInstance;
-    componentInstance.itemsSource = [];
-    componentInstance.ngOnChanges({});
-    expect(componentInstance.columns).toBe(columns, 'Expected instance column identical');
-  }));
-
   it('should assign the expected class to the row', async(() => {
     const expectedClass = 'qui-harum-sit';
     const selectedClass = 'itm-row-selected';
@@ -169,7 +160,7 @@ describe('ItmTableComponent', () => {
   }));
 
   it('should toggle the item selection when clicking on the selection button', async(() => {
-    const itemSource: Itms = [{id: 63}];
+    const itemSource: Itm[] = [{id: 63}];
     const fixture = setupTable({columns: ['id'], canSelect: true}, itemSource);
     const debugSelectionButton = fixture.debugElement
       .query(By.directive(MatCell))

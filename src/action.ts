@@ -1,20 +1,27 @@
-export interface ItmActionConfig {
+import { ItmPipeLike, ItmPipe, deferPipe } from './item';
+
+export interface ItmActionConfig<T = {}> {
   /** The identifier of the actions */
   key: string;
-  /** The icon representing the action */
-  icon?: string;
+  /** Defines the action icon. */
+  icon?: false | ItmPipeLike<T, string>;
+  /** Defines the the text */
+  text?: ItmPipeLike<T, string>;
 }
 
-export class ItmActionDef implements ItmActionConfig {
+export class ItmActionDef<T = {}> implements ItmActionConfig {
   /** see [[ItmActionConfig.key]] */
   key: string;
   /** see [[ItmActionConfig.icon]] */
-  icon: string;
+  icon: ItmPipe<T, string>;
+  /** see [[ItmActionConfig.text]] */
+  text: ItmPipe<T, string>;
 
   constructor(cfg: ItmActionConfig) {
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
     else throw new TypeError('InvalidItmActionConfig : Expected [key] as string for event config');
-    this.icon = cfg.icon && typeof cfg.icon === 'string' ? cfg.icon : this.key;
+    this.icon = cfg.icon === false ? null : deferPipe(cfg.icon || this.key);
+    this.text = deferPipe(cfg.text || this.key);
   }
 }
 
