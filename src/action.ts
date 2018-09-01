@@ -1,4 +1,8 @@
 import { ItmPipeLike, ItmPipe, deferPipe } from './item';
+import { InjectionToken } from '@angular/core';
+
+/** The token for display mode for row actions buttons */
+export const ITM_TABLE_ACTIONS_BUTTONS_MODE = new InjectionToken('ITM_TABLE_ACTIONS_BUTTONS_MODE');
 
 export interface ItmActionConfig<T = {}> {
   /** The identifier of the actions */

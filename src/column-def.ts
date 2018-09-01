@@ -8,9 +8,8 @@ import { ComponentType, isComponentType } from './utils';
 
 export const ITM_DEFAULT_CELL_VALUE_CHANGES = new InjectionToken('ITM_DEFAULT_CELL_VALUE_CHANGES');
 
-export const ITM_DEFAULT_HEADER_CELL_VALUE_CHANGES = (
-  new InjectionToken('ITM_DEFAULT_HEADER_CELL_VALUE_CHANGES')
-);
+// tslint:disable-next-line:max-line-length
+export const ITM_DEFAULT_HEADER_CELL_VALUE_CHANGES = new InjectionToken('ITM_DEFAULT_HEADER_CELL_VALUE_CHANGES');
 
 /** The definition of a column used by ItmTableComponent */
 export class ItmColumnDef<I extends Itm = Itm> implements ItmColumnConfig {

@@ -1,7 +1,9 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
+import { ItmActionDefs, ItmActionEvent, ITM_TABLE_ACTIONS_BUTTONS_MODE } from './action';
+import { ItmButtonMode } from './button.component';
 import { Itm } from './item';
-import { ItmActionDefs, ItmActionEvent } from './action';
 
 @Component({
   selector: 'itm-actions-cell',
@@ -9,7 +11,7 @@ import { ItmActionDefs, ItmActionEvent } from './action';
     <itm-buttons
       [actions]="actions"
       [target]="item"
-      [mode]="mode"
+      [mode]="buttonsMode | async"
       (event)="emitter.emit($event)"></itm-buttons>
     `
 })
@@ -17,8 +19,8 @@ export class ItmDefaultActionsCellComponent<I extends Itm = Itm> {
   constructor(
     readonly actions: ItmActionDefs,
     readonly item: Itm,
-    readonly emitter: EventEmitter<ItmActionEvent<I>>
+    readonly emitter: EventEmitter<ItmActionEvent<I>>,
+    @Inject(ITM_TABLE_ACTIONS_BUTTONS_MODE)
+    readonly buttonsMode: Observable<ItmButtonMode>
   ) { }
-
-  mode = 'icon';
 }

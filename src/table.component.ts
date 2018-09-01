@@ -9,6 +9,7 @@ import { ItmConfig } from './config';
 import { Itm, ItmsChanges, ItmsSource, deferPipe, ItmPipe } from './item';
 import { ItmTableConfig } from './table-config';
 import { ItmActionConfig, ItmActionEvent } from './action';
+import { ItmButtonMode } from './button.component';
 
 const SELECTOR = 'itm-table';
 
@@ -54,6 +55,9 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   /** see [[TableConfig.selectionLimit]]. */
   selectionLimit = 0;
+
+  /** The display of the actions cells buttons */
+  readonly actionsButtonsMode = new BehaviorSubject<ItmButtonMode>('icon');
 
   /** The observable of items changes. */
   readonly itemsChanges: ItmsChanges<I>;

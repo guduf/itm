@@ -1,4 +1,12 @@
 <mat-table [dataSource]="itemsChanges">
+  <!-- Actions -->
+  <ng-container matColumnDef="itm-actions">
+    <th *matHeaderCellDef mat-header-cell [ngClass]="actionHeaderCellClass"></th>
+    <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell" [ngClass]="actionCellClass">
+      <ng-container [itmActionsCell]="item" [actions]="actions" [buttonsMode]="actionsButtonsMode" [eventEmitter]="event"></ng-container>
+    </td>
+  </ng-container>
+
   <!-- Selection -->
   <ng-container matColumnDef="itm-selection">
     <th *matHeaderCellDef mat-header-cell [ngClass]="selectionHeaderCellClass">
@@ -16,13 +24,6 @@
         (click)="toggleItemSelection(item)">
         <mat-icon>{{getSelectionCellIcon(item)}}</mat-icon>
       </button>
-    </td>
-  </ng-container>
-  <!-- Actions -->
-  <ng-container matColumnDef="itm-actions">
-    <th *matHeaderCellDef mat-header-cell [ngClass]="actionHeaderCellClass"></th>
-    <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell" [ngClass]="actionCellClass">
-      <ng-container [itmActionsCell]="item" [actions]="actions" [eventEmitter]="event"></ng-container>
     </td>
   </ng-container>
 
