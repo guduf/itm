@@ -3,11 +3,11 @@
     @extend .mat-body-1;
 
     display: block;
-    position: relative;
 
     & > .mat-table {
       width: 100%;
       height: 100%;
+      overflow: hidden;
     }
   }
 
@@ -16,6 +16,25 @@
     display: flex;
     flex-direction: row;
     align-items: stretch;
+  }
+
+  tr.mat-header-row.itm-header-row {
+    position: relative;
+    z-index: 2;
+    right: 0;
+    left: 0;
+    transition: top 240ms ease-out;
+
+    &::before {
+      content: '';
+
+      position: absolute;
+      right: 0;
+      bottom: 1px;
+      left: 0;
+      height: 100vh;
+      background-color: white;
+    }
   }
 
   %itm-cell {
@@ -61,5 +80,9 @@
     @extend %itm-cell;
 
     flex-grow: 1;
+  }
+
+  th.mat-header-cell.itm-header-cell {
+    position: relative;
   }
 }

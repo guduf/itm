@@ -1,7 +1,8 @@
-// tslint:disable-next-line:max-line-length
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, HostBinding } from '@angular/core';
-import { BehaviorSubject, Observable, of, Subscription, from, merge } from 'rxjs';
-import { map, mergeMap, reduce, first, tap, skip, distinctUntilChanged } from 'rxjs/operators';
+// tslint:disable:max-line-length
+import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { BehaviorSubject, from, fromEvent , merge, Observable, of, Subscription } from 'rxjs';
+import { distinctUntilChanged, first, map, mergeMap, reduce, skip, tap, startWith } from 'rxjs/operators';
+// tslint:enable:max-line-length
 
 import { ItmColumnDef } from './column-def';
 import { ItmConfig } from './config';
@@ -20,24 +21,24 @@ const SELECTOR = 'itm-table';
  */
 export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDestroy {
   @Input()
-  /** Data source for MatTable and provider for ItmHeaderCellComponent. */
+  /** @Input The color of the material components inside the table. */
+  color: string;
+
+  @Input()
+  /** @Input Data source for MatTable and provider for ItmHeaderCellComponent. */
   itemsSource: ItmsSource<I>;
 
   @Input()
   /** The table definition to configure the MatTable. */
   table: ItmTableConfig<I>;
 
-  @Input()
-  /** The color of the material components inside the table. */
-  color: string;
-
   @Output()
-  /** Emits selected items changes. */
-  readonly selectionChanges = new EventEmitter<I[]>();
-
-  @Output()
-  /** Emitter of action events */
+  /** @Output Emitter of action events */
   readonly event = new EventEmitter<ItmActionEvent<I>>();
+
+  @Output()
+  /** @Output Emits selected items changes. */
+  readonly selectionChanges = new EventEmitter<I[]>();
 
   /** The actions for the row cell */
   actions: ItmActionConfig[];
@@ -47,6 +48,9 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   /** The keys of the columns to display. */
   displayedColumns: string[];
+
+  /** The observable to set the style of the header row. */
+  headerRowStyle: Observable<{ [key: string]: string; }>;
 
   /** see [[TableConfig.selectionLimit]]. */
   selectionLimit = 0;
@@ -141,13 +145,16 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   /** The subscription on toggle selectable items. */
   private _selectablesChangeSubscr: Subscription;
+
+  /** The subsription on toggle each selectable item. */
   private _selectableChangesSubscr: Subscription;
 
-  constructor(private readonly _config: ItmConfig) {
+  constructor(private readonly _config: ItmConfig, hostRef: ElementRef) {
     this.itemsChanges = this._itemsChanges.asObservable();
     this._selectionSubscr = this._selectionChanges.subscribe(
       selection => this.selectionChanges.next(Array.from(selection))
     );
+    this._setHeaderRowStyle(hostRef);
   }
 
   ngOnChanges({table: tableChanges, itemsSource: itemSourceChanges}: SimpleChanges) {
@@ -201,6 +208,11 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     if (this._selectablesChangeSubscr) this._selectableChangesSubscr.unsubscribe();
   }
 
+  /** Determines if the item is selected. */
+  isSelected(item: I): boolean {
+    return this._selectionChanges.value.has(item);
+  }
+
   /** Determines if the item row checkbox is enabled. */
   isToggable(item: I): boolean {
     return (
@@ -208,11 +220,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
       this._selectableItems.has(item) &&
       (!this.selectionLimit || this.selectionLimit > this.selection.size)
     );
-  }
-
-  /** Determines if the item is selected. */
-  isSelected(item: I): boolean {
-    return this._selectionChanges.value.has(item);
   }
 
   getCellClass(column: ItmColumnDef) {
@@ -223,17 +230,17 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     return `itm-header-cell itm-slot-${column.size}`;
   }
 
-  /** The icon of the selection cell. */
-  getSelectionCellIcon(item: I) {
-    const {selectedCheckBoxIcon, unselectedCheckBoxIcon} = this._config;
-    return this.isSelected(item) ? selectedCheckBoxIcon : unselectedCheckBoxIcon;
-  }
-
   /** Set CSS class on the item row. */
   getRowClass(item: I): Observable<string> {
     return (typeof this._setRowClass === 'function' ? this._setRowClass(item) : of('')).pipe(
       map(value => ('itm-row ' + (this.isSelected(item) ? 'itm-row-selected ' : '') + value))
     );
+  }
+
+  /** The icon of the selection cell. */
+  getSelectionCellIcon(item: I) {
+    const {selectedCheckBoxIcon, unselectedCheckBoxIcon} = this._config;
+    return this.isSelected(item) ? selectedCheckBoxIcon : unselectedCheckBoxIcon;
   }
 
   /** Adds the item to the selection or removes it if selected. */
@@ -281,5 +288,32 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
         .pipe(tap(() => this._filterSelectableItems()))
         .subscribe(null, err => console.error(err));
     }
+  }
+
+  /** Set the header row style observable in DOM environment */
+  private _setHeaderRowStyle(hostRef: ElementRef) {
+    const hostEl: HTMLElement = hostRef.nativeElement;
+    if (!(hostEl instanceof HTMLElement)) return;
+    this.headerRowStyle = merge(
+      fromEvent(window, 'resize', {passive: true}),
+      fromEvent(window, 'scroll', {passive: true})
+    ).pipe(
+      startWith(null),
+      map(() => {
+        const tableEl = hostEl.querySelector('mat-table.mat-table');
+        if (!tableEl) return 0;
+        const {bottom, height, top} = tableEl.getBoundingClientRect();
+        if (top >= 0 || bottom <= 0 || tableEl.childElementCount < 3) return 0;
+        const offset = top >= 0 ? 0 : -top;
+        const limit = (
+          height -
+          tableEl.firstElementChild.getBoundingClientRect().height -
+          tableEl.lastElementChild.getBoundingClientRect().height
+        );
+        return offset > limit ? limit : offset;
+      }),
+      distinctUntilChanged(),
+      map(top => top ? {top: `${top}px`} : {})
+    );
   }
 }

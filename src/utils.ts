@@ -9,4 +9,3 @@ export function isComponentType(value: any): boolean {
 }
 
 export interface ComponentType { new(...args: any[]); }
-

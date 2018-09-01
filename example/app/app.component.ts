@@ -18,8 +18,7 @@ const ID_COLUMN: ItmColumnConfig = {
     <itm-table
       [table]="table"
       [itemsSource]="itemsSource"
-      (event)="onEvent($event)"
-      color="primary"></itm-table>
+      (event)="onEvent($event)"></itm-table>
   `,
   styleUrls: ['./app.component.scss']
 })
