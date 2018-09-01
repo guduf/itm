@@ -1,17 +1,23 @@
 // tslint:disable:max-line-length
-import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { MatMenuTrigger } from '@angular/material';
 import { BehaviorSubject, from, fromEvent , merge, Observable, of, Subscription } from 'rxjs';
-import { distinctUntilChanged, first, map, mergeMap, reduce, skip, tap, startWith } from 'rxjs/operators';
+import { distinctUntilChanged, first, map, mergeMap, reduce, startWith, skip, tap } from 'rxjs/operators';
 // tslint:enable:max-line-length
 
+import { ItmActionConfig, ItmActionEvent, ItmActionDef } from './action';
 import { ItmColumnDef } from './column-def';
+import { ItmButtonMode } from './button.component';
 import { ItmConfig } from './config';
 import { Itm, ItmsChanges, ItmsSource, deferPipe, ItmPipe } from './item';
 import { ItmTableConfig } from './table-config';
-import { ItmActionConfig, ItmActionEvent } from './action';
-import { ItmButtonMode } from './button.component';
 
 const SELECTOR = 'itm-table';
+
+const ITM_TABLE_ORDER_COLUMNS = new ItmActionDef({
+  key: 'itm_table_order_columns',
+  icon: 'view_columns'
+});
 
 @Component({
   selector: SELECTOR,
@@ -55,6 +61,12 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   /** see [[TableConfig.selectionLimit]]. */
   selectionLimit = 0;
+
+  @ViewChild(MatMenuTrigger)
+  /** The trigger for the tabble menu */
+  menuTrigger: MatMenuTrigger;
+
+  menuHeaderActions: ItmActionDef[];
 
   /** The display of the actions cells buttons */
   readonly actionsButtonsMode = new BehaviorSubject<ItmButtonMode>('icon');
@@ -102,6 +114,9 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   /** The current items currently of the table. */
   get items(): I[] { return this._itemsChanges.getValue(); }
+
+  /** The CSS class of the table menu */
+  get menuClass(): string { return 'itm-table-menu'; }
 
   /** The current selection of items. */
   get selection(): Set<I> { return this._selectionChanges.getValue(); }
@@ -153,12 +168,19 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   /** The subsription on toggle each selectable item. */
   private _selectableChangesSubscr: Subscription;
 
+  /** The scroll subscription */
+  private readonly _scrollSubscr: Subscription;
+
   constructor(private readonly _config: ItmConfig, hostRef: ElementRef) {
     this.itemsChanges = this._itemsChanges.asObservable();
     this._selectionSubscr = this._selectionChanges.subscribe(
       selection => this.selectionChanges.next(Array.from(selection))
     );
     this._setHeaderRowStyle(hostRef);
+    if (typeof window === 'undefined') return;
+    this._scrollSubscr = fromEvent(window, 'scroll', {passive: true})
+      .subscribe(() => this.menuTrigger && this.menuTrigger.closeMenu());
+    this.menuHeaderActions = [ITM_TABLE_ORDER_COLUMNS];
   }
 
   ngOnChanges({table: tableChanges, itemsSource: itemSourceChanges}: SimpleChanges) {
@@ -210,6 +232,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     if (this._itemsSubscr) this._itemsSubscr.unsubscribe();
     if (this._selectableChangesSubscr) this._selectableChangesSubscr.unsubscribe();
     if (this._selectablesChangeSubscr) this._selectableChangesSubscr.unsubscribe();
+    if (this._scrollSubscr) this._scrollSubscr.unsubscribe();
   }
 
   /** Determines if the item is selected. */

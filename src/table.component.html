@@ -1,7 +1,11 @@
 <mat-table [dataSource]="itemsChanges">
   <!-- Actions -->
   <ng-container matColumnDef="itm-actions">
-    <th *matHeaderCellDef mat-header-cell [ngClass]="actionHeaderCellClass"></th>
+    <th *matHeaderCellDef mat-header-cell [ngClass]="actionHeaderCellClass">
+      <button mat-icon-button [matMenuTriggerFor]="tableMenu">
+        <mat-icon>settings</mat-icon>
+      </button>
+    </th>
     <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell" [ngClass]="actionCellClass">
       <ng-container [itmActionsCell]="item" [actions]="actions" [buttonsMode]="actionsButtonsMode" [eventEmitter]="event"></ng-container>
     </td>
@@ -41,3 +45,7 @@
   <tr *matHeaderRowDef="displayedColumns" mat-header-row [ngClass]="headerRowClass" [ngStyle]="headerRowStyle | async"></tr>
   <tr *matRowDef="let item; columns: displayedColumns;" mat-row [ngClass]="getRowClass(item) | async"></tr>
 </mat-table>
+
+<mat-menu #tableMenu="matMenu" [class]="menuClass">
+  <itm-buttons [actions]="menuHeaderActions" mode="icon"></itm-buttons>
+</mat-menu>

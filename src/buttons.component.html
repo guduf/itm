@@ -1,9 +1,9 @@
 <ng-container [ngSwitch]="mode">
   <ng-container *ngSwitchCase="'menu'">
-    <mat-menu #appMenu="matMenu">
+    <mat-menu #buttonsMenu="matMenu">
       <ng-container *ngTemplateOutlet="buttons"></ng-container>
     </mat-menu>
-    <button mat-icon-button [matMenuTriggerFor]="appMenu">
+    <button mat-icon-button [matMenuTriggerFor]="buttonsMenu">
       <mat-icon>{{menuIcon}}</mat-icon>
     </button>
   </ng-container>
