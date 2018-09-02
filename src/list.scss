@@ -2,18 +2,38 @@
   $selector: 'itm-list';
 
   .#{$selector} {
+    @extend .mat-body-1;
+
     display: flex;
     flex-flow: column nowrap;
     list-style-type: none;
+    font-size: 16px;
     padding: 0;
 
     & > li {
-      display: block;
-      height: 56px;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      height: 48px;
+      font-size: 16px;
 
       &.itm-dragging-move {
         display: none;
       }
+
+      & > .mat-icon {
+        opacity: 0.33;
+      }
+
+      &:hover {
+        & > .mat-icon {
+          opacity: 0.66;
+        }
+      }
+    }
+
+    &.itm-dragover > li:not(.itm-draging) > .mat-icon {
+      opacity: 0.12;
     }
 
     .#{$selector}-placeholder {
