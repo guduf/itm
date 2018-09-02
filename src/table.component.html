@@ -1,3 +1,5 @@
+
+<itm-list [values]="displayedColumns"></itm-list>
 <mat-table [dataSource]="itemsChanges">
   <!-- Actions -->
   <ng-container matColumnDef="itm-actions">
@@ -47,5 +49,5 @@
 </mat-table>
 
 <mat-menu #tableMenu="matMenu" [class]="menuClass">
-  <itm-buttons [actions]="menuHeaderActions" mode="icon"></itm-buttons>
+  <itm-buttons [actions]="menuHeaderActions" mode="icon" (event)="onMenuHeaderEvent($event)"></itm-buttons>
 </mat-menu>

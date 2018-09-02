@@ -12,6 +12,12 @@ import { ItmHeaderCellDirective } from './header-cell.directive';
 import { ItmMaterialModule } from './material.module';
 import { ItmTableComponent } from './table.component';
 import { ItmButtonsComponent } from './buttons.component';
+import { ItmTableOrganizerDialogComponent } from './table-organizer-dialog.component';
+import { ItmDraggableDirective } from './draggable.directive';
+import { ItmDroppableDirective } from './droppable.directive';
+import { ItmDropPlaceholderDirective } from './drop-placeholder.directive';
+import { ItmDragActionService } from './drag.service';
+import { ItmListComponent } from './list.component';
 
 const IMPORTS = [
   CommonModule,
@@ -21,7 +27,8 @@ const IMPORTS = [
 const ENTRY_COMPONENTS = [
   ItmDefaultActionsCellComponent,
   ItmDefaultCellComponent,
-  ItmDefaultHeaderCellComponent
+  ItmDefaultHeaderCellComponent,
+  ItmTableOrganizerDialogComponent
 ];
 
 const DECLARATIONS = [
@@ -35,6 +42,10 @@ const DECLARATIONS = [
 const EXPORTED_DECLARATIONS = [
   ItmButtonComponent,
   ItmButtonsComponent,
+  ItmDraggableDirective,
+  ItmDroppableDirective,
+  ItmListComponent,
+  ItmDropPlaceholderDirective,
   ItmTableComponent
 ];
 
@@ -52,7 +63,8 @@ export const ITM_CONFIG = new InjectionToken('ITM_CONFIG');
 const configFactory = (config: ItmConfig = {}) => ({...DEFAULT_CONFIG, ...config});
 
 const PROVIDERS = [
-  {provide: ItmConfig, deps: [[new Optional(), ITM_CONFIG]], useFactory: configFactory}
+  {provide: ItmConfig, deps: [[new Optional(), ITM_CONFIG]], useFactory: configFactory},
+  ItmDragActionService
 ];
 
 @NgModule({

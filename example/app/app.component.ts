@@ -14,11 +14,14 @@ const ID_COLUMN: ItmColumnConfig = {
 @Component({
   selector: 'app-root',
   template: `
-    <itm-button action="print"></itm-button>
-    <itm-table
-      [table]="table"
-      [itemsSource]="itemsSource"
-      (event)="onEvent($event)"></itm-table>
+  <ul itmDroppable #droppableList="itmDroppable">
+    <li  *ngFor="let value of values" itmDraggable>
+        {{value}}
+    </li>
+    <li *itmDropPlaceholderFor="droppableList">
+        PLACEHOLDER
+    </li>
+  </ul>
   `,
   styleUrls: ['./app.component.scss']
 })
@@ -26,6 +29,8 @@ export class AppComponent {
   title = 'itm';
 
   itemsSource: Itm[] = DATA;
+
+  values = DATA.map(name => name.lastName);
 
   table: ItmTableConfig = {
     actions: [{key: 'delete'}, {key: 'print'}],
@@ -36,7 +41,6 @@ export class AppComponent {
   };
 
   onEvent(e: ItmActionEvent<Itm>) {
-    console.log(e);
     if (e.key === 'delete') this.remove(e.target);
   }
 

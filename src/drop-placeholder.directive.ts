@@ -1,8 +1,8 @@
 // tslint:disable-next-line:max-line-length
-import { Directive, OnChanges, OnDestroy, Input, ElementRef, TemplateRef, ViewContainerRef, SimpleChanges, EmbeddedViewRef } from '@angular/core';
-import { ItmDroppableDirective } from './itm-droppable.directive';
-import { Subscription, empty } from 'rxjs';
-import { flatMap, tap, map, reduce, distinctUntilChanged, filter } from 'rxjs/operators';
+import { Directive, OnChanges, OnDestroy, Input, TemplateRef, ViewContainerRef, SimpleChanges } from '@angular/core';
+import { ItmDroppableDirective } from './droppable.directive';
+import { Subscription } from 'rxjs';
+import { map, distinctUntilChanged, filter, debounceTime, throttleTime } from 'rxjs/operators';
 
 @Directive({selector: '[itmDropPlaceholderFor]'})
 export class ItmDropPlaceholderDirective<T> implements OnChanges, OnDestroy {

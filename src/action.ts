@@ -31,12 +31,12 @@ export class ItmActionDef<T = {}> implements ItmActionConfig {
 
 export abstract class ItmActionDefs extends Array<ItmActionDef> { }
 
-export class ItmActionEvent<T = {}> {
+export class ItmActionEvent<T = {}, A extends ItmActionDef = ItmActionDef> {
   /** The key of the action */
   readonly key: string;
 
   constructor(
-    readonly action: ItmActionDef,
+    readonly action: A,
     readonly nativeEvent: any,
     readonly target: T = {} as T
   ) {

@@ -2,7 +2,7 @@
 import { Directive, ElementRef, Renderer2, EventEmitter, Output, OnDestroy, ViewChild, AfterViewInit, Input, SimpleChanges, OnChanges, HostBinding, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Subscription, fromEvent, merge, BehaviorSubject, Observable, Subject, empty } from 'rxjs';
 import { tap, map, distinctUntilChanged } from 'rxjs/operators';
-import { ItmDragActionService } from './itm-drag.service';
+import { ItmDragActionService } from './drag.service';
 
 export const DRAGGABLE_DROP_EFFECTS = ['move', 'copy', 'link'];
 
@@ -71,6 +71,8 @@ export class ItmDroppableDirective<T> implements OnDestroy {
         tap(e => {
           const newTarget = window.document.elementFromPoint(e.clientX, e.clientY);
           if (!this._nativeElement.contains(newTarget)) this._resetDragover();
+          e.stopPropagation();
+          return false;
         })
       ),
       fromEvent<DragEvent>(this._nativeElement, 'drop').pipe(

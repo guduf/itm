@@ -1,13 +1,12 @@
-import { Directive, Input, ElementRef, Renderer2 } from '@angular/core';
-import { Subscription, fromEvent, merge } from 'rxjs';
-import { tap, delay, map, filter } from 'rxjs/operators';
-import { ItmDragActionService, ItmDragAction } from './itm-drag.service';
-import { log } from 'util';
+import { Directive, Input, ElementRef, Renderer2, OnDestroy } from '@angular/core';
+import { fromEvent, merge, Subscription } from 'rxjs';
+import { tap, delay, map } from 'rxjs/operators';
+import { ItmDragActionService, ItmDragAction } from './drag.service';
 
 export const DRAGGABLE_DROP_EFFECTS = ['move', 'copy', 'link'];
 
 @Directive({ selector: '[itmDraggable]' })
-export class ItmDraggableDirective<T> {
+export class ItmDraggableDirective<T> implements OnDestroy {
   // tslint:disable-next-line:no-input-rename
   @Input('itmDraggable')
   /** The data target for the transfer. */
@@ -19,6 +18,8 @@ export class ItmDraggableDirective<T> {
   /** The host HTML element to drag. */
   private _nativeElement: HTMLElement;
 
+  private readonly _subscr: Subscription;
+
   constructor(
     private _hostRef: ElementRef,
     private _renderer: Renderer2,
@@ -26,7 +27,7 @@ export class ItmDraggableDirective<T> {
   ) {
     this._nativeElement = this._hostRef.nativeElement;
     this._renderer.setAttribute(this._nativeElement, 'draggable', 'true');
-    merge(
+    this._subscr = merge(
       fromEvent<DragEvent>(this._nativeElement, 'dragstart').pipe(
         map(e => {
           if (!this.isDraggable) return true;
@@ -37,7 +38,7 @@ export class ItmDraggableDirective<T> {
 
           e.stopPropagation();
         }),
-        delay(1),
+        delay(0),
         tap(() => {
           if (this._service.pendingEffect === 'move')
             this._renderer.addClass(this._nativeElement, 'itm-dragging-move');
@@ -54,5 +55,9 @@ export class ItmDraggableDirective<T> {
       )
     )
     .subscribe();
+  }
+
+  ngOnDestroy() {
+    this._subscr.unsubscribe();
   }
 }

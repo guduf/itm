@@ -1,0 +1,23 @@
+@mixin itm-list($config) {
+  $selector: 'itm-list';
+
+  .#{$selector} {
+    display: flex;
+    flex-flow: column nowrap;
+    list-style-type: none;
+    padding: 0;
+
+    & > li {
+      display: block;
+      height: 56px;
+
+      &.itm-dragging-move {
+        display: none;
+      }
+    }
+
+    .#{$selector}-placeholder {
+      background: grey;
+    }
+  }
+}
