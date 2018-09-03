@@ -8,7 +8,7 @@ import { map, distinctUntilChanged, filter, debounceTime, throttleTime } from 'r
 export class ItmDropPlaceholderDirective<T> implements OnChanges, OnDestroy {
   // tslint:disable-next-line:no-input-rename
   @Input('itmDropPlaceholderFor')
-  droppableRef: ItmDroppableDirective<T>;
+  droppableRef: ItmDroppableDirective;
 
   private _dragoverEventSubscr: Subscription;
   private _dragoverSubscr: Subscription;

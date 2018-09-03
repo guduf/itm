@@ -46,7 +46,7 @@ export class ItmDraggableDirective<T> implements OnDestroy {
       ),
       fromEvent<DragEvent>(this._nativeElement, 'dragend').pipe(
         tap(e => {
-          e.dataTransfer.dropEffect = DRAGGABLE_DROP_EFFECTS[0];
+          e.dataTransfer.dropEffect = this._service.pendingEffect;
           this._renderer.removeClass(this._nativeElement, 'itm-dragging');
           e.stopPropagation();
         }),

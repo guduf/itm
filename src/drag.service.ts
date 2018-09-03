@@ -11,7 +11,7 @@ export class ItmDragAction<T> extends ItmActionDef<T> {
   key: 'itm-drag-copy' | 'itm-drag-link' | 'itm-drag-move';
 
   private constructor(key: 'copy' | 'link' | 'move') {
-    super({key: `itm-drag-{key}`, icon: 'drag_indicator'});
+    super({key: `itm-drag-${key}`, icon: 'drag_indicator'});
   }
 }
 
@@ -34,13 +34,22 @@ export class ItmDragActionService {
 
   private _pending: {action: ItmDragAction<any>, target: any, timestamp: number};
 
+  consumeDrag(e: DragEvent): ItmActionDragEvent<any> {
+    const timestamp = parseFloat(e.dataTransfer.getData('Text'));
+    if (timestamp !== this._pending.timestamp)
+      throw new ReferenceError('Drag event data does\'nt match the pending timestamp');
+    const actionEvent = new ItmActionEvent(this._pending.action, e, this._pending.target);
+    this.resetDrag();
+    return actionEvent;
+  }
+
   startDrag<T>(action: ItmDragAction<T>, target: T, timestamp: number): void {
     if (!(action instanceof ItmDragAction))
       throw new TypeError('Action must be a instance of ItmDragAction');
     this._pending = {action, target, timestamp};
   }
 
-  stopDrag(): void {
+  resetDrag(): void {
     this._pending = null;
   }
 }
