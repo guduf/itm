@@ -1,91 +1,80 @@
 // tslint:disable-next-line:max-line-length
-import { Directive, OnChanges, OnDestroy, Input, TemplateRef, ViewContainerRef, SimpleChanges } from '@angular/core';
-import { ItmDroppableDirective } from './droppable.directive';
+import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { map, distinctUntilChanged, filter, debounceTime, throttleTime } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
+
+import { ItmDragActionService } from './drag.service';
+import { ItmDroppableDirective } from './droppable.directive';
 
 @Directive({selector: '[itmDropPlaceholderFor]'})
-export class ItmDropPlaceholderDirective<T> implements OnChanges, OnDestroy {
+export class ItmDropPlaceholderDirective implements OnChanges, OnDestroy {
   // tslint:disable-next-line:no-input-rename
   @Input('itmDropPlaceholderFor')
+  /** The reference on the droppable directive. */
   droppableRef: ItmDroppableDirective;
 
-  private _dragoverEventSubscr: Subscription;
-  private _dragoverSubscr: Subscription;
-  private _placeholderEl: HTMLElement;
+  /** The placeholder native element. */
+  get nativeElement(): HTMLElement {
+    if (!this._viewRef) return null;
+    return this._viewRef.rootNodes[0];
+  }
+
+  /** The subscription on the dragover index. */
+  private _dragoverIndexSubscr: Subscription;
+  private _viewRef: EmbeddedViewRef<any>;
 
   constructor(
     private readonly _templateRef: TemplateRef<any>,
-    private readonly _viewContainerRef: ViewContainerRef
+    private readonly _viewContainerRef: ViewContainerRef,
+    private readonly _renderer: Renderer2,
+    private readonly _service: ItmDragActionService
   ) { }
 
-  ngOnChanges({droppableRef: {currentValue}}: SimpleChanges) {
-    if (currentValue instanceof ItmDroppableDirective)
-      this._attachDroppable();
-  }
-
-  ngOnDestroy() {
-    if (this._dragoverEventSubscr) this._dragoverEventSubscr.unsubscribe();
-    if (this._dragoverSubscr) this._dragoverSubscr.unsubscribe();
-  }
-
-  private _attachDroppable() {
-    if (this._dragoverEventSubscr) this._dragoverEventSubscr.unsubscribe();
-    if (this._dragoverSubscr) this._dragoverSubscr.unsubscribe();
-    this._dragoverSubscr = this.droppableRef.dragoverChanges.pipe(
-      map(dragover => {
-        if (!dragover) return null;
-        const viewRef = this._viewContainerRef.createEmbeddedView(this._templateRef);
-        const placeholderEl = viewRef.rootNodes[0];
-        if (!(placeholderEl instanceof HTMLElement)) return null;
-        const droppableEl = placeholderEl.parentElement;
-        if (droppableEl !== this.droppableRef.nativeElement) {
-          // tslint:disable-next-line:max-line-length
-          console.error(new Error('The parent element of the placeholder is not the droppable element'));
-          return null;
-        }
-        return placeholderEl;
-      }),
-      filter(placeholderEl => {
-        this._placeholderEl = placeholderEl;
-        if (!placeholderEl) this._viewContainerRef.clear();
-        return Boolean(placeholderEl);
-      })
-    )
-    .subscribe(
-      dragoverEnabled => {
-        if (dragoverEnabled) this._enableDragover();
-        else this._dragoverEventSubscr.unsubscribe();
-      },
-      err => console.error(err)
+  ngOnChanges({droppableRef: {currentValue, previousValue}}: SimpleChanges) {
+    if (!(currentValue instanceof ItmDroppableDirective)) {
+      if (previousValue instanceof ItmDroppableDirective) previousValue.detachPlaceholder();
+      this._resetView();
+      return;
+    }
+    if (this._dragoverIndexSubscr) this._dragoverIndexSubscr.unsubscribe();
+    this._dragoverIndexSubscr = this.droppableRef.attachPlaceholder(this).subscribe(
+      i => this._onDragoverIndexChanges(i),
+      err => console.error(err),
+      () => this._resetView()
     );
   }
 
-  private _enableDragover() {
-    if (this._dragoverEventSubscr) this._dragoverEventSubscr.unsubscribe();
+  ngOnDestroy() {
+    if (this._dragoverIndexSubscr) this._dragoverIndexSubscr.unsubscribe();
+    this.droppableRef.detachPlaceholder();
+  }
+
+  /** Create the embedded placeholder view. */
+  private _createView(): EmbeddedViewRef<any> {
+    const viewRef = this._viewContainerRef.createEmbeddedView(this._templateRef);
+    const placeholderEl = viewRef.rootNodes[0];
+    if (!(placeholderEl instanceof HTMLElement)) return null;
+    this._renderer.addClass(placeholderEl, 'itm-drop-placeholder');
+    return viewRef;
+  }
+
+  /** Set the view and replace the placeholder when dragover changes. */
+  private _onDragoverIndexChanges(i: number) {
+    if (!(i >= 0)) return this._resetView();
+    if (!this._viewRef) this._viewRef = this._createView();
     const droppableEl = this.droppableRef.nativeElement;
-    const placeholderEl = this._placeholderEl;
-    this._dragoverEventSubscr = this.droppableRef.dragoverEvent
-      .pipe(
-        map(e => {
-          const i: number = Array.from(droppableEl.children).reduce(
-            (acc, el, j) => (acc < 0 && el === e.target as HTMLElement) ? j : acc,
-            -1
-          );
-          const child = (droppableEl.children.item(i) as HTMLElement) || placeholderEl;
-          if (i < 0 || child === placeholderEl) return i;
-          const rect = child.getBoundingClientRect();
-          const isFirsHalf = e.clientY < rect.top + rect.height / 2;
-          return isFirsHalf ? i : i + 1;
-        }),
-        distinctUntilChanged((a, b) => a === b)
-      )
-      .subscribe(
-        i => {
-          const child = droppableEl.children.item(i);
-          if (child) droppableEl.insertBefore(placeholderEl, child);
-        },
-        err => console.error(err)
-      );
+    const children = Array.from(droppableEl.children)
+      .filter(el => (
+        el !== this._service.pending.nativeEvent.target &&
+        el !== this.nativeElement
+      ));
+    if (i >= children.length) droppableEl.appendChild(this.nativeElement);
+    else droppableEl.insertBefore(this.nativeElement, children[i]);
+  }
+
+  /** Reset the the view container. */
+  private _resetView(): void {
+    this._viewContainerRef.clear();
+    this._viewRef = null;
   }
 }

@@ -16,10 +16,7 @@ import { ItmTableOrganizerDialogData } from './table-organizer-dialog.component'
 
 const SELECTOR = 'itm-table';
 
-const ITM_TABLE_ORDER_COLUMNS_ACTION = new ItmActionDef({
-  key: 'itm_table_order_columns',
-  icon: 'view_columns'
-});
+
 
 @Component({
   selector: SELECTOR,
@@ -64,12 +61,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   /** see [[TableConfig.selectionLimit]]. */
   selectionLimit = 0;
 
-  @ViewChild(MatMenuTrigger)
-  /** The trigger for the tabble menu */
-  menuTrigger: MatMenuTrigger;
-
-  menuHeaderActions: ItmActionDef[];
-
   /** The display of the actions cells buttons */
   readonly actionsButtonsMode = new BehaviorSubject<ItmButtonMode>('icon');
 
@@ -95,6 +86,10 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     return 'itm-header-row';
   }
 
+  get instance(): this {
+    return this;
+  }
+
   /** Determines if all selectables items are selected observing selection limit. */
   get isAllSelected(): boolean {
     if (this.selection.size >= this.items.length) return true;
@@ -116,9 +111,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   /** The current items currently of the table. */
   get items(): I[] { return this._itemsChanges.getValue(); }
-
-  /** The CSS class of the table menu */
-  get menuClass(): string { return 'itm-table-menu'; }
 
   /** The current selection of items. */
   get selection(): Set<I> { return this._selectionChanges.getValue(); }
@@ -170,9 +162,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   /** The subsription on toggle each selectable item. */
   private _selectableChangesSubscr: Subscription;
 
-  /** The scroll subscription */
-  private readonly _scrollSubscr: Subscription;
-
   private _matDialogRef: MatDialogRef<any>;
 
   constructor(
@@ -185,10 +174,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
       selection => this.selectionChanges.next(Array.from(selection))
     );
     this._setHeaderRowStyle(hostRef);
-    if (typeof window === 'undefined') return;
-    this._scrollSubscr = fromEvent(window, 'scroll', {passive: true})
-      .subscribe(() => this.menuTrigger && this.menuTrigger.closeMenu());
-    this.menuHeaderActions = [ITM_TABLE_ORDER_COLUMNS_ACTION];
   }
 
   ngOnChanges({table: tableChanges, itemsSource: itemSourceChanges}: SimpleChanges) {
@@ -240,9 +225,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     if (this._itemsSubscr) this._itemsSubscr.unsubscribe();
     if (this._selectableChangesSubscr) this._selectableChangesSubscr.unsubscribe();
     if (this._selectablesChangeSubscr) this._selectableChangesSubscr.unsubscribe();
-    if (this._scrollSubscr) this._scrollSubscr.unsubscribe();
     if (this._matDialogRef) this._matDialogRef.close();
-    if (this.menuTrigger.menuOpen) this.menuTrigger.closeMenu();
   }
 
   /** Determines if the item is selected. */
@@ -278,13 +261,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   getSelectionCellIcon(item: I) {
     const {selectedCheckBoxIcon, unselectedCheckBoxIcon} = this._config;
     return this.isSelected(item) ? selectedCheckBoxIcon : unselectedCheckBoxIcon;
-  }
-
-  onMenuHeaderEvent({action}: ItmActionEvent) {
-    switch (action) {
-      case ITM_TABLE_ORDER_COLUMNS_ACTION: return this._openOrganizerDialog();
-      default: return;
-    }
   }
 
   /** Adds the item to the selection or removes it if selected. */
@@ -332,11 +308,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
         .pipe(tap(() => this._filterSelectableItems()))
         .subscribe(null, err => console.error(err));
     }
-  }
-
-  /** Opens the ItmTableOrganizerDialogComponent */
-  private _openOrganizerDialog(): void {
-    ItmTableOrganizerDialogComponent.create(this._dialog, {columns: this.columns});
   }
 
   /** Set the header row style observable in DOM environment */

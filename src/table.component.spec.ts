@@ -47,7 +47,7 @@ describe('ItmTableComponent', () => {
         ItmActionsCellDirective,
         ItmCellDirective,
         ItmHeaderCellDirective,
-        ItmTableComponent
+        ItmTableComponent,
       ],
       providers: [
         {provide: ItmConfig, useValue: DEFAULT_CONFIG}

@@ -1,7 +1,8 @@
 import { Directive, Input, ElementRef, Renderer2, OnDestroy } from '@angular/core';
 import { fromEvent, merge, Subscription } from 'rxjs';
-import { tap, delay, map } from 'rxjs/operators';
-import { ItmDragActionService, ItmDragAction } from './drag.service';
+import { delay, map , tap} from 'rxjs/operators';
+
+import { ItmDragAction, ItmDragActionService } from './drag.service';
 
 export const DRAGGABLE_DROP_EFFECTS = ['move', 'copy', 'link'];
 
@@ -18,7 +19,8 @@ export class ItmDraggableDirective<T> implements OnDestroy {
   /** The host HTML element to drag. */
   private _nativeElement: HTMLElement;
 
-  private readonly _subscr: Subscription;
+  /** The subscriptions on native drag events. */
+  private readonly _dragEventSubscr: Subscription;
 
   constructor(
     private _hostRef: ElementRef,
@@ -27,11 +29,19 @@ export class ItmDraggableDirective<T> implements OnDestroy {
   ) {
     this._nativeElement = this._hostRef.nativeElement;
     this._renderer.setAttribute(this._nativeElement, 'draggable', 'true');
-    this._subscr = merge(
+    this._dragEventSubscr = merge(
       fromEvent<DragEvent>(this._nativeElement, 'dragstart').pipe(
         map(e => {
           if (!this.isDraggable) return true;
-          this._service.startDrag(ItmDragAction.MOVE_ACTION, {}, e.timeStamp);
+          const oldIndex = Array.from(this._nativeElement.parentElement.children)
+            .reduce((acc, el, i) => (acc >= 0 || this._nativeElement !== el) ? acc : i, -1);
+          this._service.startDrag({
+            action: ItmDragAction.MOVE_ACTION,
+            target: this.target,
+            nativeEvent: e,
+            oldIndex,
+            draggedNativeElement: this._nativeElement
+          });
           e.dataTransfer.effectAllowed = this._service.pendingEffect;
           e.dataTransfer.setData('Text', String(e.timeStamp));
           this._renderer.addClass(this._nativeElement, 'itm-dragging');
@@ -58,6 +68,6 @@ export class ItmDraggableDirective<T> implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this._subscr.unsubscribe();
+    this._dragEventSubscr.unsubscribe();
   }
 }

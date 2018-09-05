@@ -3,9 +3,7 @@
   <!-- Actions -->
   <ng-container matColumnDef="itm-actions">
     <th *matHeaderCellDef mat-header-cell [ngClass]="actionHeaderCellClass">
-      <button mat-icon-button [matMenuTriggerFor]="tableMenu">
-        <mat-icon>settings</mat-icon>
-      </button>
+      <itm-table-settings [table]="instance"></itm-table-settings>
     </th>
     <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell" [ngClass]="actionCellClass">
       <ng-container [itmActionsCell]="item" [actions]="actions" [buttonsMode]="actionsButtonsMode" [eventEmitter]="event"></ng-container>
@@ -47,6 +45,4 @@
   <tr *matRowDef="let item; columns: displayedColumns;" mat-row [ngClass]="getRowClass(item) | async"></tr>
 </mat-table>
 
-<mat-menu #tableMenu="matMenu" [class]="menuClass">
-  <itm-buttons [actions]="menuHeaderActions" mode="icon" (event)="onMenuHeaderEvent($event)"></itm-buttons>
-</mat-menu>
+

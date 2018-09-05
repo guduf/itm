@@ -18,6 +18,7 @@ import { ItmDroppableDirective } from './droppable.directive';
 import { ItmDropPlaceholderDirective } from './drop-placeholder.directive';
 import { ItmDragActionService } from './drag.service';
 import { ItmListComponent } from './list.component';
+import { ItmTableSettingsComponent } from './table-settings.component';
 
 const IMPORTS = [
   CommonModule,
@@ -36,7 +37,8 @@ const DECLARATIONS = [
   ItmCellDirective,
   ItmDefaultCellComponent,
   ItmHeaderCellDirective,
-  ItmDefaultActionsCellComponent
+  ItmDefaultActionsCellComponent,
+  ItmTableSettingsComponent
 ];
 
 const EXPORTED_DECLARATIONS = [

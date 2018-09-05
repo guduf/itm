@@ -19,6 +19,9 @@
 
       &.itm-dragging-move {
         display: none;
+        position: absolute;
+        top: 100vh;
+        left: 100vh;
       }
 
       & > .mat-icon {
