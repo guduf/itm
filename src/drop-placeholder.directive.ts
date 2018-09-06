@@ -3,7 +3,7 @@ import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, Sim
 import { Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-import { ItmDragActionService } from './drag.service';
+import { ItmDragActionService } from './drag-action.service';
 import { ItmDroppableDirective } from './droppable.directive';
 
 @Directive({selector: '[itmDropPlaceholderFor]'})

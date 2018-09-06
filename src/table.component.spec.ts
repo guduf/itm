@@ -1,5 +1,5 @@
 // tslint:disable:max-line-length
-import { ValueProvider, Directive, Input } from '@angular/core';
+import { ValueProvider, Directive, Input, Component } from '@angular/core';
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
@@ -17,7 +17,7 @@ import { ItmActionsCellDirective } from './actions-cell.directive';
 
 @Directive({selector: '[itmCell]'})
 // tslint:disable-next-line:directive-class-suffix
-export class ItmCellDirective {
+class ItmCellDirective {
   @Input()
   column: ItmColumnDef;
 
@@ -28,13 +28,19 @@ export class ItmCellDirective {
 
 @Directive({selector: '[itmHeaderCell]'})
 // tslint:disable-next-line:directive-class-suffix
-export class ItmHeaderCellDirective<I extends Itm = Itm> {
+class ItmHeaderCellDirective<I extends Itm = Itm> {
   @Input()
   column: ItmColumnDef;
 
   // tslint:disable-next-line:no-input-rename
   @Input('itmHeaderCell')
   itemsChanges: ItmsChanges<I>;
+}
+
+@Component({selector: 'itm-table-settings', template: ''})
+class ItmTableSettingsComponent {
+  @Input()
+  table: ItmTableComponent;
 }
 
 describe('ItmTableComponent', () => {
@@ -48,6 +54,7 @@ describe('ItmTableComponent', () => {
         ItmCellDirective,
         ItmHeaderCellDirective,
         ItmTableComponent,
+        ItmTableSettingsComponent
       ],
       providers: [
         {provide: ItmConfig, useValue: DEFAULT_CONFIG}

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { filter, first } from 'rxjs/operators';
 
 import { ItmActionDef, ItmActionEvent } from './action';
 
@@ -15,7 +16,7 @@ export class ItmDragAction<T> extends ItmActionDef<T> {
   }
 }
 
-export class ItmActionDragEvent<T> extends ItmActionEvent<T, ItmDragAction<T>> {
+export class ItmDragActionEvent<T> extends ItmActionEvent<T, ItmDragAction<T>> {
   constructor(
     readonly action: ItmDragAction<T>,
     readonly nativeEvent: any,
@@ -49,15 +50,21 @@ export class ItmDragActionService {
     }
   }
 
+  /** The pending action. */
   get pending(): ItmDragPendingAction { return this._pending; }
 
+  /** see [[ItmDragService.pending]] */
   private _pending: ItmDragPendingAction;
 
-  consumeDrag(e: DragEvent, newIndex: number, sameParent: boolean): ItmActionDragEvent<any> {
+  /** The subject of all drop action events. */
+  private _dropEvent = new Subject<ItmDragActionEvent<any>>();
+
+  /** Consume a native drop event and emits a new drag action event observing the pending action. */
+  consumeDrag(e: DragEvent, newIndex: number, sameParent: boolean): ItmDragActionEvent<any> {
     const timestamp = parseFloat(e.dataTransfer.getData('Text'));
     if (timestamp !== this._pending.nativeEvent.timeStamp)
       throw new ReferenceError('Drag event data does\'nt match the pending timestamp');
-    const actionEvent = new ItmActionDragEvent(
+    const actionEvent = new ItmDragActionEvent(
       this._pending.action,
       e,
       this._pending.target,
@@ -66,15 +73,24 @@ export class ItmDragActionService {
       sameParent
     );
     this.resetDrag();
+    this._dropEvent.next(actionEvent);
     return actionEvent;
   }
 
-  startDrag<T>(pending: ItmDragPendingAction): void {
+  /** Start a pending action. */
+  startDrag(pending: ItmDragPendingAction): Observable<ItmDragActionEvent<any>> {
     if (!(pending.action instanceof ItmDragAction))
       throw new TypeError('Action must be a instance of ItmDragAction');
     this._pending = pending;
+    return this._dropEvent.pipe(
+      filter(e => (
+        parseFloat(e.nativeEvent.dataTransfer.getData('Text')) === pending.nativeEvent.timeStamp
+      )),
+      first()
+    );
   }
 
+  /** Reset a possible pending action. */
   resetDrag(): void {
     this._pending = null;
   }

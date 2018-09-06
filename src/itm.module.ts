@@ -16,7 +16,7 @@ import { ItmTableOrganizerDialogComponent } from './table-organizer-dialog.compo
 import { ItmDraggableDirective } from './draggable.directive';
 import { ItmDroppableDirective } from './droppable.directive';
 import { ItmDropPlaceholderDirective } from './drop-placeholder.directive';
-import { ItmDragActionService } from './drag.service';
+import { ItmDragActionService } from './drag-action.service';
 import { ItmListComponent } from './list.component';
 import { ItmTableSettingsComponent } from './table-settings.component';
 

@@ -3,7 +3,7 @@ import { Directive, ElementRef, EventEmitter, NgZone, OnDestroy, Output, Rendere
 import { BehaviorSubject, fromEvent, merge, Observable, Subscription, throwError } from 'rxjs';
 import { map, takeWhile } from 'rxjs/operators';
 
-import { ItmActionDragEvent, ItmDragActionService } from './drag.service';
+import { ItmDragActionEvent, ItmDragActionService } from './drag-action.service';
 import { ItmDropPlaceholderDirective } from './drop-placeholder.directive';
 
 export const DRAGGABLE_DROP_EFFECTS = ['move', 'copy', 'link'];
@@ -13,7 +13,7 @@ export class ItmDroppableDirective implements OnDestroy {
   // tslint:disable-next-line:no-output-rename
   @Output('itmDroppable')
   /** The data target for the transfer. */
-  drop = new EventEmitter<ItmActionDragEvent<any>>();
+  drop = new EventEmitter<ItmDragActionEvent<any>>();
 
   /** The droppable native element. */
   get nativeElement(): HTMLElement { return this._nativeElement; }
@@ -92,7 +92,7 @@ export class ItmDroppableDirective implements OnDestroy {
         map(e => {
           e.preventDefault();
           e.dataTransfer.dropEffect = this._service.pendingEffect;
-          let actionEvent: ItmActionDragEvent<any>;
+          let actionEvent: ItmDragActionEvent<any>;
           if (!(this._dragoverIndex.value >= 0)) return this._resetDragover();
           const sameParent = (
             this._service.pending.draggedNativeElement.parentElement === this.nativeElement
