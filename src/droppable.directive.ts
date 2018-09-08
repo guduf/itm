@@ -32,9 +32,6 @@ export class ItmDroppableDirective implements OnDestroy {
   /** The behavior subject of dragover index. */
   private _dragoverIndex = new BehaviorSubject(-1);
 
-  /** The reference of the dragover event listener on the droppable native element.  */
-  private _dragoverListener: (e: DragEvent) => false;
-
   /** The reference of the placeholder attached to droppable. */
   private _placeholder: ItmDropPlaceholderDirective;
 
@@ -71,65 +68,62 @@ export class ItmDroppableDirective implements OnDestroy {
 
   /** Subscribe on native drag events. */
   private _subscribeDragEvents() {
-    this._dragEventSubscr = this._dragEventSubscr = merge(
-      fromEvent<DragEvent>(this._nativeElement, 'dragenter').pipe(
-        map(e => {
-          if (!this._service.isDragging) return true;
-          if (!this.dragover) this._setDragover();
-          e.preventDefault();
-          return false;
-        })
-      ),
-      fromEvent<DragEvent>(this._nativeElement, 'dragleave').pipe(
-        map(e => {
-          const newTarget = window.document.elementFromPoint(e.clientX, e.clientY);
-          if (!this._nativeElement.contains(newTarget)) this._resetDragover();
-          e.stopPropagation();
-          return false;
-        })
-      ),
-      fromEvent<DragEvent>(this._nativeElement, 'drop').pipe(
-        map(e => {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = this._service.pendingEffect;
-          let actionEvent: ItmDragActionEvent<any>;
-          if (!(this._dragoverIndex.value >= 0)) return this._resetDragover();
-          const sameParent = (
-            this._service.pending.draggedNativeElement.parentElement === this.nativeElement
-          );
-          try { actionEvent = this._service.consumeDrag(e, this._dragoverIndex.value, sameParent); }
-          catch (err) { console.error(err); }
-          this.drop.emit(actionEvent);
-          e.stopPropagation();
-          this._resetDragover();
-          return false;
-        })
+    this._dragEventSubscr = this._dragEventSubscr = this._zone.runOutsideAngular(() => {
+      return merge(
+        fromEvent<DragEvent>(this._nativeElement, 'dragenter').pipe(
+          map(e => {
+            if (!this._service.isDragging) return true;
+            if (!this.dragover) this._setDragover();
+            e.preventDefault();
+            return false;
+          })
+        ),
+        fromEvent(this.nativeElement, 'dragover').pipe(
+          map((e: DragEvent) => {
+            e.preventDefault();
+            this._refreshDragoverIndex(e);
+            return false;
+          })
+        ),
+        fromEvent<DragEvent>(this._nativeElement, 'dragleave').pipe(
+          map(e => {
+            const newTarget = window.document.elementFromPoint(e.clientX, e.clientY);
+            if (!this._nativeElement.contains(newTarget)) this._resetDragover();
+            e.stopPropagation();
+            return false;
+          })
+        ),
+        fromEvent<DragEvent>(this._nativeElement, 'drop').pipe(
+          map(e => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = this._service.pendingEffect;
+            let actionEvent: ItmDragActionEvent<any>;
+            if (!(this._dragoverIndex.value >= 0)) return this._resetDragover();
+            const sameParent = (
+              this._service.pending.draggedNativeElement.parentElement === this.nativeElement
+            );
+            try {
+              actionEvent = this._service.consumeDrag(e, this._dragoverIndex.value, sameParent);
+            }
+            catch (err) { console.error(err); }
+            this.drop.emit(actionEvent);
+            e.stopPropagation();
+            this._resetDragover();
+            return false;
+          })
+        )
       )
-    )
-    .subscribe();
+      .subscribe();
+    });
   }
 
   /** Set the dragover event listenner. */
   private _setDragover() {
-    if (this.dragover) return;
-    if (this._dragoverListener)
-      this._nativeElement.removeEventListener('dragover', this._dragoverListener);
-    this._zone.runOutsideAngular(() => {
-      this._dragoverListener = (e: DragEvent) => {
-        e.preventDefault();
-        this._refreshDragoverIndex(e);
-        return false;
-      };
-      this._nativeElement.addEventListener('dragover', this._dragoverListener);
-      });
     this._renderer.addClass(this._nativeElement, 'itm-dragover');
   }
 
   /** Resets the dragover state. */
   private _resetDragover(): false {
-    if (this._dragoverListener)
-      this._nativeElement.removeEventListener('dragover', this._dragoverListener);
-    this._dragoverListener = null;
     this._renderer.removeClass(this._nativeElement, 'itm-dragover');
     this._dragoverIndex.next(-1);
     return false;

@@ -1,0 +1,14 @@
+<mat-toolbar>
+  <span>{{'itm.table_organizer' | itmLocale}}</span>
+  <button mat-icon-button (click)="cancel()">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-toolbar>
+<mat-dialog-content>
+  <itm-list [values]="values"></itm-list>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-mini-fab (click)="close()">
+    <mat-icon>done</mat-icon>
+  </button>
+</mat-dialog-actions>

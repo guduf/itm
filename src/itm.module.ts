@@ -9,10 +9,11 @@ import { ItmDefaultActionsCellComponent } from './default-actions-cell.component
 import { ItmDefaultCellComponent } from './default-cell.component';
 import { ItmDefaultHeaderCellComponent } from './default-header-cell.component';
 import { ItmHeaderCellDirective } from './header-cell.directive';
+import { ItmLocalePipe } from './locale.pipe';
 import { ItmMaterialModule } from './material.module';
 import { ItmTableComponent } from './table.component';
 import { ItmButtonsComponent } from './buttons.component';
-import { ItmTableOrganizerDialogComponent } from './table-organizer-dialog.component';
+import { ItmSortableListDialogComponent } from './sortable-list-dialog.component';
 import { ItmDraggableDirective } from './draggable.directive';
 import { ItmDroppableDirective } from './droppable.directive';
 import { ItmDropPlaceholderDirective } from './drop-placeholder.directive';
@@ -29,7 +30,7 @@ const ENTRY_COMPONENTS = [
   ItmDefaultActionsCellComponent,
   ItmDefaultCellComponent,
   ItmDefaultHeaderCellComponent,
-  ItmTableOrganizerDialogComponent
+  ItmSortableListDialogComponent
 ];
 
 const DECLARATIONS = [
@@ -47,8 +48,9 @@ const EXPORTED_DECLARATIONS = [
   ItmDraggableDirective,
   ItmDroppableDirective,
   ItmListComponent,
+  ItmLocalePipe,
   ItmDropPlaceholderDirective,
-  ItmTableComponent
+  ItmTableComponent,
 ];
 
 export const DEFAULT_CONFIG: ItmConfig = {

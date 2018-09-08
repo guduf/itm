@@ -1,22 +1,18 @@
 // tslint:disable:max-line-length
-import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { MatMenuTrigger, MatDialogRef, MatDialog } from '@angular/material';
+import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { MatDialogRef, MatDialog } from '@angular/material';
 import { BehaviorSubject, from, fromEvent , merge, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilChanged, first, map, mergeMap, reduce, startWith, skip, tap } from 'rxjs/operators';
 // tslint:enable:max-line-length
 
-import { ItmActionConfig, ItmActionEvent, ItmActionDef } from './action';
+import { ItmActionConfig, ItmActionEvent } from './action';
 import { ItmColumnDef } from './column-def';
 import { ItmButtonMode } from './button.component';
 import { ItmConfig } from './config';
 import { Itm, ItmsChanges, ItmsSource, deferPipe, ItmPipe } from './item';
 import { ItmTableConfig } from './table-config';
-import { ItmTableOrganizerDialogComponent } from './table-organizer-dialog.component';
-import { ItmTableOrganizerDialogData } from './table-organizer-dialog.component';
 
 const SELECTOR = 'itm-table';
-
-
 
 @Component({
   selector: SELECTOR,
@@ -52,14 +48,14 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   /** The columns transcluded to the MatTable */
   columns: ItmColumnDef[];
 
-  /** The keys of the columns to display. */
-  displayedColumns: string[];
-
   /** The observable to set the style of the header row. */
   headerRowStyle: Observable<{ [key: string]: string; }>;
 
   /** see [[TableConfig.selectionLimit]]. */
   selectionLimit = 0;
+
+  /** The table settings */
+  settings: Partial<{ columns: string[]; }> = {};
 
   /** The display of the actions cells buttons */
   readonly actionsButtonsMode = new BehaviorSubject<ItmButtonMode>('icon');
@@ -80,6 +76,18 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   get actionHeaderCellClass() {
     const size  = Math.ceil(this.actions.length * 40 / 60);
     return `itm-action-header-cell itm-slot-${size}`;
+  }
+
+  /** The keys of the columns to display. */
+  get displayedColumns(): string[] {
+    const columns = (
+      this.settings.columns ? this.settings.columns : this.columns.map(({key}) => key)
+    );
+    return  [
+      ...(this.columns.length && (this._canSelect ? ['$itm-selection'] : [])),
+      ...columns,
+      ...(this.actions ? ['$itm-actions'] : []),
+    ];
   }
 
   get headerRowClass() {
@@ -166,7 +174,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   constructor(
     private readonly _config: ItmConfig,
-    private _dialog: MatDialog,
     hostRef: ElementRef
   ) {
     this.itemsChanges = this._itemsChanges.asObservable();
@@ -200,11 +207,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
         this.columns = columns.map(def => new ItmColumnDef(
           typeof def === 'string' ? {key: def} : def
         ));
-        this.displayedColumns = [
-          ...(this.columns.length && (this._canSelect ? ['itm-selection'] : [])),
-          ...this.columns.map(({key}) => key),
-          ...(this.actions ? ['itm-actions'] : []),
-        ];
         this._selectionChanges.next(new Set());
       }
     }

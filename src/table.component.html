@@ -1,7 +1,7 @@
 
 <mat-table [dataSource]="itemsChanges">
   <!-- Actions -->
-  <ng-container matColumnDef="itm-actions">
+  <ng-container matColumnDef="$itm-actions">
     <th *matHeaderCellDef mat-header-cell [ngClass]="actionHeaderCellClass">
       <itm-table-settings [table]="instance"></itm-table-settings>
     </th>
@@ -11,7 +11,7 @@
   </ng-container>
 
   <!-- Selection -->
-  <ng-container matColumnDef="itm-selection">
+  <ng-container matColumnDef="$itm-selection">
     <th *matHeaderCellDef mat-header-cell [ngClass]="selectionHeaderCellClass">
       <button
         mat-icon-button [color]="color"

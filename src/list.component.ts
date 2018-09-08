@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
 import { ItmDragActionEvent } from './drag-action.service';
 
@@ -6,26 +6,33 @@ import { ItmDragActionEvent } from './drag-action.service';
   selector: 'itm-list',
   template: `
   <ul class="itm-list" role="list"
-    (itmDroppable)="drop.emit($event)" #droppableList="itmDroppable">
-    <li *ngFor="let value of values"
-      role="list-item"
-      [itmDraggable]="value" (drop)="onDrop($event)">
+    (itmDroppable)="onDrop($event)" #droppableList="itmDroppable">
+    <li *ngFor="let value of sortedValues" role="list-item" [itmDraggable]="value">
       <mat-icon>drag_indicator</mat-icon>
       <span>{{value}}</span>
     </li>
-    <li *itmDropPlaceholderFor="droppableList">
-    </li>
+    <li *itmDropPlaceholderFor="droppableList"></li>
   </ul>
   `
 })
-export class ItmListComponent<T> {
+export class ItmListComponent<T> implements OnChanges {
   @Input()
-  values: string[];
+  values: T[];
 
   @Output()
-  drop = new EventEmitter<ItmDragActionEvent<T>>();
+  sort = new EventEmitter<ItmDragActionEvent<T>>();
+
+  sortedValues: T[];
+
+  ngOnChanges() {
+    this.sortedValues = [...this.values];
+  }
 
   onDrop(e: ItmDragActionEvent<T>) {
-    console.log(e);
+    if (!e.sameParent || e.oldIndex === e.newIndex) return;
+    const values = [...this.sortedValues];
+    const [target] = values.splice(e.oldIndex, 1);
+    values.splice(e.newIndex, 0, target);
+    this.sortedValues = values;
   }
 }

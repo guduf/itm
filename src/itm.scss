@@ -3,6 +3,7 @@
 @import './slot';
 @import './table';
 @import './list';
+@import './sortable-list-dialog';
 
 @mixin itm-core($config: null) {
   @if $config == null {
@@ -14,4 +15,5 @@
   @include itm-button($config);
   @include itm-table($config);
   @include itm-list($config);
+  @include itm-sortable-list-dialog($config);
 }
