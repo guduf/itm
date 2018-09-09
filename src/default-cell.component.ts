@@ -1,13 +1,13 @@
 import { Component, HostBinding, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import { ITM_DEFAULT_CELL_VALUE_CHANGES } from './column-def';
+import { ItmColumnDef } from './column';
+import { Itm } from './item';
 
 const SELECTOR = 'itm-default-cell';
 
 @Component({
   selector: SELECTOR,
-  template: `{{valueChanges | async}}`
+  template: `{{rendered | async}}`
 })
 /**
  * Entry component created by CellDirective
@@ -17,9 +17,13 @@ export class ItmDefaultCellComponent {
   /** The css class attached to the host. */
   get hostClass() { return SELECTOR; }
 
+  rendered: Observable<string>;
+
   constructor(
-    @Inject(ITM_DEFAULT_CELL_VALUE_CHANGES)
-    /** The value changes to display. */
-    public valueChanges: Observable<string>
-  ) { }
+    column: ItmColumnDef,
+    private item: Itm
+  ) {
+    console.log(item, this.item);
+    this.rendered = column.defaultText(this.item);
+  }
 }

@@ -6,6 +6,8 @@ export class ItmConfig {
   defaultHeaderCellComp?: any;
   /** The actions component to create if not specified. Default: ItmDefaultActionsCellComponent */
   defaultActionsCellComp?: any;
+  /** The area component to create if not specified. Default: ItmDefaultAreaComponent */
+  defaultCardAreaComp?: any;
   /**
    * The icon to display in the button of selection column when item is selected.
    * Default: 'check_box' */

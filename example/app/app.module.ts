@@ -6,6 +6,7 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { ItmModule } from 'src/itm.module';
 import { MatCheckboxModule, MatTableModule } from '@angular/material';
+import { User } from './user';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,7 @@ import { MatCheckboxModule, MatTableModule } from '@angular/material';
     BrowserAnimationsModule,
     MatCheckboxModule,
     MatTableModule,
-    ItmModule
+    ItmModule.create([User])
   ],
   providers: [],
   bootstrap: [AppComponent]

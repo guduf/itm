@@ -9,6 +9,8 @@ export abstract class Itm {
   [key: string]: any;
 }
 
+export abstract class Itms<I extends Itm = Itm> extends Array<I> { }
+
 /** Represents a observable of a array of generic items. */
 export abstract class ItmsChanges<I extends Itm = Itm> extends Observable<I[]> { }
 

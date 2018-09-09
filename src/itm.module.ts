@@ -1,5 +1,6 @@
+import 'reflect-metadata';
 import { CommonModule } from '@angular/common';
-import { NgModule, InjectionToken, Optional } from '@angular/core';
+import { NgModule, InjectionToken, ModuleWithProviders, Optional } from '@angular/core';
 
 import { ItmActionsCellDirective } from './actions-cell.directive';
 import { ItmButtonComponent } from './button.component';
@@ -20,6 +21,8 @@ import { ItmDropPlaceholderDirective } from './drop-placeholder.directive';
 import { ItmDragActionService } from './drag-action.service';
 import { ItmListComponent } from './list.component';
 import { ItmTableSettingsComponent } from './table-settings.component';
+import { ItmTypeService, ItmTableTypePipe } from './type.service';
+import { ItmTypeDef, getItmTypeDef, ItmTypeDefs } from './type';
 
 const IMPORTS = [
   CommonModule,
@@ -51,6 +54,7 @@ const EXPORTED_DECLARATIONS = [
   ItmLocalePipe,
   ItmDropPlaceholderDirective,
   ItmTableComponent,
+  ItmTableTypePipe
 ];
 
 export const DEFAULT_CONFIG: ItmConfig = {
@@ -64,10 +68,24 @@ export const DEFAULT_CONFIG: ItmConfig = {
 
 export const ITM_CONFIG = new InjectionToken('ITM_CONFIG');
 
-const configFactory = (config: ItmConfig = {}) => ({...DEFAULT_CONFIG, ...config});
+const configFactory = (config: ItmConfig = {}): ItmConfig => ({...DEFAULT_CONFIG, ...config});
+
+export const ITM_TYPES = new InjectionToken('ITM_TYPES');
+
+const typeDefsFactory = (typeCtors: any[] = []): ItmTypeDefs => {
+  const typeDefs = new Map<string, ItmTypeDef>();
+  for (const typeCtor of typeCtors) {
+    const typeDef = getItmTypeDef(typeCtor);
+    if (!typeDef) throw new ReferenceError(`TypeDefNotFound for : ${typeCtor.toString()}`);
+    typeDefs.set(typeDef.key, typeDef);
+  }
+  return typeDefs;
+};
 
 const PROVIDERS = [
   {provide: ItmConfig, deps: [[new Optional(), ITM_CONFIG]], useFactory: configFactory},
+  {provide: ItmTypeDefs, deps: [[new Optional(), ITM_TYPES]], useFactory: typeDefsFactory},
+  ItmTypeService,
   ItmDragActionService
 ];
 
@@ -79,4 +97,14 @@ const PROVIDERS = [
   providers: PROVIDERS
 })
 /** The main module of the library. */
-export class ItmModule { }
+export class ItmModule {
+  static create(types: any[], config?: ItmConfig): ModuleWithProviders {
+    return {
+      ngModule: ItmModule,
+      providers: [
+        {provide: ITM_CONFIG, useValue: config},
+        {provide: ITM_TYPES, useValue: types}
+      ]
+    };
+  }
+}

@@ -6,7 +6,7 @@
       <itm-table-settings [table]="instance"></itm-table-settings>
     </th>
     <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell" [ngClass]="actionCellClass">
-      <ng-container [itmActionsCell]="item" [actions]="actions" [buttonsMode]="actionsButtonsMode" [eventEmitter]="event"></ng-container>
+      <ng-container [itmActionsCell]="rowActions" [item]="item" [buttonsMode]="actionsButtonsMode" [actionEmitter]="event"></ng-container>
     </td>
   </ng-container>
 
@@ -33,10 +33,10 @@
   <!-- Columns -->
   <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
     <th *matHeaderCellDef mat-header-cell [ngClass]="getHeaderCellClass(column)">
-      <ng-container [itmHeaderCell]="itemsChanges" [column]="column"></ng-container>
+      <ng-container [itmHeaderCell]="column" [itemsChanges]="itemsChanges"></ng-container>
     </th>
     <td *matCellDef="let item" mat-cell [ngClass]="getCellClass(column)">
-      <ng-container [itmCell]="item" [column]="column"></ng-container>
+      <ng-container [itmCell]="column" [item]="item" [actionEmitter]="event"></ng-container>
     </td>
   </ng-container>
 

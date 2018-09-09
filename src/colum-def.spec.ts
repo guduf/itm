@@ -1,8 +1,8 @@
-import { ItmColumnDef } from './column-def';
+import { ItmColumnDef } from './column';
 import { Component } from '@angular/core';
 
 @Component({template: ''})
-class ItmCell { }
+class ItmCellComponent { }
 
 describe('ItmColumnDef', () => {
   it('should create with the minimal config `{ key: "id" }`', () => {
@@ -11,11 +11,11 @@ describe('ItmColumnDef', () => {
   });
 
   it('should throw a TypeError with a invalid [key] config', () => {
-    expect(() => new ItmColumnDef({} as any)).toThrowError(TypeError, /^InvalidItmColumnConfig.*/);
+    expect(() => new ItmColumnDef({} as any)).toThrowError(TypeError, /^InvalidItm[\w]+Config.*/);
   });
 
   it('should set a component class as cell when provided in def', () => {
-    const def = new ItmColumnDef({key: 'id', cell: ItmCell});
-    expect(def.cell).toBe(ItmCell);
+    const def = new ItmColumnDef({key: 'id', text: ItmCellComponent});
+    expect(def.text).toBe(ItmCellComponent);
   });
 });

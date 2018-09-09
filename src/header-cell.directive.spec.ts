@@ -5,19 +5,21 @@ import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/t
 import { of } from 'rxjs';
 
 import { ItmDefaultCellMockComponent } from './cell.directive.spec';
-import { ItmColumnDef } from './column-def';
+import { ItmColumnDef } from './column';
 import { ItmsChanges } from './item';
 import { ItmConfig } from './config';
 import { ItmHeaderCellDirective } from './header-cell.directive';
 
 @Component({
-  template: '<ng-container [itmHeaderCell]="itemsChanges" [column]="column"></ng-container>'
+  template: '<ng-container [itmHeaderCell]="column" [itemsChanges]="itemsChanges"></ng-container>'
 })
 export class ItmHeaderCellDirectiveHotTestComponent {
   @ViewChild(ItmHeaderCellDirective)
   itmHeaderCellDirective: ItmHeaderCellDirective;
+
   column = new ItmColumnDef({key: 'id'});
-  itemChanges: ItmsChanges = of([{id: 42}]);
+
+  itemsChanges: ItmsChanges = of([{id: 42}]);
 }
 
 describe('ItmHeaderCellDirective', () => {
@@ -45,6 +47,7 @@ describe('ItmHeaderCellDirective', () => {
 
   function setup(): ComponentFixture<ItmHeaderCellDirectiveHotTestComponent> {
     const fixture = TestBed.createComponent(ItmHeaderCellDirectiveHotTestComponent);
+    fixture.componentInstance.itemsChanges = of([]);
     fixture.detectChanges();
     fixture.componentInstance.itmHeaderCellDirective.ngOnInit();
     return fixture;

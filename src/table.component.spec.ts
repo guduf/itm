@@ -1,12 +1,12 @@
 // tslint:disable:max-line-length
-import { ValueProvider, Directive, Input, Component } from '@angular/core';
+import { ValueProvider, Directive, Input, Component, EventEmitter } from '@angular/core';
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { of, BehaviorSubject } from 'rxjs';
 
 import { Itm, ItmsChanges, ItmsSource } from './item';
-import { ItmColumnDef } from './column-def';
+import { ItmColumnDef } from './column';
 import { ItmTableConfig } from './table-config';
 import { ItmTableComponent } from './table.component';
 import { ItmMaterialModule } from './material.module';
@@ -14,27 +14,33 @@ import { click, changeInputs } from './helpers.spec';
 import { ItmConfig } from './config';
 import { DEFAULT_CONFIG } from './itm.module';
 import { ItmActionsCellDirective } from './actions-cell.directive';
+import { ItmActionEvent } from 'src/action';
 
 @Directive({selector: '[itmCell]'})
 // tslint:disable-next-line:directive-class-suffix
 class ItmCellDirective {
   @Input()
-  column: ItmColumnDef;
-
+  actionEmitter: EventEmitter<ItmActionEvent<Itm>>;
   // tslint:disable-next-line:no-input-rename
   @Input('itmCell')
+  column: ItmColumnDef;
+
+  @Input()
   item: Itm;
 }
 
 @Directive({selector: '[itmHeaderCell]'})
 // tslint:disable-next-line:directive-class-suffix
-class ItmHeaderCellDirective<I extends Itm = Itm> {
+class ItmHeaderCellDirective {
   @Input()
-  column: ItmColumnDef;
+  actionEmitter: EventEmitter<ItmActionEvent<Itm>>;
 
   // tslint:disable-next-line:no-input-rename
   @Input('itmHeaderCell')
-  itemsChanges: ItmsChanges<I>;
+  column: ItmColumnDef;
+
+  @Input()
+  itemsChanges: ItmsChanges<Itm>;
 }
 
 @Component({selector: 'itm-table-settings', template: ''})

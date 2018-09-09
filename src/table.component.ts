@@ -1,12 +1,12 @@
 // tslint:disable:max-line-length
 import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import { MatDialogRef, MatDialog } from '@angular/material';
+import { MatDialogRef } from '@angular/material';
 import { BehaviorSubject, from, fromEvent , merge, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilChanged, first, map, mergeMap, reduce, startWith, skip, tap } from 'rxjs/operators';
 // tslint:enable:max-line-length
 
 import { ItmActionConfig, ItmActionEvent } from './action';
-import { ItmColumnDef } from './column-def';
+import { ItmColumnDef } from './column';
 import { ItmButtonMode } from './button.component';
 import { ItmConfig } from './config';
 import { Itm, ItmsChanges, ItmsSource, deferPipe, ItmPipe } from './item';
@@ -43,7 +43,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   readonly selectionChanges = new EventEmitter<I[]>();
 
   /** The actions for the row cell */
-  actions: ItmActionConfig[];
+  rowActions: ItmActionConfig[];
 
   /** The columns transcluded to the MatTable */
   columns: ItmColumnDef[];
@@ -69,12 +69,12 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   }
 
   get actionCellClass() {
-    const size  = Math.ceil(this.actions.length * 40 / 60);
+    const size  = Math.ceil(this.rowActions.length * 40 / 60);
     return `itm-action-cell itm-slot-${size}`;
   }
 
   get actionHeaderCellClass() {
-    const size  = Math.ceil(this.actions.length * 40 / 60);
+    const size  = Math.ceil(this.rowActions.length * 40 / 60);
     return `itm-action-header-cell itm-slot-${size}`;
   }
 
@@ -84,9 +84,9 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
       this.settings.columns ? this.settings.columns : this.columns.map(({key}) => key)
     );
     return  [
-      ...(this.columns.length && (this._canSelect ? ['$itm-selection'] : [])),
+      ...(this.columns.length && this._canSelect ? ['$itm-selection'] : []),
       ...columns,
-      ...(this.actions ? ['$itm-actions'] : []),
+      ...(this.rowActions ? ['$itm-actions'] : []),
     ];
   }
 
@@ -187,10 +187,10 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     let selectablesMarkedForChanges = false;
     if (tableChanges) {
       const previous = (
-        tableChanges.isFirstChange ? {} : tableChanges.previousValue
+        tableChanges.isFirstChange ? {columns: []} : tableChanges.previousValue
       ) as ItmTableConfig<I>;
-      const {actions, columns, canSelect, setRowClass, selectionLimit} = this.table;
-      if (previous.actions !== actions) this.actions = actions || null;
+      const {rowActions, columns, canSelect, setRowClass, selectionLimit} = this.table;
+      if (previous.rowActions !== rowActions) this.rowActions = rowActions || null;
       if (previous.canSelect !== canSelect) {
         this._canSelect = (
           canSelect === true ? true :
@@ -204,8 +204,14 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
       );
       if (previous.selectionLimit !== selectionLimit) this.selectionLimit = selectionLimit || 0;
       if (previous.columns !== columns) {
-        this.columns = columns.map(def => new ItmColumnDef(
-          typeof def === 'string' ? {key: def} : def
+        const columnsArr = (
+          Array.isArray(columns) ? columns :
+          columns instanceof Map ? Array.from(columns.values()) :
+            []
+        );
+        this.columns = columnsArr.map(cfg => (
+          cfg instanceof ItmColumnDef ? cfg :
+            new ItmColumnDef(typeof cfg === 'string' ? {key: cfg} : cfg)
         ));
         this._selectionChanges.next(new Set());
       }

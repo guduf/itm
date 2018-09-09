@@ -1,21 +1,15 @@
 import { Component } from '@angular/core';
 
 import { ItmTableConfig } from 'src/table-config';
-import { ItmColumnConfig } from '../../src/column-config';
 import { Itm } from '../../src/item';
 import { ItmActionEvent } from 'src/action';
 import { DATA } from './data';
-
-const ID_COLUMN: ItmColumnConfig = {
-  key: 'id',
-  header: (items: Itm[]) => `${items.length} item${items.length > 1 ? 's' : ''}`
-};
 
 @Component({
   selector: 'app-root',
   template: `
     <itm-table
-      [table]="table"
+      [table]="'user' | itmTableType:table"
       [itemsSource]="itemsSource"
       (event)="onEvent($event)"></itm-table>
   `,
@@ -27,11 +21,7 @@ export class AppComponent {
   itemsSource: Itm[] = DATA;
 
   table: ItmTableConfig = {
-    actions: [{key: 'delete'}, {key: 'print'}],
-    columns: [ID_COLUMN, 'firstName', 'lastName'],
-    canSelect: true,
-    selectionLimit: 3,
-    setRowClass: () => 'foo'
+    rowActions: [{key: 'delete'}, {key: 'print'}]
   };
 
   onEvent(e: ItmActionEvent<Itm>) {
