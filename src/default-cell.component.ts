@@ -17,6 +17,7 @@ export class ItmDefaultCellComponent {
   /** The css class attached to the host. */
   get hostClass() { return SELECTOR; }
 
+  /** The rendered string observable for the value. */
   rendered: Observable<string>;
 
   constructor(

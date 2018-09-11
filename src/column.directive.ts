@@ -5,7 +5,6 @@ import { StaticProvider, Injectable } from '@angular/core';
 import { ItmColumnDef } from './column';
 import { ItmActionDef } from './action';
 
-// tslint:disable-next-line:max-line-length
 @Injectable()
 export abstract class ItmColumnDirective<
   I extends Itm = Itm,

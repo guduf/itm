@@ -13,9 +13,10 @@ import { Itm, Itms, ItmPipe } from './item';
 import { ItmActionEvent, ItmActionDef } from './action';
 import { ItmTypeDef } from './type';
 
-
+/** The abstract directive to create area component. */
 @Injectable()
 export abstract class ItmAreaDirective<T = {}, A extends ItmActionDef<T> = ItmActionDef<T>> {
+  /** The emitter of action events. */
   @Input()
   actionEmitter?: EventEmitter<ItmActionEvent<T, A>>;
 
@@ -41,17 +42,21 @@ export abstract class ItmAreaDirective<T = {}, A extends ItmActionDef<T> = ItmAc
 }
 
 @Injectable()
+/** The abstract directive to create area component with a typed item. */
 export abstract class ItmTypedAreaDirective<
   I extends Itm = Itm,
   II extends (I | I[]) = I,
   A extends ItmActionDef<II> = ItmActionDef<II>
 > extends ItmAreaDirective<II, A> {
+  /** The item target of the area */
   @Input()
   item?: I;
 
+  /** The collection where come from the item target. */
   @Input()
   items?: I[];
 
+  /** The type definition of the item target. */
   @Input()
   typeDef?: ItmTypeDef<I>;
 

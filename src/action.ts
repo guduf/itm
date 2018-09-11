@@ -3,26 +3,26 @@ import { Observable, Subscriber } from 'rxjs';
 
 import { deferPipe, ItmPipeLike, ItmPipe } from './item';
 
-/** The token for display mode for row actions buttons */
+/** The token for display mode of row actions buttons. */
 export const ITM_TABLE_ACTIONS_BUTTONS_MODE = new InjectionToken('ITM_TABLE_ACTIONS_BUTTONS_MODE');
 
 /** A generic action configuration. */
 export interface ItmActionConfig<T = {}> {
-  /** The identifier of the actions */
+  /** The identifier of the actions. */
   key: string;
   /** Defines the action icon. */
   icon?: false | ItmPipeLike<T, string>;
-  /** Defines the the text */
+  /** Defines the the text. */
   text?: ItmPipeLike<T, string>;
 }
 
 /** A generic action definition. */
 export class ItmActionDef<T = {}> implements ItmActionConfig {
-  /** see [[ItmActionConfig.key]] */
+  /** see [[ItmActionConfig.key]]. */
   key: string;
-  /** see [[ItmActionConfig.icon]] */
+  /** see [[ItmActionConfig.icon]]. */
   icon: ItmPipe<T, string>;
-  /** see [[ItmActionConfig.text]] */
+  /** see [[ItmActionConfig.text]]. */
   text: ItmPipe<T, string>;
 
   constructor(cfg: ItmActionConfig) {
@@ -33,7 +33,7 @@ export class ItmActionDef<T = {}> implements ItmActionConfig {
   }
 }
 
-/** A array of generic action definitions */
+/** A array of generic action definitions. */
 export abstract class ItmActionDefs extends Array<ItmActionDef> { }
 
 /** A generic event with a action definition, a target. */
@@ -43,17 +43,22 @@ export class ItmActionEvent<T = {}, A extends ItmActionDef = ItmActionDef> exten
 
   /** Whether the event is proccessed. */
   get proccessed(): boolean { return this.proccessed; }
+
   /** Event error if is failed. */
   get error(): Error { return this._error; }
+
   /** Whether the event is failed.  */
   get failed(): boolean { return this._error && true; }
+
   /** Whether the event is succeeded. */
   get succeeded(): boolean { return this._proccessed && !this._error && true; }
 
   /** see [[ItmActionEvent.proccessed]]. */
   private _proccessed = false;
+
   /** Subscriber to complete the event. */
   private _completionSubscriber: Subscriber<void>;
+
   /** see [[ItmActionEvent.error]]. */
   private _error: Error;
 

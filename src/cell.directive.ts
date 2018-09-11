@@ -6,9 +6,8 @@ import { ItmColumnDef } from './column';
 import { ItmActionDef } from './action';
 import { ItmColumnDirective } from './column.directive';
 
-@Directive({selector: '[itmCell]'})
 /** The directive assigned to the row cell of a ItmTable */
-// tslint:disable-next-line:max-line-length
+@Directive({selector: '[itmCell]'})
 export class ItmCellDirective<
   I extends Itm = Itm,
   A extends ItmActionDef<I> = ItmActionDef<I>

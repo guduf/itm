@@ -15,6 +15,7 @@ export interface ItmColumnConfig<I extends Itm = Itm> extends ItmAreaConfig<I> {
 /** The definition of a column used by ItmTableComponent */
 // tslint:disable-next-line:max-line-length
 export class ItmColumnDef<I extends Itm = Itm> extends ItmAreaDef<I> implements ItmColumnConfig {
+  /** Whether the column is sortable. */
   readonly sortable: boolean;
 
   constructor(cfg: ItmColumnConfig<I>) {

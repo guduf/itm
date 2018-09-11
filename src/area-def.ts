@@ -8,16 +8,34 @@ import { ItmAreaConfig } from './area-config';
 
 /** The definition of a column used by ItmTableComponent */
 export class ItmAreaDef<I extends Itm = Itm> implements ItmAreaConfig {
+  /** see [[ItmAreaConfig.key]]. */
   readonly key: string;
+
+  /** see [[ItmAreaConfig.size]]. */
   readonly size: number;
+
+  /** see [[ItmAreaConfig.grow]]. */
   readonly grow: number;
+
+  /** see [[ItmAreaConfig.text]]. */
   readonly text: ComponentType;
+
+  /** see [[ItmAreaConfig.header]]. */
   readonly header: ComponentType;
+
+  /** see [[ItmAreaConfig.label]]. */
   readonly label: ComponentType;
 
+  /** The text observable used by default components. */
   readonly defaultText?: ItmPipe<I, string>;
+
+  /** The header observable used by default components. */
   readonly defaultHeader?: ItmPipe<I[], string>;
+
+  /** The label observable used by default components. */
   readonly defaultLabel?: ItmPipe<I, string>;
+
+  /** The providers to inject into the component. */
   readonly providers: StaticProvider[] = [];
 
   constructor(cfg: ItmAreaConfig<I>) {

@@ -1,7 +1,6 @@
 import { Itm } from './item';
 import { ItmAreaDef } from './area-def';
 import { ItmAreaConfig } from './area-config';
-import { isArray } from 'util';
 
 export interface ItmCardConfig<I extends Itm = Itm> {
   areas?: (string | ItmAreaConfig<I>)[] | Map<string, ItmAreaConfig<I>>;

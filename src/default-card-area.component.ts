@@ -13,10 +13,14 @@ const SELECTOR = 'itm-default-card-area';
   `
 })
 export class ItmDefaultCardAreaComponent {
+  /** The rendered string observable for the label. */
   renderedLabel: Observable<string>;
+
+  /** The rendered string observable for the value. */
   renderedText: Observable<string>;
 
   @HostBinding('class')
+  /** The CSS class of the host element. */
   get hostClass(): string { return SELECTOR; }
 
   constructor(

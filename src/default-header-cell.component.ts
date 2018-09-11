@@ -19,6 +19,7 @@ export class ItmDefaultHeaderCellComponent<I extends Itm = Itm> {
   /** The css class attached to the host. */
   get hostClass() { return SELECTOR; }
 
+  /** The rendered string observable for the header. */
   rendered: Observable<string>;
 
   constructor(

@@ -6,6 +6,7 @@
 
   .#{$selector} {
     @extend .mat-body-1;
+    @extend .mat-elevation-z1;
 
     display: grid;
     padding: 6px;

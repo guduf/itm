@@ -7,6 +7,7 @@ import { ItmActionConfig, ItmActionDef, ItmActionEvent } from './action';
 /** The possible display modes for the button. */
 export type ItmButtonMode = 'icon' | 'menu';
 
+/** The selector of ItmButtonComponent */
 const SELECTOR = 'itm-button';
 
 @Component({
@@ -18,8 +19,8 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
   @Input()
   target: T;
 
-  @Input()
   /** The display mode of the button. */
+  @Input()
   mode: ItmButtonMode;
 
   @Output()
@@ -36,9 +37,11 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
   /** The text of the button. */
   text: Observable<string>;
 
+  /** The action definition of the button. */
   actionDef: ItmActionDef<T>;
 
   @HostBinding('class')
+  /** The CSS class of host element. */
   get hostClass() {
     return SELECTOR + (this.mode ? ` ${SELECTOR}-${this.mode}` : '');
   }
