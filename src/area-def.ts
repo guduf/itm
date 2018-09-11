@@ -39,7 +39,7 @@ export class ItmAreaDef<I extends Itm = Itm> implements ItmAreaConfig {
     if (!this.label && cfg.label === false) this.label = null;
     else if (!this.label) (
       this.defaultLabel = (
-        !cfg.label ? item => of(item[this.key]) :
+        !cfg.label ? () => of(this.key) :
         typeof cfg.label === 'string' ? item => of(item[cfg.label as string]) :
           deferPipe(cfg.label as ItmPipeLike<I, string>)
       )

@@ -23,7 +23,6 @@ export class ItmDefaultCellComponent {
     column: ItmColumnDef,
     private item: Itm
   ) {
-    console.log(item, this.item);
     this.rendered = column.defaultText(this.item);
   }
 }

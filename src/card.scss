@@ -1,0 +1,26 @@
+@mixin itm-card($config) {
+  $selector: 'itm-card';
+
+  $slots: 24;
+  $total-size: 1440px;
+
+  .#{$selector} {
+    @extend .mat-body-1;
+
+    display: grid;
+    padding: 6px;
+  }
+
+  @for $i from 1 through $slots {
+    .#{$selector}-rows-#{$i} {
+      grid-template-rows: repeat($i, $total-size / 24);
+    }
+    .#{$selector}-columns-#{$i} {
+      grid-template-columns: repeat($i, $total-size / 24);
+    }
+  }
+
+  .#{$selector}-cell {
+    padding: 6px;
+  }
+}

@@ -3,6 +3,7 @@ import { ItmTableConfig } from './table-config';
 import { ItmColumnDef, ItmColumnConfig } from './column';
 import { ItmTableDef } from './table-def';
 import { ItmAreaConfig } from './area-config';
+import { ItmCardDef, ItmCardConfig } from './card';
 
 export interface ItmPropConfig<I extends Itm = Itm> {
   key: string;
@@ -25,6 +26,7 @@ export class ItmPropDef<I extends Itm = Itm> implements ItmPropConfig<I> {
   readonly required: boolean;
   readonly size: number;
   readonly text: ItmPipe<I, string>;
+  readonly card: ItmCardDef<I>;
   readonly column: ItmColumnDef<I>;
 
   constructor(cfg: ItmPropConfig<I> & ItmAreaConfig<I>) {
@@ -68,11 +70,13 @@ export function ItmProp<I extends Itm = Itm>(cfg: Partial<ItmPropConfig<I>> = {}
 
 export class ItmTypeConfig<I extends Itm = Itm> {
   key?: string;
+  card?: ItmCardConfig<I>;
   table?: ItmTableConfig<I>;
 }
 
 export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
   readonly key: string;
+  readonly card: ItmCardDef<I>;
   readonly table: ItmTableDef<I>;
 
   constructor(readonly type: any, cfg: ItmTypeConfig, readonly props: Map<keyof I, ItmPropDef>) {
@@ -84,12 +88,32 @@ export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
     this.table = new ItmTableDef({
       ...tableCfg,
       columns: [
-        ...(Array.from(this.props.values()).map(propDef => {
-          return propDef.column; })),
+        ...(Array.from(this.props.values()).map(propDef => propDef.column)),
         ...(
           Array.isArray(tableCfg.columns) ? tableCfg.columns :
           tableCfg.columns instanceof Map ? Array.from(tableCfg.columns.values()) :
           []
+        )
+      ]
+    });
+    const cardCfg = cfg.card && typeof cfg.card === 'object' ? cfg.card : {};
+    this.card = new ItmCardDef({
+      ...cardCfg,
+      template: (
+        cardCfg.template ? cardCfg.template :
+          Array.from(this.props.values()).map(prop => {
+            const row: string[] = [];
+            const size = (prop.card || {size: 0}).size || prop.size;
+            for (let i = 0; i < size; i++) row.push(prop.key);
+            return row;
+          })
+      ),
+      areas: [
+        ...(Array.from(this.props.values()).map(propDef => propDef)),
+        ...(
+          Array.isArray(cardCfg.areas) ? cardCfg.areas :
+          cardCfg.areas instanceof Map ? Array.from(cardCfg.areas.values()) :
+            []
         )
       ]
     });

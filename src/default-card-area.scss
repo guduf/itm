@@ -1,0 +1,13 @@
+@mixin itm-default-card-area($config) {
+  $selector: 'itm-default-card-area';
+
+  .#{$selector} {
+    display: block;
+
+    & > .label {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.54);
+    }
+  }
+}

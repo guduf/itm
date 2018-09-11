@@ -1,25 +1,29 @@
-import { Component, EventEmitter, Inject } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
+import { ItmAreaDef } from './area-def';
+import { Itm } from './item';
 import { Observable } from 'rxjs';
 
-import { ItmActionDefs, ItmActionEvent, ITM_TABLE_ACTIONS_BUTTONS_MODE } from './action';
-import { ItmButtonMode } from './button.component';
-import { Itm } from './item';
+const SELECTOR = 'itm-default-card-area';
 
 @Component({
-  selector: 'itm-card-area',
+  selector: SELECTOR,
   template: `
-    <itm-buttons
-      [actions]="actions"
-      [target]="item"
-      [mode]="buttonsMode | async"
-      (event)="emitter.emit($event)"></itm-buttons>
-    `
+    <span class="label">{{renderedLabel | async}}</span><br />
+    <span class="text">{{renderedText | async}}<span>
+  `
 })
-export class ItmDefaultActionsCellComponent<I extends Itm = Itm> {
+export class ItmDefaultCardAreaComponent {
+  renderedLabel: Observable<string>;
+  renderedText: Observable<string>;
+
+  @HostBinding('class')
+  get hostClass(): string { return SELECTOR; }
+
   constructor(
-    readonly actions: ItmActionDefs,
-    readonly item: Itm,
-    readonly emitter: EventEmitter<ItmActionEvent<I>>,
-    readonly cardArea: ItmCardAreaDef<I>
-  ) { }
+    area: ItmAreaDef,
+    item: Itm
+  ) {
+    this.renderedLabel = area.defaultLabel(item);
+    this.renderedText = area.defaultText(item);
+  }
 }

@@ -3,6 +3,7 @@ import { Itm } from './item';
 import { ItmTableDef } from './table-def';
 import { ItmTypeDefs, ItmTypeDef } from './type';
 import { ItmTableConfig } from './table-config';
+import { ItmCardConfig, ItmCardDef } from './card';
 
 @Injectable()
 export class ItmTypeService {
@@ -16,6 +17,27 @@ export class ItmTypeService {
     return this._types.get(key);
   }
 }
+
+@Pipe({name: 'itmCardType'})
+export class ItmCardTypePipe implements PipeTransform {
+  constructor(
+    private _typeService: ItmTypeService
+  ) { }
+  transform(key: string, cfg?: ItmCardConfig): ItmCardDef {
+    const typeCardDef = this._typeService.get(key).card;
+    if (!cfg) return typeCardDef;
+    return new ItmCardDef({
+      ...typeCardDef,
+      ...cfg,
+      areas: [
+        ...Array.from(typeCardDef.areas.values()),
+        ...(cfg.areas ? Array.from(cfg.areas.values()) : [])
+      ],
+      size: cfg.size ? cfg.size : cfg.template ? null : typeCardDef.size
+    });
+  }
+}
+
 
 @Pipe({name: 'itmTableType'})
 export class ItmTableTypePipe implements PipeTransform {

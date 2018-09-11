@@ -21,8 +21,11 @@ import { ItmDropPlaceholderDirective } from './drop-placeholder.directive';
 import { ItmDragActionService } from './drag-action.service';
 import { ItmListComponent } from './list.component';
 import { ItmTableSettingsComponent } from './table-settings.component';
-import { ItmTypeService, ItmTableTypePipe } from './type.service';
+import { ItmTypeService, ItmTableTypePipe, ItmCardTypePipe } from './type.service';
 import { ItmTypeDef, getItmTypeDef, ItmTypeDefs } from './type';
+import { ItmCardComponent } from './card.component';
+import { ItmCardAreaDirective } from './card-area.directive';
+import { ItmDefaultCardAreaComponent } from './default-card-area.component';
 
 const IMPORTS = [
   CommonModule,
@@ -31,6 +34,7 @@ const IMPORTS = [
 
 const ENTRY_COMPONENTS = [
   ItmDefaultActionsCellComponent,
+  ItmDefaultCardAreaComponent,
   ItmDefaultCellComponent,
   ItmDefaultHeaderCellComponent,
   ItmSortableListDialogComponent
@@ -38,6 +42,7 @@ const ENTRY_COMPONENTS = [
 
 const DECLARATIONS = [
   ItmActionsCellDirective,
+  ItmCardAreaDirective,
   ItmCellDirective,
   ItmDefaultCellComponent,
   ItmHeaderCellDirective,
@@ -48,6 +53,8 @@ const DECLARATIONS = [
 const EXPORTED_DECLARATIONS = [
   ItmButtonComponent,
   ItmButtonsComponent,
+  ItmCardComponent,
+  ItmCardTypePipe,
   ItmDraggableDirective,
   ItmDroppableDirective,
   ItmListComponent,
@@ -59,6 +66,7 @@ const EXPORTED_DECLARATIONS = [
 
 export const DEFAULT_CONFIG: ItmConfig = {
   defaultActionsCellComp: ItmDefaultActionsCellComponent,
+  defaultCardAreaComp: ItmDefaultCardAreaComponent,
   defaultCellComp: ItmDefaultCellComponent,
   defaultHeaderCellComp: ItmDefaultHeaderCellComponent,
   selectedCheckBoxIcon: 'check_box',
