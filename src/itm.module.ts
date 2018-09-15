@@ -14,13 +14,6 @@ import { ItmLocalePipe } from './locale.pipe';
 import { ItmMaterialModule } from './material.module';
 import { ItmTableComponent } from './table.component';
 import { ItmButtonsComponent } from './buttons.component';
-import { ItmSortableListDialogComponent } from './sortable-list-dialog.component';
-import { ItmDraggableDirective } from './draggable.directive';
-import { ItmDroppableDirective } from './droppable.directive';
-import { ItmDropPlaceholderDirective } from './drop-placeholder.directive';
-import { ItmDragActionService } from './drag-action.service';
-import { ItmListComponent } from './list.component';
-import { ItmTableSettingsComponent } from './table-settings.component';
 import { ItmTypeService, ItmTableTypePipe, ItmCardTypePipe } from './type.service';
 import { ItmTypeDef, getItmTypeDef, ItmTypeDefs } from './type';
 import { ItmCardComponent } from './card.component';
@@ -37,7 +30,6 @@ const ENTRY_COMPONENTS = [
   ItmDefaultCardAreaComponent,
   ItmDefaultCellComponent,
   ItmDefaultHeaderCellComponent,
-  ItmSortableListDialogComponent
 ];
 
 const DECLARATIONS = [
@@ -47,7 +39,6 @@ const DECLARATIONS = [
   ItmDefaultCellComponent,
   ItmHeaderCellDirective,
   ItmDefaultActionsCellComponent,
-  ItmTableSettingsComponent
 ];
 
 const EXPORTED_DECLARATIONS = [
@@ -55,11 +46,7 @@ const EXPORTED_DECLARATIONS = [
   ItmButtonsComponent,
   ItmCardComponent,
   ItmCardTypePipe,
-  ItmDraggableDirective,
-  ItmDroppableDirective,
-  ItmListComponent,
   ItmLocalePipe,
-  ItmDropPlaceholderDirective,
   ItmTableComponent,
   ItmTableTypePipe
 ];
@@ -94,7 +81,6 @@ const PROVIDERS = [
   {provide: ItmConfig, deps: [[new Optional(), ITM_CONFIG]], useFactory: configFactory},
   {provide: ItmTypeDefs, deps: [[new Optional(), ITM_TYPES]], useFactory: typeDefsFactory},
   ItmTypeService,
-  ItmDragActionService
 ];
 
 @NgModule({

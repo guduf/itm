@@ -3,7 +3,6 @@
   <!-- Actions -->
   <ng-container matColumnDef="$itm-actions">
     <th *matHeaderCellDef mat-header-cell [ngClass]="actionHeaderCellClass">
-      <itm-table-settings [table]="instance"></itm-table-settings>
     </th>
     <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell" [ngClass]="actionCellClass">
       <ng-container [itmActionsCell]="rowActions" [item]="item" [buttonsMode]="actionsButtonsMode" [actionEmitter]="event"></ng-container>

@@ -94,10 +94,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     return 'itm-header-row';
   }
 
-  get instance(): this {
-    return this;
-  }
-
   /** Determines if all selectables items are selected observing selection limit. */
   get isAllSelected(): boolean {
     if (this.selection.size >= this.items.length) return true;
