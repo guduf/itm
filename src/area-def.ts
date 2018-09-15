@@ -1,8 +1,7 @@
-import { StaticProvider, InjectionToken } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
+import { StaticProvider } from '@angular/core';
+import { of } from 'rxjs';
 
-import { Itm, ItmPipe, ItmPipeLike, deferPipe, ItmsChanges } from './item';
+import { Itm, ItmPipe, ItmPipeLike, deferPipe } from './item';
 import { ComponentType, isComponentType } from './utils';
 import { ItmAreaConfig } from './area-config';
 
@@ -45,8 +44,7 @@ export class ItmAreaDef<I extends Itm = Itm> implements ItmAreaConfig {
     this.size = (cfg.size && typeof cfg.size === 'number') ? cfg.size : 2;
     this.grow = (cfg.grow && typeof cfg.grow === 'number') ? cfg.grow : 0;
     this.text = isComponentType(cfg.text) ? cfg.text as ComponentType : null;
-    if (!this.text && cfg.text === false) this.text = null;
-    else if (!this.text) (
+    if (!this.text && cfg.text !== false) (
       this.defaultText = (
         !cfg.text ? item => of(item[this.key]) :
         typeof cfg.text === 'string' ? item => of(item[cfg.text as string]) :
@@ -54,22 +52,21 @@ export class ItmAreaDef<I extends Itm = Itm> implements ItmAreaConfig {
       )
     );
     this.label = isComponentType(cfg.label) ? cfg.label as ComponentType : null;
-    if (!this.label && cfg.label === false) this.label = null;
-    else if (!this.label) (
+    if (!this.label && cfg.label !== false) (
       this.defaultLabel = (
         !cfg.label ? () => of(this.key) :
-        typeof cfg.label === 'string' ? item => of(item[cfg.label as string]) :
+        typeof cfg.label === 'string' ? () => of(cfg.label as string) :
           deferPipe(cfg.label as ItmPipeLike<I, string>)
       )
     );
     this.header = isComponentType(cfg.header) ? cfg.header as ComponentType : null;
-    if (!this.header && cfg.header === false) (this.header = null);
-    else if (!this.header) (
+    if (!this.header && cfg.header !== false) (
       this.defaultHeader = (
         !cfg.header ? () => of(this.key) :
         typeof cfg.header === 'string' ? () => of(cfg.header as string) :
           deferPipe(cfg.header as ItmPipeLike<I[], string>)
       )
     );
+    if (Array.isArray(cfg.providers)) this.providers = [...cfg.providers];
   }
 }
