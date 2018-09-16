@@ -54,24 +54,22 @@ export class ItmCardDef<I extends Itm = Itm> implements ItmCardConfig<I> {
     for (let row = 0; row < rowCount; row++) for (let col = 0; col < columnCount; col++) {
       if (!col) template.push([]);
       const prev = template[row][col - 1];
-      let cell = cardTemplate[row][col];
-      if (!cell || cell === '.' || (cell === '=' && !col)) cell = '.';
-      else if (cell === '=') cell = prev;
-      if (cell !== '.' && !this.areas.has(cell))
-        throw new TypeError(`InvalidCellArea: ${cell}`);
-      if (
-        prev && prev !== cell && positions.has(prev) &&
-        (col <= positions.get(prev)[1][1])
-      ) throw new TypeError('Invalid template: Area not closed ' + cell);
+      const cell = cardTemplate[row][col] !== '=' ? cardTemplate[row][col] : prev || '.';
+      if (prev !== cell && positions.has(prev) && positions.get(prev)[1][1] >= col)
+        throw new TypeError(`Invalid row start: '${cell}'`);
       if (cell !== '.')
-        if (!positions.has(cell)) positions.set(cell, [[row, col], [row, col]]);
+        if (!this.areas.has(cell)) throw new TypeError(`InvalidCellArea: '${cell}'`);
+        else if (!positions.has(cell)) positions.set(cell, [[row, col], [row, col]]);
         else {
           const [[startRow, startCol], [endRow, endCol]] = positions.get(cell);
-          if (endRow !== row && startCol !== col)
-            throw new TypeError('Invalid template: Area wrong column start' + cell);
-          if (prev !== cell || endCol >= col)
-            throw new TypeError('Invalid template: Area wrong end' + cell);
-          positions.set(cell, [[startRow, startCol], [endRow, Math.max(col, endCol)]]);
+          if (row === startRow && col - 1 > endCol)
+            throw new TypeError(`Invalid column end: '${cell}'`);
+          if (row > startRow && cell !== prev && col > startCol)
+            throw new TypeError(`Invalid column start: '${cell}'`);
+          if (row - 1 > endRow)
+            throw new TypeError(`Invalid row end: '${cell}'`);
+          // tslint:disable-next-line:max-line-length
+          positions.set(cell, [[startRow, startCol], [Math.max(row, endRow), Math.max(col, endCol)]]);
         }
       template[row][col] = cell;
     }

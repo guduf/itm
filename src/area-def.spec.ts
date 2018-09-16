@@ -13,7 +13,7 @@ class LabelComponent { }
 @Component({template: ''})
 class TextComponent { }
 
-describe('AreaDef', () => {
+describe('ItmAreaDef', () => {
   it('should create with a minimal config', () => {
     expect(new ItmAreaDef({key: 'id'})).toBeTruthy();
   });
