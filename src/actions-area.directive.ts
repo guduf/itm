@@ -6,18 +6,16 @@ import { ItmActionConfig, ItmActionDefs, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmActi
 import { ItmButtonMode } from './button.component';
 import { ItmConfig } from './config';
 import { Itm } from './item';
-import { ItmTypedAreaDirective } from './area.directive';
-import { ItmColumnDirective } from './column.directive';
-import { ItmColumnDef } from './column';
+import { ItmAreaDirective } from './area.directive';
 
-@Directive({selector: '[itmActionsCell]'})
+@Directive({selector: '[itmActionsArea]'})
 // tslint:disable-next-line:max-line-length
-export class ItmActionsCellDirective<
-  I extends Itm = Itm,
-  A extends ItmActionDef<I> = ItmActionDef<I>
-> extends ItmTypedAreaDirective<I, I, A> implements OnInit {
+export class ItmActionsAreaDirective<
+  T = {},
+  A extends ItmActionDef<T> = ItmActionDef<T>
+> extends ItmAreaDirective<T, A> implements OnInit {
   // tslint:disable-next-line:no-input-rename
-  @Input('itmActionsCell')
+  @Input()
   actions: ItmActionConfig[];
 
   @Input()
@@ -26,7 +24,7 @@ export class ItmActionsCellDirective<
 
   ngOnInit() {
     this._createComponent(
-      this._injector.get(ItmConfig).defaultActionsCellComp,
+      this._injector.get(ItmConfig).defaultActionsAreaComp,
       [
         {provide: ItmActionDefs, useValue: this.actions},
         {provide: ITM_TABLE_ACTIONS_BUTTONS_MODE, useValue: this.buttonsMode}

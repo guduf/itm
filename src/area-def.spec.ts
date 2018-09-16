@@ -1,8 +1,9 @@
-import { ItmAreaDef } from './area-def';
-import { ItmAreaConfig } from './area-config';
-import { Itm } from './item';
-import { fakeAsync, tick } from '@angular/core/testing';
 import { Component } from '@angular/core';
+import { fakeAsync, tick } from '@angular/core/testing';
+
+import { ItmPropAreaConfig } from './area-config';
+import { ItmPropAreaDef } from './area-def';
+import { Itm } from './item';
 
 @Component({template: ''})
 class HeaderComponent { }
@@ -11,31 +12,31 @@ class HeaderComponent { }
 class LabelComponent { }
 
 @Component({template: ''})
-class TextComponent { }
+class CellComponent { }
 
-describe('ItmAreaDef', () => {
+describe('ItmPropAreaDef', () => {
   it('should create with a minimal config', () => {
-    expect(new ItmAreaDef({key: 'id'})).toBeTruthy();
+    expect(new ItmPropAreaDef({key: 'id'})).toBeTruthy();
   });
 
   it('should throw a error with invalid key is specified', () => {
-    expect(() => new ItmAreaDef({key: null})).toThrowError(/InvalidItmAreaConfig/);
+    expect(() => new ItmPropAreaDef({key: null})).toThrowError(/InvalidItmPropAreaConfig/);
   });
 
   const item: Itm = {id: 63, firstName: 'Aron'};
 
   const expectedKey = 'name';
   const expectedGrow = 4;
-  const expectedText = item.firstName;
+  const expectedCell = item.firstName;
   const expectedHeader = 'Name of user';
   const expectedLabel = 'Name';
   const expectedProvider = {provide: 'foo', useValue: 'FOO'};
   const expectedSize = 4;
 
-  const config: ItmAreaConfig = {
+  const config: ItmPropAreaConfig = {
     key: expectedKey,
     grow: expectedGrow,
-    text: 'firstName',
+    cell: 'firstName',
     header: expectedHeader,
     label: expectedLabel,
     providers: [expectedProvider],
@@ -43,9 +44,9 @@ describe('ItmAreaDef', () => {
   };
 
   it('should implements a valid config without components', fakeAsync(() => {
-    const def = new ItmAreaDef(config);
+    const def = new ItmPropAreaDef(config);
     let renderedText: string;
-    def.defaultText(item).subscribe(text => (renderedText = text));
+    def.defaultText(item).subscribe(cell => (renderedText = cell));
     let renderedLabel: string;
     def.defaultLabel(item).subscribe(label => (renderedLabel = label));
     let renderedHeader: string;
@@ -53,7 +54,7 @@ describe('ItmAreaDef', () => {
     tick();
     expect(def.key).toBe(expectedKey, 'Expected key');
     expect(def.grow).toBe(expectedGrow, 'Expected grow');
-    expect(renderedText).toBe(expectedText, 'Expected text');
+    expect(renderedText).toBe(expectedCell, 'Expected cell');
     expect(renderedLabel).toBe(expectedLabel, 'Expected label');
     expect(renderedHeader).toBe(expectedHeader, 'Expected header');
     expect(def.providers).toContain(expectedProvider, 'Expected provider');
@@ -61,28 +62,28 @@ describe('ItmAreaDef', () => {
   }));
 
   it('should implements a valid config with component', () => {
-    const def = new ItmAreaDef({
+    const def = new ItmPropAreaDef({
       ...config,
       header: HeaderComponent,
       label: LabelComponent,
-      text: TextComponent
+      cell: CellComponent
     });
     expect(def.header).toBe(HeaderComponent);
     expect(def.label).toBe(LabelComponent);
-    expect(def.text).toBe(TextComponent);
+    expect(def.cell).toBe(CellComponent);
   });
 
   it('should has empty member when false is specified in config', () => {
-    const defWithoutHeader = new ItmAreaDef({...config, header: false});
+    const defWithoutHeader = new ItmPropAreaDef({...config, header: false});
     expect(defWithoutHeader.header).toBeNull();
     expect(defWithoutHeader.defaultHeader).toBeFalsy();
 
-    const defWithoutLabel = new ItmAreaDef({...config, label: false});
+    const defWithoutLabel = new ItmPropAreaDef({...config, label: false});
     expect(defWithoutLabel.label).toBeNull();
     expect(defWithoutLabel.defaultLabel).toBeFalsy();
 
-    const defWithoutText = new ItmAreaDef({...config, text: false});
-    expect(defWithoutText.text).toBeNull();
-    expect(defWithoutText.defaultText).toBeFalsy();
+    const defWithoutCell = new ItmPropAreaDef({...config, cell: false});
+    expect(defWithoutCell.cell).toBeNull();
+    expect(defWithoutCell.defaultText).toBeFalsy();
   });
 });

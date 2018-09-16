@@ -4,12 +4,11 @@ import { ItmTableConfig } from 'src/table-config';
 import { Itm } from '../../src/item';
 import { ItmActionEvent } from 'src/action';
 import { DATA } from './data';
-import { ItmCardConfig } from 'src/card';
+import { ItmGridConfig } from '../../src/grid';
 
 @Component({
   selector: 'app-root',
   template: `
-    <itm-card [card]="'user' | itmCardType:card" [item]="itemsSource[0]"></itm-card>
     <itm-table
       [table]="'user' | itmTableType:table"
       [itemsSource]="itemsSource"
@@ -22,7 +21,7 @@ export class AppComponent {
 
   itemsSource: Itm[] = DATA;
 
-  card: ItmCardConfig = {
+  card: ItmGridConfig = {
     template: `
       firstName = lastName  =
       ipAddress = =         =

@@ -1,20 +1,17 @@
 
-import { Itm, ItmPipe, ItmPipeLike, ItmsChanges, deferPipe } from './item';
-import { ItmAreaDef } from './area-def';
-import { ItmAreaConfig } from './area-config';
-import { ComponentType } from './utils';
-import { Observable, of } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
+import { Itm } from './item';
+import { ItmPropAreaDef } from './area-def';
+import { ItmPropAreaConfig } from './area-config';
 
 /** The definition of a column used by ItmTableConfig. */
-export interface ItmColumnConfig<I extends Itm = Itm> extends ItmAreaConfig<I> {
+export interface ItmColumnConfig<I extends Itm = Itm> extends ItmPropAreaConfig<I> {
   /** Used by MatTable. */
   sortable?: boolean;
 }
 
 /** The definition of a column used by ItmTableComponent */
 // tslint:disable-next-line:max-line-length
-export class ItmColumnDef<I extends Itm = Itm> extends ItmAreaDef<I> implements ItmColumnConfig {
+export class ItmColumnDef<I extends Itm = Itm> extends ItmPropAreaDef<I> implements ItmColumnConfig {
   /** Whether the column is sortable. */
   readonly sortable: boolean;
 

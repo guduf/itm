@@ -34,7 +34,8 @@ export class ItmActionDef<T = {}> implements ItmActionConfig {
 }
 
 /** A array of generic action definitions. */
-export abstract class ItmActionDefs extends Array<ItmActionDef> { }
+// tslint:disable-next-line:max-line-length
+export abstract class ItmActionDefs<T = {}, A extends ItmActionDef<T> = ItmActionDef<T>> extends Array<A> { }
 
 /** A generic event with a action definition, a target. */
 export class ItmActionEvent<T = {}, A extends ItmActionDef = ItmActionDef> {

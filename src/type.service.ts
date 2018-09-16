@@ -3,7 +3,7 @@ import { Itm } from './item';
 import { ItmTableDef } from './table-def';
 import { ItmTypeDefs, ItmTypeDef } from './type';
 import { ItmTableConfig } from './table-config';
-import { ItmCardConfig, ItmCardDef } from './card';
+import { ItmGridConfig, ItmGridDef } from './grid';
 
 @Injectable()
 export class ItmTypeService {
@@ -18,15 +18,15 @@ export class ItmTypeService {
   }
 }
 
-@Pipe({name: 'itmCardType'})
-export class ItmCardTypePipe implements PipeTransform {
+@Pipe({name: 'itmGridType'})
+export class ItmGridTypePipe implements PipeTransform {
   constructor(
     private _typeService: ItmTypeService
   ) { }
-  transform(key: string, cfg?: ItmCardConfig): ItmCardDef {
+  transform(key: string, cfg?: ItmGridConfig): ItmGridDef {
     const typeCardDef = this._typeService.get(key).card;
     if (!cfg) return typeCardDef;
-    return new ItmCardDef({
+    return new ItmGridDef({
       ...typeCardDef,
       ...cfg,
       areas: [

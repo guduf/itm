@@ -14,7 +14,7 @@ export class ItmCellMockComponent {
 }
 
 @Component({template: ''})
-export class ItmDefaultCellMockComponent { }
+export class ItmCellMockComponent { }
 
 @Component({template: '<ng-container [itmCell]="defaultColumn" [item]="item"></ng-container>'})
 export class ItmCellDirectiveHotTestComponent {
@@ -28,7 +28,7 @@ export class ItmCellDirectiveHotTestComponent {
 describe('ItmCellDirective', () => {
   beforeEach(async(() => {
     const config: ItmConfig = {
-      defaultCellComp: ItmDefaultCellMockComponent
+      defaultCellComp: ItmCellMockComponent
     };
     TestBed
       .configureTestingModule({
@@ -36,13 +36,13 @@ describe('ItmCellDirective', () => {
           ItmCellDirective,
           ItmCellDirectiveHotTestComponent,
           ItmCellMockComponent,
-          ItmDefaultCellMockComponent,
+          ItmCellMockComponent,
         ],
         providers: [{provide: ItmConfig, useValue: config}]
       })
       .overrideModule(
         BrowserDynamicTestingModule,
-        {set: {entryComponents: [ItmCellMockComponent, ItmDefaultCellMockComponent]}
+        {set: {entryComponents: [ItmCellMockComponent, ItmCellMockComponent]}
       });
   }));
 
@@ -66,7 +66,7 @@ describe('ItmCellDirective', () => {
 
   it('should create the default cell component when no specified', async(() => {
     const {debugElement} = setup();
-    expect(debugElement.query(By.directive(ItmDefaultCellMockComponent))).toBeTruthy();
+    expect(debugElement.query(By.directive(ItmCellMockComponent))).toBeTruthy();
   }));
 
   it('should throw a error when initiated with missing inputs', async(() => {

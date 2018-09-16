@@ -1,7 +1,6 @@
 @import './button';
-@import './card';
-@import './default-card-area';
-@import './default-cell';
+@import './card-area';
+@import './grid';
 @import './slot';
 @import './table';
 
@@ -11,9 +10,8 @@
   }
 
   @include itm-slot($config);
-  @include itm-card($config);
-  @include itm-default-card-area($config);
-  @include itm-default-cell($config);
+  @include itm-grid($config);
+  @include itm-card-area($config);
   @include itm-button($config);
   @include itm-table($config);
 }

@@ -4,26 +4,26 @@ import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 import { ItmActionEvent } from './action';
 import { ItmAreaDef } from './area-def';
-import { ItmCardConfig, ItmCardDef } from './card';
+import { ItmGridConfig, ItmGridDef } from './grid';
 import { Itm } from './item';
 
-/** The selector of ItmCardComponent. */
-const SELECTOR = 'itm-card';
+/** The selector of ItmGridComponent. */
+const SELECTOR = 'itm-grid';
 
 @Component({
   selector: SELECTOR,
   template: `
     <div *ngFor="let area of displayedAreas"
       [class]="getCellClass()" [style.grid-area]="getCellPosition(area)">
-      <ng-container [itmCardArea]="areas.get(area)" [item]="item" [actionEmitter]="action">
+      <ng-container [itmGridArea]="areas.get(area)" [item]="item" [actionEmitter]="action">
       </ng-container>
     </div>
   `
 })
-export class ItmCardComponent<I extends Itm = Itm> implements OnChanges {
+export class ItmGridComponent<I extends Itm = Itm> implements OnChanges {
   @Input()
   /** The configuration of the card. */
-  card: ItmCardConfig<I>;
+  card: ItmGridConfig<I>;
 
   @Input()
   /** The target item of the card. */
@@ -80,12 +80,12 @@ export class ItmCardComponent<I extends Itm = Itm> implements OnChanges {
 
   ngOnChanges({card: cardChanges}: SimpleChanges) {
     if (cardChanges) {
-      const previous: ItmCardConfig<I> = (
+      const previous: ItmGridConfig<I> = (
         cardChanges.isFirstChange ? {} : cardChanges.previousValue
       );
       if (previous === this.card) return;
-      const {areas, size, positions}: ItmCardDef<I> = (
-        this.card instanceof ItmCardDef ? this.card : new ItmCardDef(this.card)
+      const {areas, size, positions}: ItmGridDef<I> = (
+        this.card instanceof ItmGridDef ? this.card : new ItmGridDef(this.card)
       );
       if (!previous.areas || previous.areas !== areas) this.areas = areas;
       if (!previous.size || previous.size !== size) (this.size = size);

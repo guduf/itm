@@ -9,16 +9,25 @@ import {
 } from '@angular/core';
 
 import { ComponentType } from './utils';
-import { Itm, Itms, ItmPipe } from './item';
+import { Itm, Itms, ItmPipe, ItmsChanges, ItmTarget } from './item';
 import { ItmActionEvent, ItmActionDef } from './action';
 import { ItmTypeDef } from './type';
+import { ItmGridDef } from './grid';
+import { ItmAreaDef, ItmPropAreaDef } from './area-def';
+import { Observable } from 'rxjs';
 
 /** The abstract directive to create area component. */
 @Injectable()
 export abstract class ItmAreaDirective<T = {}, A extends ItmActionDef<T> = ItmActionDef<T>> {
+  @Input()
+  area: ItmAreaDef;
+
   /** The emitter of action events. */
   @Input()
-  actionEmitter?: EventEmitter<ItmActionEvent<T, A>>;
+  actionEmitter: EventEmitter<ItmActionEvent<T, A>>;
+
+  @Input()
+  target: T;
 
   constructor(
     protected _injector: Injector,
@@ -29,10 +38,23 @@ export abstract class ItmAreaDirective<T = {}, A extends ItmActionDef<T> = ItmAc
   /** Create the component in the view container */
   protected _createComponent(component: ComponentType, providers: StaticProvider[] = []
   ): void {
+    if (typeof this.target !== 'undefined') {
+      // tslint:disable-next-line:max-line-length
+      if (typeof this.target !== 'object') throw new TypeError('Expected target.');
+      providers = [...providers, {provide: ItmTarget, useValue: this.target}];
+    }
     if (typeof this.actionEmitter !== 'undefined') {
-      if (!(this.actionEmitter instanceof EventEmitter))
-        throw new TypeError('Expected actionEmitter.');
-      providers = [{provide: EventEmitter, useValue: this.actionEmitter}, ...providers];
+      // tslint:disable-next-line:max-line-length
+      if (!(this.actionEmitter instanceof EventEmitter)) throw new TypeError('Expected actionEmitter.');
+      providers = [...providers, {provide: EventEmitter, useValue: this.actionEmitter}];
+    }
+    if (typeof this.area !== 'undefined') {
+      if (!(this.area instanceof ItmAreaDef)) throw new TypeError('Expected area.');
+      providers = [
+        ...providers,
+        {provide: ItmAreaDef, useValue: this.area},
+        ...(this.area ? this.area.providers : [])
+      ];
     }
     const injector = Injector.create(providers, this._injector);
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory(component);
@@ -56,27 +78,33 @@ export abstract class ItmTypedAreaDirective<
   @Input()
   items?: I[];
 
-  /** The type definition of the item target. */
   @Input()
-  typeDef?: ItmTypeDef<I>;
+  itemsChanges: ItmsChanges<I>;
 
   /** Create the component in the view container */
   protected _createComponent(
     component: ComponentType,
     providers: StaticProvider[] = []
   ): void {
+    if (!(this.area instanceof ItmPropAreaDef)) throw new TypeError('Expected ItmPropAreaDef.');
+    providers = [
+      ...providers,
+      {provide: ItmPropAreaDef, useValue: this.area},
+      {provide: ItmTarget, useValue: this.target}
+    ];
     if (typeof this.item !== 'undefined') {
       if (!this.item || typeof this.item !== 'object') throw new TypeError('Expected item.');
-      providers = [{provide: Itm, useValue: this.item}, ...providers];
+      providers = [ ...providers, {provide: Itm, useValue: this.item},];
     }
     if (typeof this.items !== 'undefined') {
       if (!Array.isArray(this.items)) throw new TypeError('Expected items.');
-      providers = [{provide: Itms, useValue: this.items}, ...providers];
+      providers = [...providers, {provide: Itms, useValue: this.items}];
     }
-    if (typeof this.typeDef !== 'undefined') {
-      if (!(this.typeDef instanceof ItmTypeDef)) throw new TypeError('Expected typeDef.');
-      providers = [{provide: ItmTypeDef, useValue: this.typeDef}, ...providers];
+    if (typeof this.itemsChanges !== 'undefined') {
+      if (!(this.itemsChanges instanceof Observable)) throw new TypeError('Expected itemsChanges.');
+      providers = [...providers, {provide: ItmsChanges, useValue: this.itemsChanges}];
     }
+    this.target = this.target || (this.item as II) || (this.items as II);
     super._createComponent(component, providers);
   }
 }

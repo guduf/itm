@@ -2,23 +2,21 @@ import 'reflect-metadata';
 import { CommonModule } from '@angular/common';
 import { NgModule, InjectionToken, ModuleWithProviders, Optional } from '@angular/core';
 
-import { ItmActionsCellDirective } from './actions-cell.directive';
 import { ItmButtonComponent } from './button.component';
-import { ItmCellDirective } from './cell.directive';
 import { ItmConfig } from './config';
-import { ItmDefaultActionsCellComponent } from './default-actions-cell.component';
-import { ItmDefaultCellComponent } from './default-cell.component';
-import { ItmDefaultHeaderCellComponent } from './default-header-cell.component';
-import { ItmHeaderCellDirective } from './header-cell.directive';
-import { ItmLocalePipe } from './locale.pipe';
 import { ItmMaterialModule } from './material.module';
 import { ItmTableComponent } from './table.component';
 import { ItmButtonsComponent } from './buttons.component';
-import { ItmTypeService, ItmTableTypePipe, ItmCardTypePipe } from './type.service';
+import { ItmTypeService, ItmTableTypePipe, ItmGridTypePipe } from './type.service';
 import { ItmTypeDef, getItmTypeDef, ItmTypeDefs } from './type';
-import { ItmCardComponent } from './card.component';
-import { ItmCardAreaDirective } from './card-area.directive';
-import { ItmDefaultCardAreaComponent } from './default-card-area.component';
+import { ItmGridComponent } from './grid.component';
+import { ItmGridAreaDirective } from './grid-area.directive';
+import { ItmCardAreaComponent } from './card-area.component';
+import { ItmActionsAreaComponent } from './actions-area.component';
+import { ItmTextAreaComponent } from './text-area.component';
+import { ItmHeaderAreaComponent } from './header-area.component';
+import { ItmColumnCellDirective, ItmColumnHeaderCellDirective } from './column.directive';
+import { ItmActionsAreaDirective } from './actions-area.directive';
 
 const IMPORTS = [
   CommonModule,
@@ -26,36 +24,34 @@ const IMPORTS = [
 ];
 
 const ENTRY_COMPONENTS = [
-  ItmDefaultActionsCellComponent,
-  ItmDefaultCardAreaComponent,
-  ItmDefaultCellComponent,
-  ItmDefaultHeaderCellComponent,
+  ItmActionsAreaComponent,
+  ItmCardAreaComponent,
+  ItmTextAreaComponent,
+  ItmHeaderAreaComponent,
 ];
 
 const DECLARATIONS = [
-  ItmActionsCellDirective,
-  ItmCardAreaDirective,
-  ItmCellDirective,
-  ItmDefaultCellComponent,
-  ItmHeaderCellDirective,
-  ItmDefaultActionsCellComponent,
+  ItmActionsAreaComponent,
+  ItmGridAreaDirective,
+  ItmColumnCellDirective,
+  ItmColumnHeaderCellDirective,
+  ItmActionsAreaDirective
 ];
 
 const EXPORTED_DECLARATIONS = [
   ItmButtonComponent,
   ItmButtonsComponent,
-  ItmCardComponent,
-  ItmCardTypePipe,
-  ItmLocalePipe,
+  ItmGridComponent,
+  ItmGridTypePipe,
   ItmTableComponent,
   ItmTableTypePipe
 ];
 
 export const DEFAULT_CONFIG: ItmConfig = {
-  defaultActionsCellComp: ItmDefaultActionsCellComponent,
-  defaultCardAreaComp: ItmDefaultCardAreaComponent,
-  defaultCellComp: ItmDefaultCellComponent,
-  defaultHeaderCellComp: ItmDefaultHeaderCellComponent,
+  defaultActionsAreaComp: ItmActionsAreaComponent,
+  defaultCardAreaComp: ItmCardAreaComponent,
+  defaultTextAreaComp: ItmTextAreaComponent,
+  defaultHeaderAreaComp: ItmHeaderAreaComponent,
   selectedCheckBoxIcon: 'check_box',
   unselectedCheckBoxIcon: 'check_box_outline_blank',
   indeterminateCheckBoxIcon: 'indeterminate_check_box'

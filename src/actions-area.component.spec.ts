@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 // tslint:disable-next-line:max-line-length
 import { ItmActionEvent, ItmActionDefs, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmActionDef, ItmActionConfig } from './action';
 import { ItmButtonMode } from './button.component';
-import { ItmDefaultActionsCellComponent } from './default-actions-cell.component';
+import { ItmActionsAreaComponent } from './actions-area.component';
 import { Itm } from './item';
 import { ItmMaterialModule } from './material.module';
 import { ItmButtonsComponent } from './buttons.component';
@@ -29,7 +29,7 @@ export class MockItmButtonsComponent<T> implements Partial<ItmButtonsComponent> 
 
 }
 
-describe('ItmDefaultActionsCellComponent', () => {
+describe('ItmActionsAreaComponent', () => {
   const item = {id: 63};
   const actions = [
     new ItmActionDef({key: 'add', icon: 'add_circle_outline'}),
@@ -45,7 +45,7 @@ describe('ItmDefaultActionsCellComponent', () => {
       ],
       declarations: [
         MockItmButtonsComponent,
-        ItmDefaultActionsCellComponent
+        ItmActionsAreaComponent
       ],
       providers: [
         {provide: ItmActionDefs, useValue: actions},
@@ -57,7 +57,7 @@ describe('ItmDefaultActionsCellComponent', () => {
   }));
 
   it('should create the component', async(() => {
-    const fixture = TestBed.createComponent(ItmDefaultActionsCellComponent);
+    const fixture = TestBed.createComponent(ItmActionsAreaComponent);
     const debugCell = fixture.debugElement.componentInstance;
     expect(debugCell).toBeTruthy();
   }));

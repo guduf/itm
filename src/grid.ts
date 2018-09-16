@@ -2,20 +2,20 @@ import { Itm } from './item';
 import { ItmAreaDef } from './area-def';
 import { ItmAreaConfig } from './area-config';
 
-export interface ItmCardConfig<I extends Itm = Itm> {
+export interface ItmGridConfig<I extends Itm = Itm> {
   areas?: (string | ItmAreaConfig<I>)[] | Map<string, ItmAreaConfig<I>>;
   size?: string | number | [string | number, string | number];
   template?: string | string[][];
   positions?: Map<string, [[number, number], [number, number]]>;
 }
 
-export class ItmCardDef<I extends Itm = Itm> implements ItmCardConfig<I> {
+export class ItmGridDef<I extends Itm = Itm> implements ItmGridConfig<I> {
   readonly areas: Map<string, ItmAreaDef<I>>;
   readonly size: [number, number];
   readonly template: string[][];
   readonly positions: Map<string, [[number, number], [number, number]]>;
 
-  constructor(cfg: ItmCardConfig<I>) {
+  constructor(cfg: ItmGridConfig<I>) {
     const areas = new Map<string, ItmAreaDef<I>>();
     cfg.areas = (
       Array.isArray(cfg.areas) ? cfg.areas :
@@ -54,7 +54,8 @@ export class ItmCardDef<I extends Itm = Itm> implements ItmCardConfig<I> {
     for (let row = 0; row < rowCount; row++) for (let col = 0; col < columnCount; col++) {
       if (!col) template.push([]);
       const prev = template[row][col - 1];
-      const cell = cardTemplate[row][col] !== '=' ? cardTemplate[row][col] : prev || '.';
+      let cell = cardTemplate[row][col] || '.';
+      if (cell === '=') cell = col ? prev : '.';
       if (prev !== cell && positions.has(prev) && positions.get(prev)[1][1] >= col)
         throw new TypeError(`Invalid row start: '${cell}'`);
       if (cell !== '.')

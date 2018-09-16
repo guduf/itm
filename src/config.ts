@@ -1,12 +1,12 @@
 /** The global config for the module */
 export class ItmConfig {
-  /** The component to create if not specified. Default: ItmDefaultCellComponent */
-  defaultCellComp?: any;
-  /** The header component to create if not specified. Default: ItmDefaultHeaderCellComponent */
-  defaultHeaderCellComp?: any;
-  /** The actions component to create if not specified. Default: ItmDefaultActionsCellComponent */
-  defaultActionsCellComp?: any;
-  /** The area component to create if not specified. Default: ItmDefaultAreaComponent */
+  /** The component to create if not specified. Default: ItmCellComponent */
+  defaultTextAreaComp?: any;
+  /** The header component to create if not specified. Default: ItmHeaderCellComponent */
+  defaultHeaderAreaComp?: any;
+  /** The actions component to create if not specified. Default: ItmActionsCellComponent */
+  defaultActionsAreaComp?: any;
+  /** The area component to create if not specified. Default: ItmAreaComponent */
   defaultCardAreaComp?: any;
   /**
    * The icon to display in the button of selection column when item is selected.

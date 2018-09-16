@@ -1,5 +1,5 @@
-@mixin itm-default-card-area($config) {
-  $selector: 'itm-default-card-area';
+@mixin itm-card-area($config) {
+  $selector: 'itm-card-area';
 
   .#{$selector} {
     display: block;

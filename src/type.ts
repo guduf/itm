@@ -3,7 +3,7 @@ import { ItmTableConfig } from './table-config';
 import { ItmColumnDef, ItmColumnConfig } from './column';
 import { ItmTableDef } from './table-def';
 import { ItmAreaConfig } from './area-config';
-import { ItmCardDef, ItmCardConfig } from './card';
+import { ItmGridDef, ItmGridConfig } from './grid';
 
 export interface ItmPropConfig<I extends Itm = Itm> {
   key: string;
@@ -26,7 +26,7 @@ export class ItmPropDef<I extends Itm = Itm> implements ItmPropConfig<I> {
   readonly required: boolean;
   readonly size: number;
   readonly text: ItmPipe<I, string>;
-  readonly card: ItmCardDef<I>;
+  readonly card: ItmGridDef<I>;
   readonly column: ItmColumnDef<I>;
 
   constructor(cfg: ItmPropConfig<I> & ItmAreaConfig<I>) {
@@ -70,13 +70,13 @@ export function ItmProp<I extends Itm = Itm>(cfg: Partial<ItmPropConfig<I>> = {}
 
 export class ItmTypeConfig<I extends Itm = Itm> {
   key?: string;
-  card?: ItmCardConfig<I>;
+  card?: ItmGridConfig<I>;
   table?: ItmTableConfig<I>;
 }
 
 export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
   readonly key: string;
-  readonly card: ItmCardDef<I>;
+  readonly card: ItmGridDef<I>;
   readonly table: ItmTableDef<I>;
 
   constructor(readonly type: any, cfg: ItmTypeConfig, readonly props: Map<keyof I, ItmPropDef>) {
@@ -97,7 +97,7 @@ export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
       ]
     });
     const cardCfg = cfg.card && typeof cfg.card === 'object' ? cfg.card : {};
-    this.card = new ItmCardDef({
+    this.card = new ItmGridDef({
       ...cardCfg,
       template: (
         cardCfg.template ? cardCfg.template :

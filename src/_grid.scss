@@ -1,5 +1,5 @@
-@mixin itm-card($config) {
-  $selector: 'itm-card';
+@mixin itm-grid($config) {
+  $selector: 'itm-grid';
 
   $slots: 24;
   $total-size: 1440px;

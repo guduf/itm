@@ -1,9 +1,9 @@
 import { Component, HostBinding, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ItmColumnDef } from './column';
-import { Itm } from './item';
+import { ItmAreaDef } from './area-def';
+import { ItmTarget } from './item';
 
-const SELECTOR = 'itm-default-cell';
+const SELECTOR = 'itm-text-area';
 
 @Component({
   selector: SELECTOR,
@@ -12,7 +12,7 @@ const SELECTOR = 'itm-default-cell';
 /**
  * Entry component created by CellDirective
  * when no component class is specified as cell for the ItmColumnDef. */
-export class ItmDefaultCellComponent {
+export class ItmTextAreaComponent<T = {}> {
   @HostBinding('class')
   /** The css class attached to the host. */
   get hostClass() { return SELECTOR; }
@@ -21,9 +21,9 @@ export class ItmDefaultCellComponent {
   rendered: Observable<string>;
 
   constructor(
-    column: ItmColumnDef,
-    private item: Itm
+    area: ItmAreaDef,
+    target: ItmTarget
   ) {
-    this.rendered = column.defaultText(this.item);
+    this.rendered = area.defaultText(target);
   }
 }

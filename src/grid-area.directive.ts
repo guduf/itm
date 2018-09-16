@@ -5,18 +5,18 @@ import { ItmConfig } from './config';
 import { ItmTypedAreaDirective } from './area.directive';
 import { ItmAreaDef } from './area-def';
 
-@Directive({selector: '[itmCardArea]'})
+@Directive({selector: '[itmGridArea]'})
 /** The directive assigned to the row cell of a ItmTable */
 // tslint:disable-next-line:max-line-length
-export class ItmCardAreaDirective<I extends Itm = Itm> extends ItmTypedAreaDirective<I, I> implements OnInit {
+export class ItmGridAreaDirective<I extends Itm = Itm> extends ItmTypedAreaDirective<I, I> implements OnInit {
   // tslint:disable-next-line:no-input-rename
-  @Input('itmCardArea')
+  @Input('itmGridArea')
   area: ItmAreaDef;
 
   ngOnInit() {
     if (!(this.area instanceof ItmAreaDef)) throw new TypeError('Expected area');
     this._createComponent(
-      this.area.text || this._injector.get(ItmConfig).defaultCardAreaComp,
+      this.area.cell || this._injector.get(ItmConfig).defaultTextAreaComp,
       [{provide: ItmAreaDef, useValue: this.area}]
     );
   }
