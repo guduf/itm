@@ -20,7 +20,7 @@ describe('ItmPropAreaDef', () => {
   });
 
   it('should throw a error with invalid key is specified', () => {
-    expect(() => new ItmPropAreaDef({key: null})).toThrowError(/InvalidItmPropAreaConfig/);
+    expect(() => new ItmPropAreaDef({key: null})).toThrowError(/InvalidItmAreaConfig/);
   });
 
   const item: Itm = {id: 63, firstName: 'Aron'};

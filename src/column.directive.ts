@@ -25,7 +25,7 @@ export abstract class ItmColumnDirective<
   }
 }
 
-@Directive({selector: '[itmColumnCellDirective]'})
+@Directive({selector: '[itmColumnCell]'})
 // tslint:disable-next-line:max-line-length
 export class ItmColumnCellDirective<I extends Itm = Itm, A extends ItmActionDef<I> = ItmActionDef<I>> extends ItmColumnDirective<I, I, A> implements OnInit {
   ngOnInit() {
@@ -33,9 +33,9 @@ export class ItmColumnCellDirective<I extends Itm = Itm, A extends ItmActionDef<
   }
 }
 
-@Directive({selector: '[itmColumnHeaderCellDirective]'})
+@Directive({selector: '[itmColumnHeader]'})
 // tslint:disable-next-line:max-line-length
-export class ItmColumnHeaderCellDirective<I extends Itm = Itm, A extends ItmActionDef<I[]> = ItmActionDef<I[]>> extends ItmColumnDirective<I, I[], A> implements OnInit {
+export class ItmColumnHeaderDirective<I extends Itm = Itm, A extends ItmActionDef<I[]> = ItmActionDef<I[]>> extends ItmColumnDirective<I, I[], A> implements OnInit {
   ngOnInit() {
     this._createComponent(this.area.header || this._injector.get(ItmConfig).defaultHeaderAreaComp);
   }

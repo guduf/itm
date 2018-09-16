@@ -36,13 +36,13 @@
   <!-- Columns -->
   <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
     <th *matHeaderCellDef mat-header-cell [ngClass]="getHeaderCellClass(column)">
-      <ng-container itmColumnHeaderCellDirective
+      <ng-container itmColumnHeader
         [area]="column"
         [itemsChanges]="itemsChanges"
         [actionEmitter]="event"></ng-container>
     </th>
     <td *matCellDef="let item" mat-cell [ngClass]="getCellClass(column)">
-      <ng-container itmColumnCellDirective
+      <ng-container itmColumnCell
         [area]="column"
         [item]="item"
         [actionEmitter]="event"></ng-container>

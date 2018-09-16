@@ -13,31 +13,30 @@ import { ItmMaterialModule } from './material.module';
 import { click, changeInputs } from './helpers.spec';
 import { ItmConfig } from './config';
 import { DEFAULT_CONFIG } from './itm.module';
-import { ItmActionsCellDirective } from './actions-cell.directive';
+import { ItmActionsAreaDirective } from './actions-area.directive';
 import { ItmActionEvent } from 'src/action';
 
-@Directive({selector: '[itmCell]'})
+@Directive({selector: '[itmColumnCell]'})
 // tslint:disable-next-line:directive-class-suffix
-class ItmCellDirective {
+class ItmColumnCellMockDirective {
   @Input()
   actionEmitter: EventEmitter<ItmActionEvent<Itm>>;
-  // tslint:disable-next-line:no-input-rename
-  @Input('itmCell')
-  column: ItmColumnDef;
+
+  @Input()
+  area: ItmColumnDef;
 
   @Input()
   item: Itm;
 }
 
-@Directive({selector: '[itmHeaderCell]'})
+@Directive({selector: '[itmColumnHeader]'})
 // tslint:disable-next-line:directive-class-suffix
-class ItmHeaderCellDirective {
+class ItmColumnHeaderMockDirective {
   @Input()
   actionEmitter: EventEmitter<ItmActionEvent<Itm>>;
 
-  // tslint:disable-next-line:no-input-rename
-  @Input('itmHeaderCell')
-  column: ItmColumnDef;
+  @Input()
+  area: ItmColumnDef;
 
   @Input()
   itemsChanges: ItmsChanges<Itm>;
@@ -56,9 +55,9 @@ describe('ItmTableComponent', () => {
         ItmMaterialModule
       ],
       declarations: [
-        ItmActionsCellDirective,
-        ItmCellDirective,
-        ItmHeaderCellDirective,
+        ItmActionsAreaDirective,
+        ItmColumnCellMockDirective,
+        ItmColumnHeaderMockDirective,
         ItmTableComponent,
         ItmTableSettingsComponent
       ],
@@ -108,7 +107,7 @@ describe('ItmTableComponent', () => {
     const {debugElement} = setupTable();
     const debugMatCell = debugElement.query(By.directive(MatCell));
     const providerToken = debugMatCell.childNodes[0].providerTokens[0];
-    expect(providerToken).toBe(ItmCellDirective, 'Expected ItmCellDirective as provider token of the first node of the first MatCell');
+    expect(providerToken).toBe(ItmColumnCellMockDirective, 'Expected ItmCellDirective as provider token of the first node of the first MatCell');
   }));
 
   // tslint:disable-next-line:max-line-length
@@ -116,7 +115,7 @@ describe('ItmTableComponent', () => {
     const {debugElement} = setupTable();
     const debugMatHeaderCell = debugElement.query(By.directive(MatHeaderCell));
     const providerToken = debugMatHeaderCell.childNodes[0].providerTokens[0];
-    expect(providerToken).toBe(ItmHeaderCellDirective, 'Expected ItmHeaderCellDirective as provider token of the first node of the first MatHeaderCell');
+    expect(providerToken).toBe(ItmColumnHeaderMockDirective, 'Expected ItmHeaderCellDirective as provider token of the first node of the first MatHeaderCell');
   }));
 
   it('should remain columns untouched when itemChanges changes', async(() => {

@@ -3,6 +3,7 @@ import { of, BehaviorSubject } from 'rxjs';
 
 import { ItmTextAreaComponent } from './text-area.component';
 import { ItmAreaDef } from './area-def';
+import { ItmTarget } from './item';
 
 describe('ItmTextAreaComponent', () => {
   beforeEach(async(() => {
@@ -12,7 +13,7 @@ describe('ItmTextAreaComponent', () => {
       ],
       providers: [
         {provide: ItmAreaDef, useValue: new ItmAreaDef({key: 'name'})},
-        {provide: ITM_TARGET, useValue: {id: 63, name: 'Scott'}}
+        {provide: ItmTarget, useValue: {id: 63, name: 'Scott'}}
       ]
     }).compileComponents();
   }));

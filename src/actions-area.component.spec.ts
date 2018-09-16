@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ItmActionEvent, ItmActionDefs, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmActionDef, ItmActionConfig } from './action';
 import { ItmButtonMode } from './button.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
-import { Itm } from './item';
+import { Itm, ItmTarget } from './item';
 import { ItmMaterialModule } from './material.module';
 import { ItmButtonsComponent } from './buttons.component';
 
@@ -30,7 +30,7 @@ export class MockItmButtonsComponent<T> implements Partial<ItmButtonsComponent> 
 }
 
 describe('ItmActionsAreaComponent', () => {
-  const item = {id: 63};
+  const target = {id: 63};
   const actions = [
     new ItmActionDef({key: 'add', icon: 'add_circle_outline'}),
     new ItmActionDef({key: 'remove', icon: 'remove_circle_outline'})
@@ -49,7 +49,7 @@ describe('ItmActionsAreaComponent', () => {
       ],
       providers: [
         {provide: ItmActionDefs, useValue: actions},
-        {provide: Itm, useValue: item},
+        {provide: ItmTarget, useValue: target},
         {provide: EventEmitter, useValue: eventEmitter},
         {provide: ITM_TABLE_ACTIONS_BUTTONS_MODE, useValue: buttonsMode}
       ]

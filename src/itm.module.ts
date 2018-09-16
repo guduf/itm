@@ -15,7 +15,7 @@ import { ItmCardAreaComponent } from './card-area.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
 import { ItmTextAreaComponent } from './text-area.component';
 import { ItmHeaderAreaComponent } from './header-area.component';
-import { ItmColumnCellDirective, ItmColumnHeaderCellDirective } from './column.directive';
+import { ItmColumnCellDirective, ItmColumnHeaderDirective } from './column.directive';
 import { ItmActionsAreaDirective } from './actions-area.directive';
 
 const IMPORTS = [
@@ -34,7 +34,7 @@ const DECLARATIONS = [
   ItmActionsAreaComponent,
   ItmGridAreaDirective,
   ItmColumnCellDirective,
-  ItmColumnHeaderCellDirective,
+  ItmColumnHeaderDirective,
   ItmActionsAreaDirective
 ];
 

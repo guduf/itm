@@ -3,62 +3,70 @@ import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 
-import { ItmCellDirective } from './cell.directive';
+import { ItmColumnCellDirective } from './column.directive';
 import { ItmColumnDef } from './column';
 import { Itm } from './item';
 import { ItmConfig } from './config';
 
 @Component({template: ''})
-export class ItmCellMockComponent {
+export class ItmColumnCellTestComponent {
   constructor(public item: Itm, public column: ItmColumnDef) { }
 }
 
 @Component({template: ''})
-export class ItmCellMockComponent { }
+export class ItmTextAreaMockComponent {
+  constructor(public target: Itm, public column: ItmColumnDef) { }
+}
 
-@Component({template: '<ng-container [itmCell]="defaultColumn" [item]="item"></ng-container>'})
-export class ItmCellDirectiveHotTestComponent {
-  @ViewChild(ItmCellDirective)
-  itmCellDirective: ItmCellDirective;
-  readonly columnWithComp = new ItmColumnDef({key: 'id', text: ItmCellMockComponent});
+@Component({
+  template: `
+    <ng-container itmColumnCell
+      [area]="defaultColumn"
+      [item]="item"></ng-container>
+  `
+})
+export class ItmColumnCellDirectiveHotTestComponent {
+  @ViewChild(ItmColumnCellDirective)
+  itmCellDirective: ItmColumnCellDirective;
+  readonly columnWithComp = new ItmColumnDef({key: 'id', cell: ItmColumnCellTestComponent});
   readonly defaultColumn = new ItmColumnDef({key: 'id'});
   readonly item: Itm = {id: 42};
 }
 
-describe('ItmCellDirective', () => {
+describe('ItmColumnCellDirective', () => {
   beforeEach(async(() => {
     const config: ItmConfig = {
-      defaultCellComp: ItmCellMockComponent
+      defaultTextAreaComp: ItmTextAreaMockComponent
     };
     TestBed
       .configureTestingModule({
         declarations: [
-          ItmCellDirective,
-          ItmCellDirectiveHotTestComponent,
-          ItmCellMockComponent,
-          ItmCellMockComponent,
+          ItmColumnCellDirective,
+          ItmColumnCellDirectiveHotTestComponent,
+          ItmColumnCellTestComponent,
+          ItmTextAreaMockComponent,
         ],
         providers: [{provide: ItmConfig, useValue: config}]
       })
       .overrideModule(
         BrowserDynamicTestingModule,
-        {set: {entryComponents: [ItmCellMockComponent, ItmCellMockComponent]}
+        {set: {entryComponents: [ItmTextAreaMockComponent, ItmColumnCellTestComponent]}
       });
   }));
 
   it('should create the directive', async(() => {
     TestBed.compileComponents();
-    const {componentInstance} = TestBed.createComponent(ItmCellDirectiveHotTestComponent);
+    const {componentInstance} = TestBed.createComponent(ItmColumnCellDirectiveHotTestComponent);
     expect(componentInstance.itmCellDirective).toBeTruthy();
   }));
 
   function setup(
     hotTestComponentTemplate?: string,
-  ): ComponentFixture<ItmCellDirectiveHotTestComponent> {
+  ): ComponentFixture<ItmColumnCellDirectiveHotTestComponent> {
     if (hotTestComponentTemplate)
-      TestBed.overrideTemplate(ItmCellDirectiveHotTestComponent, hotTestComponentTemplate);
+      TestBed.overrideTemplate(ItmColumnCellDirectiveHotTestComponent, hotTestComponentTemplate);
     TestBed.compileComponents();
-    const fixture = TestBed.createComponent(ItmCellDirectiveHotTestComponent);
+    const fixture = TestBed.createComponent(ItmColumnCellDirectiveHotTestComponent);
     fixture.detectChanges();
     fixture.componentInstance.itmCellDirective.ngOnInit();
     return fixture;
@@ -66,24 +74,24 @@ describe('ItmCellDirective', () => {
 
   it('should create the default cell component when no specified', async(() => {
     const {debugElement} = setup();
-    expect(debugElement.query(By.directive(ItmCellMockComponent))).toBeTruthy();
+    expect(debugElement.query(By.directive(ItmTextAreaMockComponent))).toBeTruthy();
   }));
 
   it('should throw a error when initiated with missing inputs', async(() => {
     const fun = () => setup(
-      '<ng-container [itmCell]="null" [item]="null"></ng-container>'
+      '<ng-container itmColumnCell [area]="null" [item]="null"></ng-container>'
     );
     expect(fun).toThrowError(TypeError);
   }));
 
   it('should provide correct Itm and ItmColumnDef in cell component injector', async(() => {
     const {debugElement} = setup(
-      '<ng-container [itmCell]="columnWithComp" [item]="item"></ng-container>'
+      '<ng-container itmColumnCell [area]="columnWithComp" [item]="item"></ng-container>'
     );
-    const debugCell = debugElement.query(By.directive(ItmCellMockComponent));
+    const debugCell = debugElement.query(By.directive(ItmColumnCellTestComponent));
     expect(debugCell).toBeTruthy();
-    const cellInstance: ItmCellMockComponent = debugCell.componentInstance;
-    const hostInstance: ItmCellDirectiveHotTestComponent = debugElement.componentInstance;
+    const cellInstance: ItmColumnCellTestComponent = debugCell.componentInstance;
+    const hostInstance: ItmColumnCellDirectiveHotTestComponent = debugElement.componentInstance;
     expect(cellInstance.column).toBe(hostInstance.columnWithComp);
     expect(cellInstance.item).toBe(hostInstance.item);
   }));

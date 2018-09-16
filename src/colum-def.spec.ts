@@ -15,7 +15,7 @@ describe('ItmColumnDef', () => {
   });
 
   it('should set a component class as cell when provided in def', () => {
-    const def = new ItmColumnDef({key: 'id', text: ItmCellComponent});
-    expect(def.text).toBe(ItmCellComponent);
+    const def = new ItmColumnDef({key: 'id', cell: ItmCellComponent});
+    expect(def.cell).toBe(ItmCellComponent);
   });
 });
