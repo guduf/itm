@@ -1,3 +1,9 @@
+/**
+ * Invalid row start:
+ *   name =  | name =
+ *   name id | name .
+ */
+
 // tslint:disable:max-line-length
 import { ItmGridDef } from './grid';
 import { ItmAreaConfig } from './area-config';

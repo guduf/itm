@@ -6,6 +6,9 @@ import { StaticProvider } from '@angular/core';
 
 /** The config to define a display container for a item property. */
 export interface ItmAreaConfig<T = {}> {
+  /** The area selector to bind the config to its class. */
+  selector?: string;
+
   /** The key of the item property. */
   key: string;
 
@@ -48,3 +51,4 @@ export interface ItmPropAreaConfig<I extends Itm = Itm> extends ItmAreaConfig<I>
   label?: ItmPipeLike<I, string> | ComponentType | false;
 }
 
+export type ItmAreasConfig<A = ItmAreaConfig<T>, T = {}> = (string | A)[] | Map<string, A>;

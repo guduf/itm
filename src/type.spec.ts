@@ -1,4 +1,5 @@
-import { ItmTypeDef, ItmPropDef, ItmType, getItmTypeDef, ItmProp } from './type';
+import { ItmProp, ItmPropDef } from './prop';
+import { getItmTypeDef, ItmType, ItmTypeDef } from './type';
 
 class User { name: string; }
 const props = new Map<string, ItmPropDef>();

@@ -9,6 +9,8 @@ import { ItmAreaConfig, ItmPropAreaConfig } from './area-config';
 export class ItmAreaDef<T = {}> implements ItmAreaConfig<T> {
   /** see [[ItmAreaConfig.key]]. */
   readonly key: string;
+  /** see [[ItmAreaConfig.selector]]. */
+  readonly selector: string;
   /** see [[ItmAreaConfig.size]]. */
   readonly size: number;
   /** see [[ItmAreaConfig.grow]]. */
@@ -24,8 +26,9 @@ export class ItmAreaDef<T = {}> implements ItmAreaConfig<T> {
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
     // tslint:disable-next-line:max-line-length
     else throw new TypeError('InvalidItmAreaConfig : Expected [key] as string for prop container config');
-    this.size = (cfg.size && typeof cfg.size === 'number') ? cfg.size : 2;
-    this.grow = (cfg.grow && typeof cfg.grow === 'number') ? cfg.grow : 0;
+    this.selector = cfg.selector && typeof this.selector === 'string' ? cfg.selector : 'area';
+    this.size = cfg.size && typeof cfg.size === 'number' ? cfg.size : 2;
+    this.grow = cfg.grow && typeof cfg.grow === 'number' ? cfg.grow : 0;
     this.cell = isComponentType(cfg.cell) ? cfg.cell as ComponentType : null;
     if (!this.cell && cfg.cell !== false) (
       this.defaultText = (
