@@ -5,8 +5,8 @@ import { ItmTableDef } from './table-def';
 import { ItmAreaConfig } from './area-config';
 import { ItmGridDef, ItmGridConfig } from './grid';
 
-export interface ItmPropConfig<I extends Itm = Itm> {
-  key: string;
+export interface ItmPropConfig<I extends Itm = Itm> extends Partial<ItmAreaConfig<I>> {
+  key?: string;
   computed?: boolean;
   label?: ItmPipeLike<I, string>;
   maxLength?: number;
@@ -29,9 +29,11 @@ export class ItmPropDef<I extends Itm = Itm> implements ItmPropConfig<I> {
   readonly card: ItmGridDef<I>;
   readonly column: ItmColumnDef<I>;
 
-  constructor(cfg: ItmPropConfig<I> & ItmAreaConfig<I>) {
-    if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
-    else throw new TypeError('InvalidItmPropConfig : Expected [key] as string for prop config');
+  constructor(key: symbol | string, cfg: ItmPropConfig<I>) {
+    if (cfg.key && typeof cfg.key === 'string') (this.key = cfg.key);
+    else if (key && typeof key === 'string') (this.key = key);
+    // tslint:disable-next-line:max-line-length
+    else throw new TypeError('InvalidItmPropConfig: Key must be specified in config if prop key is not a string');
     this.computed = cfg.computed || false;
     this.size = cfg.size >= 0 ? Math.round(cfg.size) : 2;
     this.pattern = cfg.pattern instanceof RegExp ? cfg.pattern : null;
@@ -54,17 +56,23 @@ export class ItmPropDef<I extends Itm = Itm> implements ItmPropConfig<I> {
   }
 }
 
-const ITM_ATTRS_META = Symbol('ITM_ATTRS_META');
+const ITM_PROPS_META = Symbol('ITM_PROPS_META');
 
 // tslint:disable-next-line:max-line-length
-export function ItmProp<I extends Itm = Itm>(cfg: Partial<ItmPropConfig<I>> = {}): PropertyDecorator {
+export function ItmProp<I extends Itm = Itm>(cfg: ItmPropConfig<I> = {}): PropertyDecorator {
   return (proto: any, key: (string | symbol) & keyof I) => {
-    let props: Map<keyof I, ItmPropDef> = Reflect.get(proto, ITM_ATTRS_META);
+    let props: Map<keyof I, ItmPropDef> = Reflect.get(proto, ITM_PROPS_META);
     if (!props) {
       props = new Map();
-      Reflect.set(proto, ITM_ATTRS_META, props);
+      Reflect.set(proto, ITM_PROPS_META, props);
     }
-    props.set(key, new ItmPropDef<I>({key: cfg.key || String(key), ...cfg}));
+    let propDef: ItmPropDef;
+    try { propDef = new ItmPropDef<I>(key, cfg); }
+    catch (err) {
+      console.error(err);
+      throw new TypeError(`Failed to create ItmPropDef for key '${String(key)}': ${proto}`);
+    }
+    props.set(key, propDef);
   };
 }
 
@@ -79,7 +87,11 @@ export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
   readonly card: ItmGridDef<I>;
   readonly table: ItmTableDef<I>;
 
-  constructor(readonly type: any, cfg: ItmTypeConfig, readonly props: Map<keyof I, ItmPropDef>) {
+  constructor(
+    readonly type: any,
+    private readonly _props: Map<keyof I, ItmPropDef> = new Map(),
+    cfg: ItmTypeConfig = {}
+  ) {
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
     else if (type.name && typeof type.name === 'string')
       this.key = (type.name as string).toLowerCase();
@@ -88,7 +100,7 @@ export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
     this.table = new ItmTableDef({
       ...tableCfg,
       columns: [
-        ...(Array.from(this.props.values()).map(propDef => propDef.column)),
+        ...(Array.from(this._props.values()).map(propDef => propDef.column)),
         ...(
           Array.isArray(tableCfg.columns) ? tableCfg.columns :
           tableCfg.columns instanceof Map ? Array.from(tableCfg.columns.values()) :
@@ -101,15 +113,14 @@ export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
       ...cardCfg,
       template: (
         cardCfg.template ? cardCfg.template :
-          Array.from(this.props.values()).map(prop => {
+          Array.from(this._props.values()).map(prop => {
             const row: string[] = [];
-            const size = (prop.card || {size: 0}).size || prop.size;
-            for (let i = 0; i < size; i++) row.push(prop.key);
+            for (let i = 0; i < prop.size; i++) row.push(prop.key);
             return row;
           })
       ),
       areas: [
-        ...(Array.from(this.props.values()).map(propDef => propDef)),
+        ...(Array.from(this._props.values()).map(propDef => propDef)),
         ...(
           Array.isArray(cardCfg.areas) ? cardCfg.areas :
           cardCfg.areas instanceof Map ? Array.from(cardCfg.areas.values()) :
@@ -118,14 +129,21 @@ export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
       ]
     });
   }
+
+  getProp(key: keyof I | string): ItmPropDef<I> {
+    let propDef = this._props.get(key);
+    if (propDef) return propDef;
+    for (propDef of Array.from(this._props.values()))
+      if (propDef.key === key) return propDef;
+  }
 }
 
 const ITM_TYPE_META = Symbol('ITM_TYPE_META');
 
-export function ItmType<I extends Itm = Itm>(config: ItmTypeConfig = {}): ClassDecorator {
+export function ItmType<I extends Itm = Itm>(cfg: ItmTypeConfig = {}): ClassDecorator {
   return (type: any) => {
-    const props: Map<keyof I, ItmPropDef> = Reflect.get(type.prototype, ITM_ATTRS_META);
-    Reflect.set(type, ITM_TYPE_META, new ItmTypeDef(type, config, props));
+    const props: Map<keyof I, ItmPropDef> = Reflect.get(type, ITM_PROPS_META);
+    Reflect.set(type, ITM_TYPE_META, new ItmTypeDef(type, props, cfg));
   };
 }
 

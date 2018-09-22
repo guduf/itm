@@ -84,12 +84,16 @@ export class ItmGridComponent<I extends Itm = Itm> implements OnChanges {
         cardChanges.isFirstChange ? {} : cardChanges.previousValue
       );
       if (previous === this.card) return;
-      const {areas, size, positions}: ItmGridDef<I> = (
+      const {areas, positions, template}: ItmGridDef<I> = (
         this.card instanceof ItmGridDef ? this.card : new ItmGridDef(this.card)
       );
-      if (!previous.areas || previous.areas !== areas) this.areas = areas;
-      if (!previous.size || previous.size !== size) (this.size = size);
+      if (!previous.areas || previous.areas !== areas) (this.areas = areas);
       if (this.positions !== positions) (this.positions =  positions);
+      if (
+        !this.size ||
+        this.size[0] !== template[0].length ||
+        this.size[1] !== template.length
+      ) (this.size = [template[0].length, template.length]);
     }
   }
 }

@@ -32,8 +32,7 @@ export class ItmGridTypePipe implements PipeTransform {
       areas: [
         ...Array.from(typeCardDef.areas.values()),
         ...(cfg.areas ? Array.from(cfg.areas.values()) : [])
-      ],
-      size: cfg.size ? cfg.size : cfg.template ? null : typeCardDef.size
+      ]
     });
   }
 }

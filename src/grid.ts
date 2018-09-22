@@ -4,14 +4,12 @@ import { ItmAreaConfig } from './area-config';
 
 export interface ItmGridConfig<I extends Itm = Itm> {
   areas?: (string | ItmAreaConfig<I>)[] | Map<string, ItmAreaConfig<I>>;
-  size?: string | number | [string | number, string | number];
   template?: string | string[][];
   positions?: Map<string, [[number, number], [number, number]]>;
 }
 
 export class ItmGridDef<I extends Itm = Itm> implements ItmGridConfig<I> {
   readonly areas: Map<string, ItmAreaDef<I>>;
-  readonly size: [number, number];
   readonly template: string[][];
   readonly positions: Map<string, [[number, number], [number, number]]>;
 
@@ -32,7 +30,6 @@ export class ItmGridDef<I extends Itm = Itm> implements ItmGridConfig<I> {
     const {template, positions} = this._parseTemplate(cfg.template);
     this.template = template;
     this.positions = positions;
-    this.size = this._parseSize(cfg.size);
   }
 
   private _parseTemplate(
@@ -75,15 +72,5 @@ export class ItmGridDef<I extends Itm = Itm> implements ItmGridConfig<I> {
       template[row][col] = cell;
     }
     return {template, positions};
-  }
-
-  private _parseSize(size: string | number | [string | number, string | number]): [number, number] {
-    if (typeof size === 'string') {
-      const match = size.match(/^(\d+)(?: (\d+))?$/);
-      size = match ? [match[1], match[2] || match[1]] : null;
-    }
-    if (!Array.isArray(size)) return [this.template[0].length, this.template.length];
-    const columns = size[0] > 0 ? Math.round(+size[0]) : this.template[0].length;
-    return [columns, size[1] > 0 ? Math.round(+size[1]) : this.template.length];
   }
 }
