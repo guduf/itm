@@ -5,11 +5,11 @@
  */
 
 // tslint:disable:max-line-length
-import { ItmGridDef } from './grid';
+import { ItmGridDef, ItmGridPosition } from './grid';
 import { ItmAreaConfig } from './area-config';
 describe('ItmGridDef', () => {
   it('should create with minimal config', () => {
-    expect(new ItmGridDef({})).toBeTruthy();
+    expect(new ItmGridDef({template: 'name', areas: ['name']})).toBeTruthy();
   });
 
   it('should create with simple template', () => {
@@ -21,27 +21,28 @@ describe('ItmGridDef', () => {
   it('should create a single line template', () => {
     const def = new ItmGridDef({template: 'id = id name', areas});
     expect(def.template).toEqual([['id', 'id', 'id', 'name']]);
-    const expectedPositions = new Map<string, [[number, number], [number, number]]>();
-    expectedPositions.set('id', [[0, 0], [0, 2]]);
-    expectedPositions.set('name', [[0, 3], [0, 3]]);
-    expect (def.positions).toEqual(expectedPositions);
+    // const expectedPositions = new Map<string, [[number, number], [number, number]]>();
+    // expectedPositions.set('id', [[0, 0], [0, 2]]);
+    // expectedPositions.set('name', [[0, 3], [0, 3]]);
+    // expect (def.positions).toEqual(expectedPositions);
   });
 
   it('should create a multi line template', () => {
     const template = `
-      id  .     name =
-      id  email name =
+      id  .             name =
+      id  control:email name =
     `;
     const def = new ItmGridDef({template, areas});
     expect(def.template).toEqual([
-      ['id', '.', 'name', 'name'],
-      ['id', 'email', 'name', 'name']
+      ['id', null, 'name', 'name'],
+      ['id', 'control:email', 'name', 'name']
     ]);
-    const expectedPositions = new Map<string, [[number, number], [number, number]]>();
-    expectedPositions.set('id', [[0, 0], [1, 0]]);
-    expectedPositions.set('name', [[0, 2], [1, 3]]);
-    expectedPositions.set('email', [[1, 1], [1, 1]]);
-    expect (def.positions).toEqual(expectedPositions);
+    const expectedIdPos =  new ItmGridPosition('$default', 'id', 1, 1, 1, 2);
+    expect(def.positions[0]).toEqual(expectedIdPos);
+    const expectedNamePos =  new ItmGridPosition('$default', 'name', 1, 3, 2, 2);
+    expect(def.positions[1]).toEqual(expectedNamePos);
+    const expectedEmailPos =  new ItmGridPosition('control', 'email', 2, 2, 1, 1);
+    expect(def.positions[2]).toEqual(expectedEmailPos);
   });
 
   it('should throw a type error when template is invalid', () => {
@@ -50,8 +51,6 @@ describe('ItmGridDef', () => {
       name id
     `;
     expect(() => new ItmGridDef({template, areas})).toThrowError(/row.*start/);
-    template = 'foo';
-    expect(() => new ItmGridDef({template, areas})).toThrowError(/InvalidCellArea/);
     template = 'name name id name';
     expect(() => new ItmGridDef({template, areas})).toThrowError(/column.*end/);
     template = `

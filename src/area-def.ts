@@ -1,5 +1,5 @@
 import { StaticProvider } from '@angular/core';
-import { of } from 'rxjs';
+import { of, config } from 'rxjs';
 
 import { Itm, ItmPipe, ItmPipeLike, deferPipe } from './item';
 import { ComponentType, isComponentType } from './utils';
@@ -9,8 +9,6 @@ import { ItmAreaConfig, ItmPropAreaConfig } from './area-config';
 export class ItmAreaDef<T = {}> implements ItmAreaConfig<T> {
   /** see [[ItmAreaConfig.key]]. */
   readonly key: string;
-  /** see [[ItmAreaConfig.selector]]. */
-  readonly selector: string;
   /** see [[ItmAreaConfig.size]]. */
   readonly size: number;
   /** see [[ItmAreaConfig.grow]]. */
@@ -25,8 +23,7 @@ export class ItmAreaDef<T = {}> implements ItmAreaConfig<T> {
   constructor(cfg: ItmAreaConfig<T>) {
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
     // tslint:disable-next-line:max-line-length
-    else throw new TypeError('InvalidItmAreaConfig : Expected [key] as string for prop container config');
-    this.selector = cfg.selector && typeof this.selector === 'string' ? cfg.selector : 'area';
+    else throw new TypeError('InvalidItmAreaConfig : Expected [key] as string for ItmAreaConfig');
     this.size = cfg.size && typeof cfg.size === 'number' ? cfg.size : 2;
     this.grow = cfg.grow && typeof cfg.grow === 'number' ? cfg.grow : 0;
     this.cell = isComponentType(cfg.cell) ? cfg.cell as ComponentType : null;

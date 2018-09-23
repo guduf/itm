@@ -1,102 +1,78 @@
 import { ItmAreaDef } from './area-def';
-import { ItmAreaConfig, ItmAreasConfig } from './area-config';
+import { ItmAreaConfig, ItmPropAreaConfig } from './area-config';
 
-export type ItmSelectorsConfig = (
-  Map<string, typeof ItmAreaDef> |
-  { [selector: string]: typeof ItmAreaDef } |
-  [string, typeof ItmAreaDef][]
+export type ItmAreasConfig = (
+  (string | ItmAreaConfig)[] |
+  { $default: (string | ItmAreaConfig)[], [selector: string]: (string | ItmAreaConfig)[] } |
+  Map<string, Map<string, ItmAreaConfig>>
 );
 
-export interface ItmGridConfig<T = {}> {
-  areas?: ItmAreasConfig<ItmAreaConfig<T>>;
+export interface ItmGridConfig {
+  areas?: ItmAreasConfig;
   template?: string | string[][];
-  positions?: Map<string, [[number, number], [number, number]]>;
-  selectors?: ItmSelectorsConfig;
 }
 
-export interface ItmGridPosition {
-  size:
+export class ItmGridPosition {
+  constructor(
+    readonly selector: string,
+    readonly key: string,
+    readonly row: number,
+    readonly col: number,
+    readonly width: number,
+    readonly height: number,
+  ) { }
 }
-
-const AREA_KEY_PATTERN = '[a-z]\\w+(?:\\.[a-z]\\w+)*';
-const AREA_KEY_REGEX = new RegExp(`^${AREA_KEY_PATTERN}$`);
-const AREA_SELECTOR_PATTERN = '[a-z]\\w+';
-const AREA_SELECTOR_REGEX = new RegExp(`^${AREA_SELECTOR_PATTERN}$`);
-const AREA_SELECTOR_CALL_PATTERN = `(${AREA_SELECTOR_PATTERN})\\((${AREA_KEY_PATTERN})\\)`;
-const AREA_SELECTOR_CALL_REGEX = new RegExp(`^${AREA_SELECTOR_CALL_PATTERN}$`);
-const AREA_FRAGMENT_PATTERN = `(?:(?:${AREA_KEY_PATTERN})|(?:${AREA_SELECTOR_CALL_PATTERN})|=|\\.)`;
-const TEMPLATE_ROW_PATTERN = ` *(${AREA_FRAGMENT_PATTERN}(?: +${AREA_FRAGMENT_PATTERN}))* *`;
-const TEMPLATE_ROW_REGEX = new RegExp(`^${TEMPLATE_ROW_PATTERN}$`);
 
 // tslint:disable-next-line:max-line-length
-export class ItmGridDef<T = {}> {
+export class ItmGridDef implements ItmGridConfig {
   readonly areas: Map<string, Map<string, ItmAreaDef>>;
-  readonly template: [string, string][][];
-  readonly positions: Map<string, [[number, number], [number, number]]>;
-  readonly selectors: Map<string, typeof ItmAreaDef>;
+  readonly template: string[][];
+  readonly positions: ItmGridPosition[];
 
-  constructor(cfg: ItmGridConfig<T> = {}) {
-    this.selectors = this._parseSelectors(cfg.selectors);
-    this.areas = this._parseAreas(cfg.areas);
+  constructor(cfg: ItmGridConfig = {}) {
     this.template = this._parseTemplate(cfg.template);
-    this.positions = this._parsePositions(cfg.template);
+    this.areas = this._parseAreas(cfg.areas);
+    this.positions = this.template ? this._parsePositions() : null;
   }
 
   private _parseAreas(cfg: ItmAreasConfig): Map<string, Map<string, ItmAreaDef>> {
-    cfg = Array.isArray(cfg) ? cfg : cfg instanceof Map ? Array.from(cfg.values()) : null;
-    if (!cfg) throw new TypeError('Expected Array or Map of ItmAreaConfig');
-    return cfg
-      .map(areaCfg => {
-        if (!areaCfg) throw new TypeError('Expected ItmAreaConfig or string');
-        if (areaCfg === 'string') return new ItmAreaDef({key: areaCfg});
-        const selector = (areaCfg as ItmAreaConfig).selector;
-        if (!selector) return new ItmAreaDef(areaCfg as ItmAreaConfig);
-        // tslint:disable-next-line:max-line-length
-        if (typeof selector !== 'string') throw new TypeError('Expected optional string as ItmAreaConfig.selector');
-        const ctor = this.selectors.get(selector);
-        // tslint:disable-next-line:max-line-length
-        if (!ctor) throw new ReferenceError(`Missing ItmTypeDef constructor for selector: ${selector}`);
-        if (areaCfg instanceof ctor) return areaCfg;
-        return new ctor(areaCfg as ItmAreaConfig);
-      })
-      .reduce(
-        (map, areaDef) => {
-          if (!map.has(areaDef.selector)) map.set(areaDef.selector, new Map());
-          map.get(areaDef.selector).set(areaDef.key, areaDef);
-          return map;
-        },
-        new Map()
-      );
-  }
-
-  private _parseSelectors(cfg: ItmSelectorsConfig): Map<string, typeof ItmAreaDef> {
-    const selectors = ((
-      // tslint:disable-next-line:max-line-length
-      cfg instanceof Map ? Array.from(cfg.keys()).map(selector => ([selector, cfg.get(selector)])) :
-      // tslint:disable-next-line:max-line-length
-      typeof cfg === 'object' ? Object.keys(cfg).map(selector => ([selector, cfg[selector]])) :
+    const selectors: { selector: string, areas: (string | ItmPropAreaConfig)[] }[] = (
+      Array.isArray(cfg) ? [{selector: '$default', areas: cfg}] :
+      cfg instanceof Map ?
+        Array.from(cfg.keys()).map(selector => ({
+          selector,
+          areas: Array.from((cfg as Map<string, Map<string, ItmAreaConfig>>).get(selector).values())
+        })) :
+      cfg && typeof cfg === 'object' ?
+        Object.keys(cfg).map(selector => ({
+          selector,
+          areas: cfg[selector]
+        })) :
         null
-    ) as [string, typeof ItmAreaDef][]);
-    if (!selectors) return null;
+      );
+    if (!cfg) throw new TypeError('Expected Array, object or Map');
     return selectors.reduce(
-      (map, [selector, ctor]) => {
-        // tslint:disable-next-line:max-line-length
-        if (!AREA_SELECTOR_REGEX.test(selector)) throw new TypeError('Expected Area selector pattern');
-        let target = ctor;
-        let isTypeOfAreaDef = ctor === ItmAreaDef;
-        while (!isTypeOfAreaDef && target) {
-          const prototype = Object.getPrototypeOf(target);
-          if (prototype !== ItmAreaDef) target = prototype;
-          else (isTypeOfAreaDef = true);
-        }
-        if (!isTypeOfAreaDef) throw new TypeError('Expected type of ItmAreaDef');
-        return map.set(selector, ctor);
+      (selectorsAcc, {selector, areas}) => {
+        if (selector !== '$default' && !AREA_SELECTOR_REGEX.test(selector))
+          throw new TypeError('Expected selector pattern or $default');
+        const keysMap = areas
+          .map(areaCfg => {
+            if (!areaCfg) throw new TypeError('Expected ItmAreaConfig or string');
+            if (typeof areaCfg === 'string') areaCfg = {key: areaCfg};
+            // tslint:disable-next-line:max-line-length
+            else if (typeof areaCfg !== 'object') throw new TypeError('Expected ItmAreaConfig or string');
+            if (!AREA_KEY_REGEX.test(areaCfg.key)) throw new TypeError('Expected string as [key]');
+            return areaCfg instanceof ItmAreaDef ? areaCfg : new ItmAreaDef(areaCfg);
+          })
+          .reduce((keysAcc, areaCfg) => keysAcc.set(areaCfg.key, areaCfg), new Map());
+        selectorsAcc.set(selector, keysMap);
+        return selectorsAcc;
       },
       new Map()
     );
   }
 
-  private _parseTemplate(cfg: string | (string | [string, string])[][]): [string, string][][] {
+  private _parseTemplate(cfg: string | string[][]): string[][] {
     if (typeof cfg === 'string') cfg = cfg
       .split(/\s*\n+\s*/)
       .filter(rowTemplate => rowTemplate.length)
@@ -109,59 +85,67 @@ export class ItmGridDef<T = {}> {
     // tslint:disable-next-line:max-line-length
     const colCount = (cfg as any[][]).reduce((max, row) => Math.max(max, row.length), 0);
     const rowCount = (cfg as any[]).length;
-    const template: [string, string][][] = [[]];
+    const template: string[][] = [[]];
     for (let row = 0; row < rowCount; row++) for (let col = 0; col < colCount; col++) {
       if (row && !col) template.push([]);
       const prev = template[row][col - 1] || null;
       let fragment = cfg[row][col] || null;
-      if (Array.isArray(fragment) && (
-        fragment.length !== 2 ||
-        !AREA_SELECTOR_REGEX.test(fragment[0]) ||
-        !AREA_KEY_REGEX.test(fragment[1])
-      )) throw new TypeError('Expected Area fragment');
-      else if (typeof fragment === 'string')
-        if (fragment.length < 2) fragment = fragment === '=' ? prev : null;
-        else {
-          const match = fragment.match(AREA_SELECTOR_CALL_REGEX);
-          fragment = match ? [match[1], match[2]] : ['area', fragment];
-        }
-      template[row][col] = fragment as [string, string];
+      if (fragment)
+        if (typeof fragment !== 'string') throw new TypeError('Expected optional string');
+        else if (!AREA_FRAGMENT_REGEX.test(fragment))
+          throw new TypeError('Expected Area fragment pattern');
+        else if (fragment.length < 2) fragment = fragment === '=' ? prev : null;
+      template[row][col] = fragment;
     }
     return template;
   }
 
 
-  private _parsePositions(): Map<string, [[number, number], [number, number]]> {
-    return ([]
+  private _parsePositions(): ItmGridPosition[] {
+    const map: Map<string, [[number, number], [number, number]]> = ([]
       .concat(...this.template.map((fragments, row) => fragments.map(
-        (fragment, col) => ({col, hash: fragment ? fragment.join(';') : null, row}))
-      )) as {col: number, hash: string, row: number}[])
+        (fragment, col) => ({col, fragment, row}))
+      )) as {col: number, fragment: string, row: number}[])
       .reduce<Map<string, [[number, number], [number, number]]>>(
-        (positions, {col, hash, row}, i, fragments) => {
-          const prevHash = row && col ? fragments[i - 1].hash : null;
+        (positions, {col, fragment, row}, i, fragments) => {
+          const prevHash = row && col ? fragments[i - 1].fragment : null;
           if (
             prevHash &&
-            prevHash !== hash &&
+            prevHash !== fragment &&
             positions.get(prevHash)[1][1] >= col
-          ) throw new TypeError(`Invalid row start: '${hash}'`);
-          if (!hash) return positions;
-          if (!positions.has(hash)) {
-            const [selector, key] = hash.split(';');
-            if (!this.areas.has(selector) || !this.areas.get(selector).has(key))
-              throw new ReferenceError('Missing ItmAreaDef');
-            return positions.set(hash, [[row, col], [row, col]]);
-          }
-          const [[startRow, startCol], [endRow, endCol]] = positions.get(hash);
+          ) throw new TypeError(`Invalid row start: '${fragment}'`);
+          if (!fragment) return positions;
+          if (!positions.has(fragment)) return positions.set(fragment, [[row, col], [row, col]]);
+          const [[startRow, startCol], [endRow, endCol]] = positions.get(fragment);
           if (row === startRow && col - 1 > endCol)
-            throw new TypeError(`Invalid column end: '${hash}'`);
-          if (row > startRow && hash !== prevHash && col > startCol)
-            throw new TypeError(`Invalid column start: '${hash}'`);
+            throw new TypeError(`Invalid column end: '${fragment}'`);
+          if (row > startRow && fragment !== prevHash && col > startCol)
+            throw new TypeError(`Invalid column start: '${fragment}'`);
           if (row - 1 > endRow)
-            throw new TypeError(`Invalid row end: '${hash}'`);
+            throw new TypeError(`Invalid row end: '${fragment}'`);
           // tslint:disable-next-line:max-line-length
-          return positions.set(hash, [[startRow, startCol], [Math.max(row, endRow), Math.max(col, endCol)]]);
+          return positions.set(fragment, [[startRow, startCol], [Math.max(row, endRow), Math.max(col, endCol)]]);
         },
         new Map()
     );
+    return Array.from(map.keys()).map(fragment => {
+      const [selector, key] = (
+        fragment.indexOf(':') >= 0 ?
+        fragment.split(':') :
+        ['$default', fragment]
+      );
+      const [[row, col], [endRow, endCol]] = map.get(fragment);
+      // tslint:disable-next-line:max-line-length
+      return new ItmGridPosition(selector, key, row + 1, col + 1, endCol - col + 1, endRow - row + 1);
+    });
   }
 }
+const AREA_KEY_PATTERN = '[a-z]\\w+(?:\\.[a-z]\\w+)*';
+const AREA_KEY_REGEX = new RegExp(`^${AREA_KEY_PATTERN}$`);
+const AREA_SELECTOR_PATTERN = '[a-z]\\w+';
+const AREA_SELECTOR_REGEX = new RegExp(`^${AREA_SELECTOR_PATTERN}$`);
+const AREA_SELECTOR_CALL_PATTERN = `${AREA_SELECTOR_PATTERN}:${AREA_KEY_PATTERN}`;
+const AREA_FRAGMENT_PATTERN = `(?:(?:${AREA_KEY_PATTERN})|(?:${AREA_SELECTOR_CALL_PATTERN})|=|\\.)`;
+const AREA_FRAGMENT_REGEX = new RegExp(`^${AREA_FRAGMENT_PATTERN}$`);
+const TEMPLATE_ROW_PATTERN = ` *(${AREA_FRAGMENT_PATTERN}(?: +${AREA_FRAGMENT_PATTERN})*) *`;
+const TEMPLATE_ROW_REGEX = new RegExp(`^${TEMPLATE_ROW_PATTERN}$`);
