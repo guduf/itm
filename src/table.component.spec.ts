@@ -20,7 +20,7 @@ import { ItmActionEvent } from 'src/action';
 // tslint:disable-next-line:directive-class-suffix
 class ItmColumnCellMockDirective {
   @Input()
-  actionEmitter: EventEmitter<ItmActionEvent<Itm>>;
+  action: EventEmitter<ItmActionEvent<Itm>>;
 
   @Input()
   area: ItmColumnDef;
@@ -33,7 +33,7 @@ class ItmColumnCellMockDirective {
 // tslint:disable-next-line:directive-class-suffix
 class ItmColumnHeaderMockDirective {
   @Input()
-  actionEmitter: EventEmitter<ItmActionEvent<Itm>>;
+  action: EventEmitter<ItmActionEvent<Itm>>;
 
   @Input()
   area: ItmColumnDef;

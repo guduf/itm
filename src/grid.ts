@@ -12,8 +12,9 @@ export interface ItmGridConfig {
   template?: string | string[][];
 }
 
-export class ItmGridPosition {
+export class ItmGridArea {
   constructor(
+    readonly area: ItmAreaDef,
     readonly selector: string,
     readonly key: string,
     readonly row: number,
@@ -27,30 +28,40 @@ export class ItmGridPosition {
 export class ItmGridDef implements ItmGridConfig {
   readonly areas: Map<string, Map<string, ItmAreaDef>>;
   readonly template: string[][];
-  readonly positions: ItmGridPosition[];
+  readonly gridAreas: ItmGridArea[];
 
-  constructor(cfg: ItmGridConfig = {}) {
+  constructor(
+    cfg: ItmGridConfig = {},
+    extraAreas?: { [selector: string]: (string | ItmAreaConfig)[] }
+  ) {
     this.template = this._parseTemplate(cfg.template);
-    this.areas = this._parseAreas(cfg.areas);
-    this.positions = this.template ? this._parsePositions() : null;
+    this.areas = this._parseAreas(cfg.areas, extraAreas);
+    this.gridAreas = this.template ? this._parsePositions() : null;
   }
 
-  private _parseAreas(cfg: ItmAreasConfig): Map<string, Map<string, ItmAreaDef>> {
-    const selectors: { selector: string, areas: (string | ItmPropAreaConfig)[] }[] = (
-      Array.isArray(cfg) ? [{selector: '$default', areas: cfg}] :
-      cfg instanceof Map ?
-        Array.from(cfg.keys()).map(selector => ({
-          selector,
-          areas: Array.from((cfg as Map<string, Map<string, ItmAreaConfig>>).get(selector).values())
-        })) :
-      cfg && typeof cfg === 'object' ?
-        Object.keys(cfg).map(selector => ({
-          selector,
-          areas: cfg[selector]
-        })) :
-        null
-      );
-    if (!cfg) throw new TypeError('Expected Array, object or Map');
+  private _parseAreas(
+    cfg: ItmAreasConfig,
+    extraAreas?: { [selector: string]: (string | ItmAreaConfig)[] }
+  ): Map<string, Map<string, ItmAreaDef>> {
+    const selectors: { selector: string, areas: (string | ItmPropAreaConfig)[] }[] = [
+      ...(
+        Array.isArray(cfg) ?
+          [{selector: '$default', areas: cfg}] :
+        cfg instanceof Map ?
+          Array.from(cfg.keys()).map(selector => ({
+            selector,
+            areas: Array.from((cfg).get(selector).values())
+          })) :
+        cfg && typeof cfg === 'object' ?
+          Object.keys(cfg).map(selector => ({selector, areas: cfg[selector]})) :
+          []
+      ),
+      ...(
+        extraAreas ?
+          Object.keys(extraAreas).map(selector => ({selector, areas: extraAreas[selector]})) :
+          []
+      )
+    ];
     return selectors.reduce(
       (selectorsAcc, {selector, areas}) => {
         if (selector !== '$default' && !AREA_SELECTOR_REGEX.test(selector))
@@ -101,22 +112,22 @@ export class ItmGridDef implements ItmGridConfig {
   }
 
 
-  private _parsePositions(): ItmGridPosition[] {
+  private _parsePositions(): ItmGridArea[] {
     const map: Map<string, [[number, number], [number, number]]> = ([]
       .concat(...this.template.map((fragments, row) => fragments.map(
         (fragment, col) => ({col, fragment, row}))
       )) as {col: number, fragment: string, row: number}[])
       .reduce<Map<string, [[number, number], [number, number]]>>(
-        (positions, {col, fragment, row}, i, fragments) => {
+        (gridAreas, {col, fragment, row}, i, fragments) => {
           const prevHash = row && col ? fragments[i - 1].fragment : null;
           if (
             prevHash &&
             prevHash !== fragment &&
-            positions.get(prevHash)[1][1] >= col
+            gridAreas.get(prevHash)[1][1] >= col
           ) throw new TypeError(`Invalid row start: '${fragment}'`);
-          if (!fragment) return positions;
-          if (!positions.has(fragment)) return positions.set(fragment, [[row, col], [row, col]]);
-          const [[startRow, startCol], [endRow, endCol]] = positions.get(fragment);
+          if (!fragment) return gridAreas;
+          if (!gridAreas.has(fragment)) return gridAreas.set(fragment, [[row, col], [row, col]]);
+          const [[startRow, startCol], [endRow, endCol]] = gridAreas.get(fragment);
           if (row === startRow && col - 1 > endCol)
             throw new TypeError(`Invalid column end: '${fragment}'`);
           if (row > startRow && fragment !== prevHash && col > startCol)
@@ -124,7 +135,7 @@ export class ItmGridDef implements ItmGridConfig {
           if (row - 1 > endRow)
             throw new TypeError(`Invalid row end: '${fragment}'`);
           // tslint:disable-next-line:max-line-length
-          return positions.set(fragment, [[startRow, startCol], [Math.max(row, endRow), Math.max(col, endCol)]]);
+          return gridAreas.set(fragment, [[startRow, startCol], [Math.max(row, endRow), Math.max(col, endCol)]]);
         },
         new Map()
     );
@@ -134,9 +145,11 @@ export class ItmGridDef implements ItmGridConfig {
         fragment.split(':') :
         ['$default', fragment]
       );
+      const area = this.areas.has(selector) ? this.areas.get(selector).get(key) : null;
+      if (!area) throw new ReferenceError('Missing area for fragment: ' + fragment);
       const [[row, col], [endRow, endCol]] = map.get(fragment);
       // tslint:disable-next-line:max-line-length
-      return new ItmGridPosition(selector, key, row + 1, col + 1, endCol - col + 1, endRow - row + 1);
+      return new ItmGridArea(area, selector, key, row + 1, col + 1, endCol - col + 1, endRow - row + 1);
     });
   }
 }

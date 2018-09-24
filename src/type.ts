@@ -6,13 +6,13 @@ import { ItmPropDef, ITM_PROPS_META } from './prop';
 
 export class ItmTypeConfig<I extends Itm = Itm> {
   key?: string;
-  card?: ItmGridConfig<I>;
+  card?: ItmGridConfig;
   table?: ItmTableConfig<I>;
 }
 
 export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
   readonly key: string;
-  readonly card: ItmGridDef<I>;
+  readonly card: ItmGridDef;
   readonly table: ItmTableDef<I>;
 
   constructor(
@@ -37,25 +37,25 @@ export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
       ]
     });
     const cardCfg = cfg.card && typeof cfg.card === 'object' ? cfg.card : {};
-    this.card = new ItmGridDef({
-      ...cardCfg,
-      template: (
-        cardCfg.template ? cardCfg.template :
-          Array.from(this._props.values()).map(prop => {
-            const row: string[] = [];
-            for (let i = 0; i < prop.size; i++) row.push(prop.key);
-            return row;
-          })
-      ),
-      areas: [
-        ...(Array.from(this._props.values()).map(propDef => propDef)),
-        ...(
-          Array.isArray(cardCfg.areas) ? cardCfg.areas :
-          cardCfg.areas instanceof Map ? Array.from(cardCfg.areas.values()) :
-            []
-        )
-      ]
-    });
+    // this.card = new ItmGridDef({
+    //   ...cardCfg,
+    //   template: (
+    //     cardCfg.template ? cardCfg.template :
+    //       Array.from(this._props.values()).map(prop => {
+    //         const row: string[] = [];
+    //         for (let i = 0; i < prop.size; i++) row.push(prop.key);
+    //         return row;
+    //       })
+    //   ),
+    //   areas: [
+    //     ...(Array.from(this._props.values()).map(propDef => propDef)),
+    //     ...(
+    //       Array.isArray(cardCfg.areas) ? cardCfg.areas :
+    //       cardCfg.areas instanceof Map ? Array.from(cardCfg.areas.values()) :
+    //         []
+    //     )
+    //   ]
+    // });
   }
 
   getProp(key: keyof I | string): ItmPropDef<I> {

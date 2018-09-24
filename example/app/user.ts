@@ -1,4 +1,5 @@
-import { ItmType, ItmProp } from 'src/type';
+import { ItmProp } from 'src/prop';
+import { ItmType } from 'src/type';
 
 @ItmType()
 export class User {
@@ -13,25 +14,25 @@ export class User {
   firstName: string;
 
   @ItmProp({
-    required: true,
-    maxLength: 120
+    // required: true,
+    // maxLength: 120
   })
   lastName: string;
 
   @ItmProp({
-    required: true,
-    pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-    size: 3
+    // required: true,
+    // pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+    // size: 3
   })
   email: string;
 
   @ItmProp({
-    required: true
+    // required: true
   })
   gender: 'male'|'female';
 
   @ItmProp({
-    pattern: /^\d{2,3}(\.\d{2,3}){2}$/
+    // pattern: /^\d{2,3}(\.\d{2,3}){2}$/
   })
   ipAddress: string;
 }

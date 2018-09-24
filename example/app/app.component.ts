@@ -6,13 +6,16 @@ import { ItmActionEvent } from 'src/action';
 import { DATA } from './data';
 import { ItmGridConfig } from '../../src/grid';
 
+const tableTemplate  = `
+  <itm-table
+  [table]="'user' | itmTableType:table"
+  [itemsSource]="itemsSource"
+  (event)="onEvent($event)"></itm-table>
+`;
 @Component({
   selector: 'app-root',
   template: `
-    <itm-table
-      [table]="'user' | itmTableType:table"
-      [itemsSource]="itemsSource"
-      (event)="onEvent($event)"></itm-table>
+    <itm-grid [grid]="grid" [target]="target"></itm-grid>
   `,
   styleUrls: ['./app.component.scss']
 })
@@ -31,6 +34,16 @@ export class AppComponent {
   table: ItmTableConfig = {
     rowActions: [{key: 'delete'}, {key: 'print'}]
   };
+
+  grid: ItmGridConfig = {
+    areas: ['firstName', 'lastName', 'ipAddress'],
+    template: `
+      firstName = lastName  =
+      ipAddress = =         =
+    `
+  };
+
+  target = DATA[0];
 
   onEvent(e: ItmActionEvent<Itm>) {
     if (e.key === 'delete') this.remove(e.target);

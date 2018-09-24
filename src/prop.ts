@@ -18,7 +18,7 @@ export class ItmPropDef<I extends Itm = Itm> implements ItmPropConfig<I> {
   readonly label: ItmPipe<I, string>;
   readonly size: number;
   readonly text: ItmPipe<I, string>;
-  readonly card: ItmGridDef<I>;
+  readonly card: ItmGridDef;
   readonly column: ItmColumnDef<I>;
 
   constructor(key: symbol | string, cfg: ItmPropConfig<I>) {

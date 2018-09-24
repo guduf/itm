@@ -26,14 +26,14 @@ export class ItmGridTypePipe implements PipeTransform {
   transform(key: string, cfg?: ItmGridConfig): ItmGridDef {
     const typeCardDef = this._typeService.get(key).card;
     if (!cfg) return typeCardDef;
-    return new ItmGridDef({
-      ...typeCardDef,
-      ...cfg,
-      areas: [
-        ...Array.from(typeCardDef.areas.values()),
-        ...(cfg.areas ? Array.from(cfg.areas.values()) : [])
-      ]
-    });
+    // return new ItmGridDef({
+    //   ...typeCardDef,
+    //   ...cfg,
+    //   areas: [
+    //     ...Array.from(typeCardDef.areas.values()),
+    //     ...(cfg.areas ? Array.from(cfg.areas.values()) : [])
+    //   ]
+    // });
   }
 }
 

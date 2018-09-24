@@ -1,7 +1,7 @@
 import { StaticProvider } from '@angular/core';
-import { of, config } from 'rxjs';
+import { of } from 'rxjs';
 
-import { Itm, ItmPipe, ItmPipeLike, deferPipe } from './item';
+import { Itm, ItmPipe, ItmPipeLike, deferPipe, ItmTarget } from './item';
 import { ComponentType, isComponentType } from './utils';
 import { ItmAreaConfig, ItmPropAreaConfig } from './area-config';
 
@@ -18,6 +18,7 @@ export class ItmAreaDef<T = {}> implements ItmAreaConfig<T> {
 
   /** The cell observable used by default components. */
   readonly defaultText?: ItmPipe<T, string>;
+
   readonly providers: StaticProvider[] = [];
 
   constructor(cfg: ItmAreaConfig<T>) {
@@ -33,7 +34,14 @@ export class ItmAreaDef<T = {}> implements ItmAreaConfig<T> {
           deferPipe(cfg.cell as ItmPipeLike<T, string>)
       )
     );
-    if (Array.isArray(cfg.providers)) this.providers = [...cfg.providers];
+    this.providers = [...(cfg.providers || [])];
+  }
+
+  getProviders(target: T): StaticProvider[] {
+    return [
+      ...this.providers,
+      {provide: ItmTarget, useValue: target}
+    ];
   }
 }
 

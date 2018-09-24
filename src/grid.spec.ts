@@ -5,8 +5,9 @@
  */
 
 // tslint:disable:max-line-length
-import { ItmGridDef, ItmGridPosition } from './grid';
+import { ItmGridDef, ItmGridArea } from './grid';
 import { ItmAreaConfig } from './area-config';
+import { ItmAreaDef } from './area-def';
 describe('ItmGridDef', () => {
   it('should create with minimal config', () => {
     expect(new ItmGridDef({template: 'name', areas: ['name']})).toBeTruthy();
@@ -24,25 +25,26 @@ describe('ItmGridDef', () => {
     // const expectedPositions = new Map<string, [[number, number], [number, number]]>();
     // expectedPositions.set('id', [[0, 0], [0, 2]]);
     // expectedPositions.set('name', [[0, 3], [0, 3]]);
-    // expect (def.positions).toEqual(expectedPositions);
+    // expect (def.gridAreas).toEqual(expectedPositions);
   });
 
   it('should create a multi line template', () => {
+    const areasDef = areas.map(cfg => new ItmAreaDef(cfg));
     const template = `
       id  .             name =
       id  control:email name =
     `;
-    const def = new ItmGridDef({template, areas});
+    const def = new ItmGridDef({template, areas: areasDef}, {control: [areasDef[2]]});
     expect(def.template).toEqual([
       ['id', null, 'name', 'name'],
       ['id', 'control:email', 'name', 'name']
     ]);
-    const expectedIdPos =  new ItmGridPosition('$default', 'id', 1, 1, 1, 2);
-    expect(def.positions[0]).toEqual(expectedIdPos);
-    const expectedNamePos =  new ItmGridPosition('$default', 'name', 1, 3, 2, 2);
-    expect(def.positions[1]).toEqual(expectedNamePos);
-    const expectedEmailPos =  new ItmGridPosition('control', 'email', 2, 2, 1, 1);
-    expect(def.positions[2]).toEqual(expectedEmailPos);
+    const expectedIdPos =  new ItmGridArea(areasDef[0], '$default', 'id', 1, 1, 1, 2);
+    expect(def.gridAreas[0]).toEqual(expectedIdPos);
+    const expectedNamePos =  new ItmGridArea(areasDef[1], '$default', 'name', 1, 3, 2, 2);
+    expect(def.gridAreas[1]).toEqual(expectedNamePos);
+    const expectedEmailPos =  new ItmGridArea(areasDef[2], 'control', 'email', 2, 2, 1, 1);
+    expect(def.gridAreas[2]).toEqual(expectedEmailPos);
   });
 
   it('should throw a type error when template is invalid', () => {
