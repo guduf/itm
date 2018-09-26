@@ -1,18 +1,18 @@
 import { Component, HostBinding } from '@angular/core';
-import { ItmAreaDef, ItmPropAreaDef } from './area-def';
 import { Itm } from './item';
 import { Observable } from 'rxjs';
+import { ItmField } from './field';
 
-const SELECTOR = 'itm-default-card-area';
+const SELECTOR = 'itm-field';
 
 @Component({
   selector: SELECTOR,
   template: `
-    <span class="label" >{{renderedLabel | async}}</span><br />
-    <span class="text" >{{renderedText | async}}<span>
+    <span class="label">{{renderedLabel | async}}</span><br />
+    <span class="text">{{renderedText | async}}<span>
   `
 })
-export class ItmCardAreaComponent {
+export class ItmFieldComponent {
   /** The rendered string observable for the label. */
   renderedLabel: Observable<string>;
 
@@ -24,7 +24,7 @@ export class ItmCardAreaComponent {
   get hostClass(): string { return SELECTOR; }
 
   constructor(
-    area: ItmPropAreaDef,
+    area: ItmField,
     item: Itm
   ) {
     this.renderedLabel = area.defaultLabel(item);

@@ -5,6 +5,7 @@ import { Itm } from '../../src/item';
 import { ItmActionEvent } from 'src/action';
 import { DATA } from './data';
 import { ItmGridConfig } from '../../src/grid';
+import { User } from './user';
 
 const tableTemplate  = `
   <itm-table
@@ -15,7 +16,8 @@ const tableTemplate  = `
 @Component({
   selector: 'app-root',
   template: `
-    <itm-grid [grid]="grid" [target]="target"></itm-grid>
+    <itm-grid [grid]="'user' | itmGridType:grid" [target]="target"></itm-grid>
+    <itm-table [table]="'user' | itmTableType:table" [itemsSource]="itemsSource"></itm-table>
   `,
   styleUrls: ['./app.component.scss']
 })
@@ -24,19 +26,12 @@ export class AppComponent {
 
   itemsSource: Itm[] = DATA;
 
-  card: ItmGridConfig = {
-    template: `
-      firstName = lastName  =
-      ipAddress = =         =
-    `
-  };
-
   table: ItmTableConfig = {
     rowActions: [{key: 'delete'}, {key: 'print'}]
   };
 
-  grid: ItmGridConfig = {
-    areas: ['firstName', 'lastName', 'ipAddress'],
+  grid: ItmGridConfig<User> = {
+    areas: ['firstName', 'lastName', 'ipAddress'].map(key => ({key, cell: user => user[key]})),
     template: `
       firstName = lastName  =
       ipAddress = =         =

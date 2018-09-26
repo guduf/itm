@@ -1,16 +1,16 @@
 import { of } from 'rxjs';
 
-import { ItmActionDef } from './action';
-import { ItmColumnDef } from './column';
+import { ItmAction } from './action';
+import { ItmColumn } from './column';
 import { Itm, ItmPipe, deferPipe } from './item';
 import { ItmTableConfig } from './table-config';
 
 export class ItmTableDef<I extends Itm = Itm> implements ItmTableConfig {
   /** see [[ItmTableConfig.rowActions]] **/
-  rowActions: ItmActionDef<I>[];
+  rowActions: ItmAction<I>[];
 
   /** see [[ItmTableConfig.columns]] **/
-  columns: Map<string, ItmColumnDef>;
+  columns: Map<string, ItmColumn>;
 
   /** see [[ItmTableConfig.setRowClass]] **/
   setRowClass: ItmPipe<I, string>;
@@ -24,16 +24,16 @@ export class ItmTableDef<I extends Itm = Itm> implements ItmTableConfig {
   constructor(cfg: ItmTableConfig<I> = {}) {
     this.rowActions = (
       !Array.isArray(cfg.rowActions) ? [] :
-        cfg.rowActions.map(actionCfg => new ItmActionDef<I>(actionCfg))
+        cfg.rowActions.map(actionCfg => new ItmAction<I>(actionCfg))
     );
     cfg.columns = (
       Array.isArray(cfg.columns) ? cfg.columns :
       cfg.columns instanceof Map ? Array.from(cfg.columns.values()) :
       []
     );
-    const columns = new Map<string, ItmColumnDef<I>>();
+    const columns = new Map<string, ItmColumn<I>>();
     for (const columnCfg of cfg.columns) {
-      const columnDef = new ItmColumnDef(
+      const columnDef = new ItmColumn(
         typeof columnCfg === 'string' ? {key: columnCfg} : columnCfg
       );
       columns.set(columnDef.key, columnDef);

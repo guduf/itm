@@ -2,7 +2,7 @@
 import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter, HostBinding } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ItmActionConfig, ItmActionDef, ItmActionEvent } from './action';
+import { ItmActionConfig, ItmAction, ItmActionEvent } from './action';
 
 /** The possible display modes for the button. */
 export type ItmButtonMode = 'icon' | 'menu';
@@ -38,7 +38,7 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
   text: Observable<string>;
 
   /** The action definition of the button. */
-  actionDef: ItmActionDef<T>;
+  actionDef: ItmAction<T>;
 
   @HostBinding('class')
   /** The CSS class of host element. */
@@ -57,9 +57,9 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
 
   ngOnChanges({action: actionChanges}: SimpleChanges) {
     if (actionChanges)
-      if (this.action instanceof ItmActionDef) this.actionDef = this.action;
+      if (this.action instanceof ItmAction) this.actionDef = this.action;
       else try {
-        this.actionDef = new ItmActionDef(
+        this.actionDef = new ItmAction(
           typeof this.action === 'string' ? {key: this.action} : this.action
         );
       }

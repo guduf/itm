@@ -6,7 +6,7 @@ import { MatIconModule, MatButtonModule } from '@angular/material';
 import { ItmButtonComponent, ItmButtonMode } from './button.component';
 import { ItmConfig } from './config';
 import { DEFAULT_CONFIG } from './itm.module';
-import { ItmActionConfig, ItmActionDef } from './action';
+import { ItmActionConfig, ItmAction } from './action';
 import { By } from '@angular/platform-browser';
 import { changeInputs } from './helpers.spec';
 
@@ -70,7 +70,7 @@ describe('ItmButtonComponent', () => {
   }
 
   it('should create the action definition observing the action input', async(() => {
-    let action: string | ItmActionConfig | ItmActionDef = 'create';
+    let action: string | ItmActionConfig | ItmAction = 'create';
     const {fixture, instance} = setup({action});
     expect(instance.actionDef).toBeDefined();
     expect(instance.actionDef.key).toBe(action, 'Expected action definition with expected key when action is as string');
@@ -78,7 +78,7 @@ describe('ItmButtonComponent', () => {
     changeInputs(fixture, {action});
     expect(instance.actionDef).toBeDefined();
     expect(instance.actionDef.key).toBe(action.key, 'Expected action definition with expected key when action is as string');
-    action = new ItmActionDef({key: 'delete'});
+    action = new ItmAction({key: 'delete'});
     changeInputs(fixture, {action});
     expect(instance.actionDef).toBeDefined();
     expect(instance.actionDef.key).toBe(action.key, 'Expected action definition with expected key when action is as string');

@@ -10,13 +10,10 @@ import { ItmButtonsComponent } from './buttons.component';
 import { ItmTypeService, ItmTableTypePipe, ItmGridTypePipe } from './type.service';
 import { ItmTypeDef, getItmTypeDef, ItmTypeDefs } from './type';
 import { ItmGridComponent } from './grid.component';
-import { ItmGridAreaDirective } from './grid-area.directive';
-import { ItmCardAreaComponent } from './card-area.component';
+import { ItmFieldComponent } from './field.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
 import { ItmTextAreaComponent } from './text-area.component';
-import { ItmHeaderAreaComponent } from './header-area.component';
-import { ItmColumnCellDirective, ItmColumnHeaderDirective } from './column.directive';
-import { ItmActionsAreaDirective } from './actions-area.directive';
+import { ItmAreaDirective } from './area.directive';
 
 const IMPORTS = [
   CommonModule,
@@ -25,17 +22,12 @@ const IMPORTS = [
 
 const ENTRY_COMPONENTS = [
   ItmActionsAreaComponent,
-  ItmCardAreaComponent,
-  ItmTextAreaComponent,
-  ItmHeaderAreaComponent,
+  ItmFieldComponent,
+  ItmTextAreaComponent
 ];
 
 const DECLARATIONS = [
-  ItmActionsAreaComponent,
-  ItmGridAreaDirective,
-  ItmColumnCellDirective,
-  ItmColumnHeaderDirective,
-  ItmActionsAreaDirective
+  ItmAreaDirective
 ];
 
 const EXPORTED_DECLARATIONS = [
@@ -49,9 +41,8 @@ const EXPORTED_DECLARATIONS = [
 
 export const DEFAULT_CONFIG: ItmConfig = {
   defaultActionsAreaComp: ItmActionsAreaComponent,
-  defaultCardAreaComp: ItmCardAreaComponent,
+  defaultFieldComp: ItmFieldComponent,
   defaultTextAreaComp: ItmTextAreaComponent,
-  defaultHeaderAreaComp: ItmHeaderAreaComponent,
   selectedCheckBoxIcon: 'check_box',
   unselectedCheckBoxIcon: 'check_box_outline_blank',
   indeterminateCheckBoxIcon: 'indeterminate_check_box'

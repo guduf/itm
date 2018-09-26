@@ -3,7 +3,7 @@ import { TestBed, async } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 
 // tslint:disable-next-line:max-line-length
-import { ItmActionEvent, ItmActionDefs, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmActionDef, ItmActionConfig } from './action';
+import { ItmActionEvent, ItmActions, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmAction, ItmActionConfig } from './action';
 import { ItmButtonMode } from './button.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
 import { Itm, ItmTarget } from './item';
@@ -19,7 +19,7 @@ export class MockItmButtonsComponent<T> implements Partial<ItmButtonsComponent> 
   mode: ItmButtonMode;
 
   @Input()
-  actions: (ItmActionConfig | ItmActionDef)[];
+  actions: (ItmActionConfig | ItmAction)[];
 
   @Input()
   menuIcon = 'more_vert';
@@ -32,8 +32,8 @@ export class MockItmButtonsComponent<T> implements Partial<ItmButtonsComponent> 
 describe('ItmActionsAreaComponent', () => {
   const target = {id: 63};
   const actions = [
-    new ItmActionDef({key: 'add', icon: 'add_circle_outline'}),
-    new ItmActionDef({key: 'remove', icon: 'remove_circle_outline'})
+    new ItmAction({key: 'add', icon: 'add_circle_outline'}),
+    new ItmAction({key: 'remove', icon: 'remove_circle_outline'})
   ];
   const eventEmitter = new EventEmitter<ItmActionEvent>();
   const buttonsMode = new BehaviorSubject<ItmButtonMode>('icon');
@@ -48,9 +48,9 @@ describe('ItmActionsAreaComponent', () => {
         ItmActionsAreaComponent
       ],
       providers: [
-        {provide: ItmActionDefs, useValue: actions},
+        {provide: ItmActions, useValue: actions},
         {provide: ItmTarget, useValue: target},
-        {provide: EventEmitter, useValue: eventEmitter},
+        {provide: ItmActionEmitter, useValue: ItmActionEmitter},
         {provide: ITM_TABLE_ACTIONS_BUTTONS_MODE, useValue: buttonsMode}
       ]
     }).compileComponents();

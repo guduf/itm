@@ -5,22 +5,22 @@
  */
 
 // tslint:disable:max-line-length
-import { ItmGridDef, ItmGridArea } from './grid';
+import { ItmGrid, ItmGridArea } from './grid';
 import { ItmAreaConfig } from './area-config';
-import { ItmAreaDef } from './area-def';
-describe('ItmGridDef', () => {
+import { ItmArea } from './area';
+describe('ItmGrid', () => {
   it('should create with minimal config', () => {
-    expect(new ItmGridDef({template: 'name', areas: ['name']})).toBeTruthy();
+    expect(new ItmGrid({template: 'name', areas: ['name']})).toBeTruthy();
   });
 
   it('should create with simple template', () => {
-    expect(new ItmGridDef({template: 'id', areas: [{key: 'id'}]})).toBeTruthy();
+    expect(new ItmGrid({template: 'id', areas: [{key: 'id'}]})).toBeTruthy();
   });
 
   const areas: ItmAreaConfig[] = [{key: 'id'}, {key: 'name'}, {key: 'email'}];
 
   it('should create a single line template', () => {
-    const def = new ItmGridDef({template: 'id = id name', areas});
+    const def = new ItmGrid({template: 'id = id name', areas});
     expect(def.template).toEqual([['id', 'id', 'id', 'name']]);
     // const expectedPositions = new Map<string, [[number, number], [number, number]]>();
     // expectedPositions.set('id', [[0, 0], [0, 2]]);
@@ -29,12 +29,12 @@ describe('ItmGridDef', () => {
   });
 
   it('should create a multi line template', () => {
-    const areasDef = areas.map(cfg => new ItmAreaDef(cfg));
+    const areasDef = areas.map(cfg => new ItmArea(cfg));
     const template = `
       id  .             name =
       id  control:email name =
     `;
-    const def = new ItmGridDef({template, areas: areasDef}, {control: [areasDef[2]]});
+    const def = new ItmGrid({template, areas: areasDef}, {control: [areasDef[2]]});
     expect(def.template).toEqual([
       ['id', null, 'name', 'name'],
       ['id', 'control:email', 'name', 'name']
@@ -52,19 +52,19 @@ describe('ItmGridDef', () => {
       name name
       name id
     `;
-    expect(() => new ItmGridDef({template, areas})).toThrowError(/row.*start/);
+    expect(() => new ItmGrid({template, areas})).toThrowError(/row.*start/);
     template = 'name name id name';
-    expect(() => new ItmGridDef({template, areas})).toThrowError(/column.*end/);
+    expect(() => new ItmGrid({template, areas})).toThrowError(/column.*end/);
     template = `
       name  name
       id    name
     `;
-    expect(() => new ItmGridDef({template, areas})).toThrowError(/column.*start/);
+    expect(() => new ItmGrid({template, areas})).toThrowError(/column.*start/);
     template = `
       name
       id
       name
     `;
-    expect(() => new ItmGridDef({template, areas})).toThrowError(/row.*end/);
+    expect(() => new ItmGrid({template, areas})).toThrowError(/row.*end/);
   });
 });

@@ -1,16 +1,18 @@
 // tslint:disable:max-line-length
-import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, SimpleChanges, StaticProvider } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 import { BehaviorSubject, from, fromEvent , merge, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilChanged, first, map, mergeMap, reduce, startWith, skip, tap } from 'rxjs/operators';
 // tslint:enable:max-line-length
 
-import { ItmActionConfig, ItmActionEvent } from './action';
-import { ItmColumnDef } from './column';
+import { ItmActionEvent, ItmAction, ItmActions, ITM_TABLE_ACTIONS_BUTTONS_MODE } from './action';
+import { ItmArea } from './area';
+import { ItmColumn } from './column';
 import { ItmButtonMode } from './button.component';
 import { ItmConfig } from './config';
 import { Itm, ItmsChanges, ItmsSource, deferPipe, ItmPipe } from './item';
 import { ItmTableConfig } from './table-config';
+import { ItmActionsAreaComponent } from './actions-area.component';
 
 const SELECTOR = 'itm-table';
 
@@ -42,11 +44,16 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   /** @Output Emits selected items changes. */
   readonly selectionChanges = new EventEmitter<I[]>();
 
+  rowActionsProviders: StaticProvider[];
+
   /** The actions for the row cell */
-  rowActions: ItmActionConfig[];
+  rowActions: ItmAction[];
 
   /** The columns transcluded to the MatTable */
-  columns: ItmColumnDef[];
+  columns: ItmColumn[];
+
+  /** The keys of the columns to display. */
+  displayedColumns: string[];
 
   /** The observable to set the style of the header row. */
   headerRowStyle: Observable<{ [key: string]: string; }>;
@@ -64,33 +71,23 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   readonly itemsChanges: ItmsChanges<I>;
 
   @HostBinding('class')
-  get hostClass() {
+  get hostClass(): string {
     return SELECTOR;
   }
 
-  get actionCellClass() {
+  actionArea = new ItmArea({key: '$actions', cell: ItmActionsAreaComponent});
+
+  get actionCellClass(): string {
     const size  = Math.ceil(this.rowActions.length * 40 / 60);
     return `itm-action-cell itm-slot-${size}`;
   }
 
-  get actionHeaderCellClass() {
+  get actionHeaderCellClass(): string {
     const size  = Math.ceil(this.rowActions.length * 40 / 60);
     return `itm-action-header-cell itm-slot-${size}`;
   }
 
-  /** The keys of the columns to display. */
-  get displayedColumns(): string[] {
-    const columns = (
-      this.settings.columns ? this.settings.columns : this.columns.map(({key}) => key)
-    );
-    return  [
-      ...(this.columns.length && this._canSelect ? ['$itm-selection'] : []),
-      ...columns,
-      ...(this.rowActions ? ['$itm-actions'] : []),
-    ];
-  }
-
-  get headerRowClass() {
+  get headerRowClass(): string {
     return 'itm-header-row';
   }
 
@@ -114,15 +111,13 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   }
 
   /** The current items currently of the table. */
-  get items(): I[] { return this._itemsChanges.getValue(); }
+  get items(): I[] { return this._itemsChanges.value; }
 
   /** The current selection of items. */
-  get selection(): Set<I> { return this._selectionChanges.getValue(); }
+  get selection(): Set<I> { return this._selectionChanges.value; }
 
   /** The CSS class of the selection cells. */
-  get selectionCellClass(): string {
-    return `itm-selection-cell`;
-  }
+  get selectionCellClass(): string { return `itm-selection-cell`; }
 
   /** Returns the icon of the selection header cell. */
   get selectionHeaderCellIcon(): string {
@@ -135,9 +130,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   }
 
   /** The CSS class of the selection header cell. */
-  get selectionHeaderCellClass(): string {
-    return 'itm-selection-header-cell';
-  }
+  get selectionHeaderCellClass(): string { return 'itm-selection-header-cell'; }
 
   /** The boolean or function to determine if the selection column is displayed. */
   private _canSelect: boolean | ItmPipe<I, boolean>;
@@ -186,7 +179,15 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
         tableChanges.isFirstChange ? {columns: []} : tableChanges.previousValue
       ) as ItmTableConfig<I>;
       const {rowActions, columns, canSelect, setRowClass, selectionLimit} = this.table;
-      if (previous.rowActions !== rowActions) this.rowActions = rowActions || null;
+      if (previous.rowActions !== rowActions) {
+        this.rowActions = (
+          !Array.isArray(rowActions) ? null : rowActions.map(actionCfg => new ItmAction(actionCfg))
+        );
+        this.rowActionsProviders = [
+          {provide: ITM_TABLE_ACTIONS_BUTTONS_MODE, useValue: this.actionsButtonsMode},
+          {provide: ItmActions, useValue: this.rowActions}
+        ];
+      }
       if (previous.canSelect !== canSelect) {
         this._canSelect = (
           canSelect === true ? true :
@@ -200,14 +201,13 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
       );
       if (previous.selectionLimit !== selectionLimit) this.selectionLimit = selectionLimit || 0;
       if (previous.columns !== columns) {
-        const columnsArr = (
+        const columnCfgs = (
           Array.isArray(columns) ? columns :
           columns instanceof Map ? Array.from(columns.values()) :
             []
         );
-        this.columns = columnsArr.map(cfg => (
-          cfg instanceof ItmColumnDef ? cfg :
-            new ItmColumnDef(typeof cfg === 'string' ? {key: cfg} : cfg)
+        this.columns = columnCfgs.map(cfg => (
+          cfg instanceof ItmColumn ? cfg : new ItmColumn(typeof cfg === 'string' ? {key: cfg} : cfg)
         ));
         this._selectionChanges.next(new Set());
       }
@@ -222,6 +222,8 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
       selectablesMarkedForChanges = true;
     }
     if (selectablesMarkedForChanges) this._filterSelectableItems();
+    this._setDisplayedColumns();
+    console.log(this.columns, this.displayedColumns);
   }
 
   ngOnDestroy() {
@@ -230,6 +232,17 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     if (this._selectableChangesSubscr) this._selectableChangesSubscr.unsubscribe();
     if (this._selectablesChangeSubscr) this._selectableChangesSubscr.unsubscribe();
     if (this._matDialogRef) this._matDialogRef.close();
+  }
+
+  private _setDisplayedColumns(): void {
+    const columns = (
+      this.settings.columns ? this.settings.columns : this.columns.map(({key}) => key)
+    );
+    this.displayedColumns = [
+      ...(this.columns.length && this._canSelect ? ['$itm-selection'] : []),
+      ...columns,
+      ...(this.rowActions ? ['$itm-actions'] : []),
+    ];
   }
 
   /** Determines if the item is selected. */
@@ -246,11 +259,11 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     );
   }
 
-  getCellClass(column: ItmColumnDef) {
+  getCellClass(column: ItmColumn) {
     return `itm-cell itm-slot-${column.size}`;
   }
 
-  getHeaderCellClass(column: ItmColumnDef) {
+  getHeaderCellClass(column: ItmColumn) {
     return `itm-header-cell itm-slot-${column.size}`;
   }
 

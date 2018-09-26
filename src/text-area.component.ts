@@ -1,7 +1,7 @@
 import { Component, HostBinding, Inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { ItmAreaDef } from './area-def';
-import { ItmTarget } from './item';
+import { Observable, of } from 'rxjs';
+import { ItmArea } from './area';
+import { ITM_TARGET } from './item';
 
 const SELECTOR = 'itm-text-area';
 
@@ -11,7 +11,7 @@ const SELECTOR = 'itm-text-area';
 })
 /**
  * Entry component created by CellDirective
- * when no component class is specified as cell for the ItmColumnDef. */
+ * when no component class is specified as cell for the ItmColumn. */
 export class ItmTextAreaComponent<T = {}> {
   @HostBinding('class')
   /** The css class attached to the host. */
@@ -21,9 +21,12 @@ export class ItmTextAreaComponent<T = {}> {
   rendered: Observable<string>;
 
   constructor(
-    area: ItmAreaDef,
-    target: ItmTarget
+    area: ItmArea,
+    @Inject(ITM_TARGET)
+    target: T
   ) {
-    this.rendered = area.defaultText(target);
+    this.rendered = (
+      typeof area.defaultText === 'function' ? area.defaultText(target) : of(area.key)
+    );
   }
 }

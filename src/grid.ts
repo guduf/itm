@@ -1,20 +1,20 @@
-import { ItmAreaDef } from './area-def';
-import { ItmAreaConfig, ItmPropAreaConfig } from './area-config';
+import { ItmArea } from './area';
+import { ItmAreaConfig } from './area-config';
 
-export type ItmAreasConfig = (
-  (string | ItmAreaConfig)[] |
-  { $default: (string | ItmAreaConfig)[], [selector: string]: (string | ItmAreaConfig)[] } |
-  Map<string, Map<string, ItmAreaConfig>>
+export type ItmAreasConfig<T = {}> = (
+  (string | ItmAreaConfig<T>)[] |
+  { $default: (string | ItmAreaConfig<T>)[], [selector: string]: (string | ItmAreaConfig<T>)[] } |
+  Map<string, Map<string, ItmAreaConfig<T>>>
 );
 
-export interface ItmGridConfig {
-  areas?: ItmAreasConfig;
+export interface ItmGridConfig<T = {}> {
+  areas?: ItmAreasConfig<T>;
   template?: string | string[][];
 }
 
 export class ItmGridArea {
   constructor(
-    readonly area: ItmAreaDef,
+    readonly area: ItmArea,
     readonly selector: string,
     readonly key: string,
     readonly row: number,
@@ -25,25 +25,16 @@ export class ItmGridArea {
 }
 
 // tslint:disable-next-line:max-line-length
-export class ItmGridDef implements ItmGridConfig {
-  readonly areas: Map<string, Map<string, ItmAreaDef>>;
+export class ItmGrid implements ItmGridConfig {
+  readonly areas: Map<string, Map<string, ItmArea>>;
   readonly template: string[][];
   readonly gridAreas: ItmGridArea[];
 
-  constructor(
-    cfg: ItmGridConfig = {},
-    extraAreas?: { [selector: string]: (string | ItmAreaConfig)[] }
-  ) {
-    this.template = this._parseTemplate(cfg.template);
-    this.areas = this._parseAreas(cfg.areas, extraAreas);
-    this.gridAreas = this.template ? this._parsePositions() : null;
-  }
-
-  private _parseAreas(
+  static parseAreas(
     cfg: ItmAreasConfig,
     extraAreas?: { [selector: string]: (string | ItmAreaConfig)[] }
-  ): Map<string, Map<string, ItmAreaDef>> {
-    const selectors: { selector: string, areas: (string | ItmPropAreaConfig)[] }[] = [
+  ): Map<string, Map<string, ItmArea>> {
+    const selectors: { selector: string, areas: (string | ItmAreaConfig)[] }[] = [
       ...(
         Array.isArray(cfg) ?
           [{selector: '$default', areas: cfg}] :
@@ -73,7 +64,7 @@ export class ItmGridDef implements ItmGridConfig {
             // tslint:disable-next-line:max-line-length
             else if (typeof areaCfg !== 'object') throw new TypeError('Expected ItmAreaConfig or string');
             if (!AREA_KEY_REGEX.test(areaCfg.key)) throw new TypeError('Expected string as [key]');
-            return areaCfg instanceof ItmAreaDef ? areaCfg : new ItmAreaDef(areaCfg);
+            return areaCfg instanceof ItmArea ? areaCfg : new ItmArea(areaCfg);
           })
           .reduce((keysAcc, areaCfg) => keysAcc.set(areaCfg.key, areaCfg), new Map());
         selectorsAcc.set(selector, keysMap);
@@ -81,6 +72,15 @@ export class ItmGridDef implements ItmGridConfig {
       },
       new Map()
     );
+  }
+
+  constructor(
+    cfg: ItmGridConfig = {},
+    extraAreas?: { [selector: string]: (string | ItmAreaConfig)[] }
+  ) {
+    this.template = this._parseTemplate(cfg.template);
+    this.areas = ItmGrid.parseAreas(cfg.areas, extraAreas);
+    this.gridAreas = this.template ? this._parsePositions() : null;
   }
 
   private _parseTemplate(cfg: string | string[][]): string[][] {

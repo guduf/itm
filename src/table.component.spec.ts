@@ -6,7 +6,7 @@ import { By } from '@angular/platform-browser';
 import { of, BehaviorSubject } from 'rxjs';
 
 import { Itm, ItmsChanges, ItmsSource } from './item';
-import { ItmColumnDef } from './column';
+import { ItmColumn } from './column';
 import { ItmTableConfig } from './table-config';
 import { ItmTableComponent } from './table.component';
 import { ItmMaterialModule } from './material.module';
@@ -20,10 +20,10 @@ import { ItmActionEvent } from 'src/action';
 // tslint:disable-next-line:directive-class-suffix
 class ItmColumnCellMockDirective {
   @Input()
-  action: EventEmitter<ItmActionEvent<Itm>>;
+  action: ItmActionEmitter<ItmActionEvent<Itm>>;
 
   @Input()
-  area: ItmColumnDef;
+  area: ItmColumn;
 
   @Input()
   item: Itm;
@@ -33,10 +33,10 @@ class ItmColumnCellMockDirective {
 // tslint:disable-next-line:directive-class-suffix
 class ItmColumnHeaderMockDirective {
   @Input()
-  action: EventEmitter<ItmActionEvent<Itm>>;
+  action: ItmActionEmitter<ItmActionEvent<Itm>>;
 
   @Input()
-  area: ItmColumnDef;
+  area: ItmColumn;
 
   @Input()
   itemsChanges: ItmsChanges<Itm>;

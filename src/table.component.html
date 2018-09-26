@@ -5,10 +5,10 @@
     <th *matHeaderCellDef mat-header-cell [ngClass]="actionHeaderCellClass">
     </th>
     <td *matCellDef="let item" mat-cell ngClass="itm-selection-cell" [ngClass]="actionCellClass">
-      <ng-container itmActionsArea
-        [actions]="rowActions"
+      <ng-container
+        [itmArea]="actionArea"
+        [providers]="rowActionsProviders"
         [target]="item"
-        [buttonsMode]="actionsButtonsMode"
         [action]="event"></ng-container>
     </td>
   </ng-container>
@@ -36,15 +36,16 @@
   <!-- Columns -->
   <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
     <th *matHeaderCellDef mat-header-cell [ngClass]="getHeaderCellClass(column)">
-      <ng-container itmColumnHeader
-        [area]="column"
-        [itemsChanges]="itemsChanges"
-        [action]="event"></ng-container>
+      <!-- <ng-container
+        [itmArea]="column.header"
+        [target]="itemsChanges"
+        [action]="event"></ng-container> -->
     </th>
     <td *matCellDef="let item" mat-cell [ngClass]="getCellClass(column)">
-      <ng-container itmColumnCell
-        [area]="column"
-        [item]="item"
+      <pre>column {{column | json}}</pre>
+      <ng-container
+        [itmArea]="column"
+        [target]="item"
         [action]="event"></ng-container>
     </td>
   </ng-container>

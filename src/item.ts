@@ -1,5 +1,6 @@
-import { Observable, defer, of, empty } from 'rxjs';
-import { tap, distinctUntilChanged } from 'rxjs/operators';
+import { Observable, defer, of } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { InjectionToken } from '@angular/core';
 
 /** Represents the generic item used this module. */
 export abstract class Itm {
@@ -9,7 +10,7 @@ export abstract class Itm {
   [key: string]: any;
 }
 
-export abstract class ItmTarget { }
+export const ITM_TARGET = new InjectionToken('ITM_TARGET');
 
 export abstract class Itms<I extends Itm = Itm> extends Array<I> { }
 
@@ -19,7 +20,7 @@ export abstract class ItmsChanges<I extends Itm = Itm> extends Observable<I[]> {
 /** Represents a observable or a value of a array of generic items. */
 export type ItmsSource<I extends Itm = Itm> = I[] | ItmsChanges<I>;
 
-/** Data for the injected ItmColumnDef for ItmCellComponent. */
+/** Data for the injected ItmColumn for ItmCellComponent. */
 export type ItmPipe<T = void, R = void> = (target: T) => Observable<R>;
 
 export type ItmPipeLike<T = void, R = {}> = R | ((target: T) => R) | ItmPipe<T, R>;

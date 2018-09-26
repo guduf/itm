@@ -3,7 +3,7 @@ import { Itm } from './item';
 import { ItmTableDef } from './table-def';
 import { ItmTypeDefs, ItmTypeDef } from './type';
 import { ItmTableConfig } from './table-config';
-import { ItmGridConfig, ItmGridDef } from './grid';
+import { ItmGridConfig, ItmGrid } from './grid';
 
 @Injectable()
 export class ItmTypeService {
@@ -23,17 +23,20 @@ export class ItmGridTypePipe implements PipeTransform {
   constructor(
     private _typeService: ItmTypeService
   ) { }
-  transform(key: string, cfg?: ItmGridConfig): ItmGridDef {
-    const typeCardDef = this._typeService.get(key).card;
-    if (!cfg) return typeCardDef;
-    // return new ItmGridDef({
-    //   ...typeCardDef,
-    //   ...cfg,
-    //   areas: [
-    //     ...Array.from(typeCardDef.areas.values()),
-    //     ...(cfg.areas ? Array.from(cfg.areas.values()) : [])
-    //   ]
-    // });
+  transform(key: string, cfg?: ItmGridConfig): ItmGrid {
+    const typedGrid = this._typeService.get(key).grid;
+    if (!cfg) return typedGrid;
+    const areasCfg = ItmGrid.parseAreas(cfg.areas);
+    if (areasCfg) areasCfg
+      .forEach((keys, areaSelector) => keys.forEach((areaCfg, areaKey) => {
+        if (!typedGrid.areas.has(areaSelector)) typedGrid.areas.set(areaSelector, new Map());
+        typedGrid.areas.get(areaSelector).set(areaKey, areaCfg);
+      }));
+    return new ItmGrid({
+      ...(typedGrid as ItmGridConfig),
+      ...cfg,
+      areas: typedGrid.areas
+    });
   }
 }
 

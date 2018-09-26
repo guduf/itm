@@ -17,7 +17,7 @@ export interface ItmActionConfig<T = {}> {
 }
 
 /** A generic action definition. */
-export class ItmActionDef<T = {}> implements ItmActionConfig {
+export class ItmAction<T = {}> implements ItmActionConfig {
   /** see [[ItmActionConfig.key]]. */
   key: string;
   /** see [[ItmActionConfig.icon]]. */
@@ -35,10 +35,10 @@ export class ItmActionDef<T = {}> implements ItmActionConfig {
 
 /** A array of generic action definitions. */
 // tslint:disable-next-line:max-line-length
-export abstract class ItmActionDefs<T = {}, A extends ItmActionDef<T> = ItmActionDef<T>> extends Array<A> { }
+export abstract class ItmActions<T = {}, A extends ItmAction<T> = ItmAction<T>> extends Array<A> { }
 
 /** A generic event with a action definition, a target. */
-export class ItmActionEvent<T = {}, A extends ItmActionDef = ItmActionDef> {
+export class ItmActionEvent<T = {}, A extends ItmAction = ItmAction> {
   /** The key of the action. */
   readonly key: string;
 
@@ -71,8 +71,8 @@ export class ItmActionEvent<T = {}, A extends ItmActionDef = ItmActionDef> {
     /** The target of the event. */
     readonly target: T = {} as T
   ) {
-    if (action instanceof ItmActionDef) this.key = action.key;
-    else throw new TypeError('ItmActionEvent : Expected (action) as ItmActionDef');
+    if (action instanceof ItmAction) this.key = action.key;
+    else throw new TypeError('ItmActionEvent : Expected (action) as ItmAction');
     if (!nativeEvent) throw new TypeError('ItmActionEvent : Expected (nativeEvent)');
   }
 
@@ -99,3 +99,5 @@ export class ItmActionEvent<T = {}, A extends ItmActionDef = ItmActionDef> {
   }
 }
 
+// tslint:disable-next-line:max-line-length
+export class ItmActionEmitter<T = {}, A extends ItmAction = ItmAction> extends Subject<ItmActionEvent<T, A>> { }

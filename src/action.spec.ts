@@ -1,17 +1,17 @@
 // tslint:disable:max-line-length
 import { fakeAsync, tick } from '@angular/core/testing';
 
-import { ItmActionConfig, ItmActionDef, ItmActionEvent } from './action';
+import { ItmActionConfig, ItmAction, ItmActionEvent } from './action';
 
-describe('ItmActionDef', () => {
+describe('ItmAction', () => {
   it('should create with a valid minimal config', () => {
     const config = {key: 'create'} as ItmActionConfig;
-    expect(new ItmActionDef(config)).toBeTruthy();
+    expect(new ItmAction(config)).toBeTruthy();
   });
 
   it('should throw a type error when a invalid config', () => {
     const config = {} as ItmActionConfig;
-    expect(() => new ItmActionDef(config)).toThrowError(/InvalidItmActionConfig/);
+    expect(() => new ItmAction(config)).toThrowError(/InvalidItmActionConfig/);
   });
 
   it('should implements a valid config', fakeAsync(() => {
@@ -22,7 +22,7 @@ describe('ItmActionDef', () => {
       icon: expectedIcon,
       text: expectedText
     };
-    const def = new ItmActionDef(config);
+    const def = new ItmAction(config);
     let renderedIcon: string;
     def.icon({}).subscribe(value => renderedIcon = value);
     let renderedText: string;
@@ -33,14 +33,14 @@ describe('ItmActionDef', () => {
   }));
 
   it('should have no icon or text with a valid config', () => {
-    const def = new ItmActionDef({key: 'create', icon: false, text: false});
+    const def = new ItmAction({key: 'create', icon: false, text: false});
     expect(def.icon).toBeNull();
     expect(def.text).toBeNull();
   });
 });
 
 describe('ItmActionEvent', () => {
-  const expectedAction = new ItmActionDef({key: 'create'});
+  const expectedAction = new ItmAction({key: 'create'});
   const expectedEvent = {} as Event;
   const expectedTarget = {};
 
@@ -52,7 +52,7 @@ describe('ItmActionEvent', () => {
   });
 
   it('should throw type error with invalid config', () => {
-    expect(() => new ItmActionEvent({} as ItmActionDef, expectedEvent)).toThrowError(TypeError);
+    expect(() => new ItmActionEvent({} as ItmAction, expectedEvent)).toThrowError(TypeError);
     expect(() => new ItmActionEvent(expectedAction, null)).toThrowError(TypeError);
   });
 

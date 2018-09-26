@@ -4,8 +4,6 @@ import { ItmType } from 'src/type';
 @ItmType()
 export class User {
   @ItmProp({
-    computed: true,
-    size: 1,
     label: 'ID'
   })
   id: number;

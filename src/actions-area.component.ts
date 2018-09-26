@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ItmActionDefs, ItmActionEvent, ITM_TABLE_ACTIONS_BUTTONS_MODE } from './action';
+import { ItmActions, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmActionEmitter } from './action';
 import { ItmButtonMode } from './button.component';
-import { Itm, ItmTarget } from './item';
+import { ITM_TARGET } from './item';
 
 @Component({
   selector: 'itm-actions-area',
@@ -12,15 +12,16 @@ import { Itm, ItmTarget } from './item';
       [actions]="actions"
       [target]="target"
       [mode]="buttonsMode | async"
-      (event)="emitter.emit($event)"></itm-buttons>
+      (event)="emitter.next($event)"></itm-buttons>
     `
 })
 export class ItmActionsAreaComponent<T = {}> {
   constructor(
-    readonly actions: ItmActionDefs,
-    readonly target: ItmTarget,
-    readonly emitter: EventEmitter<ItmActionEvent<T>>,
+    readonly actions: ItmActions,
     @Inject(ITM_TABLE_ACTIONS_BUTTONS_MODE)
-    readonly buttonsMode: Observable<ItmButtonMode>
+    readonly buttonsMode: Observable<ItmButtonMode>,
+    readonly emitter: ItmActionEmitter,
+    @Inject(ITM_TARGET)
+    readonly target: T
   ) { }
 }

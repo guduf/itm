@@ -1,5 +1,5 @@
 import { ItmAreaConfig } from './area-config';
-import { ItmAreaDef } from './area-def';
+import { ItmArea } from './area';
 
 export interface ItmControlConfig<T = {}> extends ItmAreaConfig<T> {
   pattern?: RegExp;
@@ -7,7 +7,7 @@ export interface ItmControlConfig<T = {}> extends ItmAreaConfig<T> {
 }
 
 // tslint:disable-next-line:max-line-length
-export class ItmControlDef<T = {}> extends ItmAreaDef<T> implements ItmControlConfig<T> {
+export class ItmControlDef<T = {}> extends ItmArea<T> implements ItmControlConfig<T> {
   readonly pattern: RegExp;
   readonly required: boolean;
 

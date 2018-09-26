@@ -2,7 +2,7 @@ import { TestBed, async } from '@angular/core/testing';
 import { of, BehaviorSubject } from 'rxjs';
 
 import { ItmTextAreaComponent } from './text-area.component';
-import { ItmAreaDef } from './area-def';
+import { ItmArea } from './area';
 import { ItmTarget } from './item';
 
 describe('ItmTextAreaComponent', () => {
@@ -12,7 +12,7 @@ describe('ItmTextAreaComponent', () => {
         ItmTextAreaComponent
       ],
       providers: [
-        {provide: ItmAreaDef, useValue: new ItmAreaDef({key: 'name'})},
+        {provide: ItmArea, useValue: new ItmArea({key: 'name'})},
         {provide: ItmTarget, useValue: {id: 63, name: 'Scott'}}
       ]
     }).compileComponents();
@@ -27,8 +27,8 @@ describe('ItmTextAreaComponent', () => {
   it('should display expected values', async(() => {
     const expectedText = 'Scott';
     const textChanges = new BehaviorSubject(expectedText);
-    TestBed.overrideProvider(ItmAreaDef, {
-      useValue: new ItmAreaDef({key: 'id', cell: () => textChanges})
+    TestBed.overrideProvider(ItmArea, {
+      useValue: new ItmArea({key: 'id', cell: () => textChanges})
     });
     const fixture = TestBed.createComponent(ItmTextAreaComponent);
     const el: HTMLElement = fixture.nativeElement;
