@@ -1,9 +1,12 @@
 import { Injectable, Pipe, PipeTransform } from '@angular/core';
+import { Set } from 'immutable';
+
 import { Itm } from './item';
 import { ItmTableDef } from './table-def';
 import { ItmTypeDefs, ItmTypeDef } from './type';
 import { ItmTableConfig } from './table-config';
 import { ItmGridConfig, ItmGrid } from './grid';
+import { ItmColumn } from './column';
 
 @Injectable()
 export class ItmTypeService {
@@ -46,16 +49,18 @@ export class ItmTableTypePipe implements PipeTransform {
   constructor(
     private _typeService: ItmTypeService
   ) { }
-  transform(key: string, cfg: ItmTableConfig = {}): ItmTableDef {
+  transform(key: string, cfg?: ItmTableConfig): ItmTableDef {
+    const typeDef = this._typeService.get(key);
+    if (!typeDef) {
+      console.error(new ReferenceError('Missing type: ' + key));
+      return cfg instanceof ItmTableDef ? cfg : new ItmTableDef(cfg);
+    }
+    if (!cfg) return typeDef.table;
     let def: ItmTableDef = cfg instanceof ItmTableDef ? cfg : new ItmTableDef(cfg);
-    const typeTableDef = this._typeService.get(key).table;
     def = new ItmTableDef({
-      ...(typeTableDef),
+      ...(typeDef.table as ItmTableConfig),
       ...cfg,
-      columns: [
-        ...Array.from(typeTableDef.columns.values()),
-        ...Array.from(def.columns.values())
-      ]
+      columns: Set<ItmColumn>().concat(def.columns, typeDef.table.columns)
     });
     return def;
   }

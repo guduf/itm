@@ -1,11 +1,12 @@
 // tslint:disable:max-line-length
 import { Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, SimpleChanges, StaticProvider } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
+import { Set } from 'immutable';
 import { BehaviorSubject, from, fromEvent , merge, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilChanged, first, map, mergeMap, reduce, startWith, skip, tap } from 'rxjs/operators';
 // tslint:enable:max-line-length
 
-import { ItmActionEvent, ItmAction, ItmActions, ITM_TABLE_ACTIONS_BUTTONS_MODE } from './action';
+import { ItmActionEvent, ItmAction, ITM_ACTIONS, ITM_TABLE_ACTIONS_BUTTONS_MODE } from './action';
 import { ItmArea } from './area';
 import { ItmColumn } from './column';
 import { ItmButtonMode } from './button.component';
@@ -13,6 +14,7 @@ import { ItmConfig } from './config';
 import { Itm, ItmsChanges, ItmsSource, deferPipe, ItmPipe } from './item';
 import { ItmTableConfig } from './table-config';
 import { ItmActionsAreaComponent } from './actions-area.component';
+import { ItmTableDef } from './table-def';
 
 const SELECTOR = 'itm-table';
 
@@ -47,7 +49,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   rowActionsProviders: StaticProvider[];
 
   /** The actions for the row cell */
-  rowActions: ItmAction[];
+  rowActions: Set<ItmAction>;
 
   /** The columns transcluded to the MatTable */
   columns: ItmColumn[];
@@ -78,12 +80,12 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   actionArea = new ItmArea({key: '$actions', cell: ItmActionsAreaComponent});
 
   get actionCellClass(): string {
-    const size  = Math.ceil(this.rowActions.length * 40 / 60);
+    const size  = Math.ceil(this.rowActions.size * 40 / 60);
     return `itm-action-cell itm-slot-${size}`;
   }
 
   get actionHeaderCellClass(): string {
-    const size  = Math.ceil(this.rowActions.length * 40 / 60);
+    const size  = Math.ceil(this.rowActions.size * 40 / 60);
     return `itm-action-header-cell itm-slot-${size}`;
   }
 
@@ -145,13 +147,13 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   private _itemsSubscr: Subscription;
 
   /** The selection of items saved as behavior subject. */
-  private readonly _selectionChanges = new BehaviorSubject<Set<I>>(new Set());
+  private readonly _selectionChanges = new BehaviorSubject(Set<I>());
 
   /** The subscription on selection subject to emit event. */
   private readonly _selectionSubscr: Subscription;
 
   /** The set of selectable items. */
-  private _selectableItems: Set<I> = new Set();
+  private _selectableItems: Set<I> = Set();
 
   /** The subscription on toggle selectable items. */
   private _selectablesChangeSubscr: Subscription;
@@ -167,7 +169,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   ) {
     this.itemsChanges = this._itemsChanges.asObservable();
     this._selectionSubscr = this._selectionChanges.subscribe(
-      selection => this.selectionChanges.next(Array.from(selection))
+      selection => this.selectionChanges.next(selection.toArray())
     );
     this._setHeaderRowStyle(hostRef);
   }
@@ -178,14 +180,14 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
       const previous = (
         tableChanges.isFirstChange ? {columns: []} : tableChanges.previousValue
       ) as ItmTableConfig<I>;
-      const {rowActions, columns, canSelect, setRowClass, selectionLimit} = this.table;
+      const {rowActions, columns, canSelect, setRowClass, selectionLimit} = (
+        this.table instanceof ItmTableDef ? this.table : new ItmTableDef(this.table)
+      );
       if (previous.rowActions !== rowActions) {
-        this.rowActions = (
-          !Array.isArray(rowActions) ? null : rowActions.map(actionCfg => new ItmAction(actionCfg))
-        );
+        this.rowActions = rowActions;
         this.rowActionsProviders = [
           {provide: ITM_TABLE_ACTIONS_BUTTONS_MODE, useValue: this.actionsButtonsMode},
-          {provide: ItmActions, useValue: this.rowActions}
+          {provide: ITM_ACTIONS, useValue: this.rowActions}
         ];
       }
       if (previous.canSelect !== canSelect) {
@@ -201,15 +203,8 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
       );
       if (previous.selectionLimit !== selectionLimit) this.selectionLimit = selectionLimit || 0;
       if (previous.columns !== columns) {
-        const columnCfgs = (
-          Array.isArray(columns) ? columns :
-          columns instanceof Map ? Array.from(columns.values()) :
-            []
-        );
-        this.columns = columnCfgs.map(cfg => (
-          cfg instanceof ItmColumn ? cfg : new ItmColumn(typeof cfg === 'string' ? {key: cfg} : cfg)
-        ));
-        this._selectionChanges.next(new Set());
+        this.columns = columns.toArray();
+        this._selectionChanges.next(Set());
       }
     }
     if (itemSourceChanges) {
@@ -223,7 +218,6 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     }
     if (selectablesMarkedForChanges) this._filterSelectableItems();
     this._setDisplayedColumns();
-    console.log(this.columns, this.displayedColumns);
   }
 
   ngOnDestroy() {
@@ -238,11 +232,14 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     const columns = (
       this.settings.columns ? this.settings.columns : this.columns.map(({key}) => key)
     );
-    this.displayedColumns = [
-      ...(this.columns.length && this._canSelect ? ['$itm-selection'] : []),
-      ...columns,
-      ...(this.rowActions ? ['$itm-actions'] : []),
-    ];
+    this.displayedColumns = (
+      !columns.length ? [] :
+        [
+          ...(this.columns.length && this._canSelect ? ['$itm-selection'] : []),
+          ...columns,
+          ...(this.rowActions ? ['$itm-actions'] : []),
+        ]
+    );
   }
 
   /** Determines if the item is selected. */
@@ -285,23 +282,21 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     const selection = this._selectionChanges.value;
     if (selection.has(item)) selection.delete(item);
     else selection.add(item);
-    this._selectionChanges.next(new Set(selection));
+    this._selectionChanges.next(Set(selection));
   }
 
   /** Adds all items to the selection or removess it if selecteds. */
   toggleAllSelection(): void {
     if (!this.isAllItemsToggable) return;
-    this._selectionChanges.next(new Set(this.selection.size ? new Set() : this._selectableItems));
+    this._selectionChanges.next(Set(this.selection.size ? null : this._selectableItems));
   }
 
   /** Returns a array of the selectable items. */
   private _filterSelectableItems(): void {
     if (this._selectableChangesSubscr) this._selectableChangesSubscr.unsubscribe();
     if (this._selectablesChangeSubscr) this._selectableChangesSubscr.unsubscribe();
-    if (!this._canSelect) this._selectableItems = new Set();
-    if (typeof this._canSelect !== 'function') (
-      this._selectableItems = new Set(this.items)
-    );
+    if (!this._canSelect) this._selectableItems = Set();
+    if (typeof this._canSelect !== 'function') (this._selectableItems = Set(this.items));
     else {
       const selectableChanges: Observable<boolean>[] = [];
       this._selectablesChangeSubscr = from(this.items)
@@ -318,7 +313,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
             return res.pipe(first(), map(isSelectable => isSelectable ? item : null));
           }),
           reduce<I>((selectables, item) => ([...selectables, ...(item ? [item] : [])]), []),
-          tap(selectables => (this._selectableItems = new Set(selectables)))
+          tap(selectables => (this._selectableItems = Set(selectables)))
         )
         .subscribe(null, err => console.error(err));
       this._selectableChangesSubscr = merge(...selectableChanges)

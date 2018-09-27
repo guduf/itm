@@ -26,6 +26,7 @@ export type ItmPipe<T = void, R = void> = (target: T) => Observable<R>;
 export type ItmPipeLike<T = void, R = {}> = R | ((target: T) => R) | ItmPipe<T, R>;
 
 export function deferPipe<T = void, R = {}>(pipe: ItmPipeLike<T, R>): ItmPipe<T, R> {
+  if (typeof pipe === 'undefined') throw new TypeError('Expected ItmPipeLike');
   if (typeof pipe !== 'function') return () => of(pipe as R);
   return value => defer(() => {
     let res: Observable<R>;

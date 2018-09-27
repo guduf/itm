@@ -12,7 +12,7 @@ const tableTemplate  = `
   [table]="'user' | itmTableType:table"
   [itemsSource]="itemsSource"
   (event)="onEvent($event)"></itm-table>
-`;
+  `;
 @Component({
   selector: 'app-root',
   template: `
@@ -31,7 +31,6 @@ export class AppComponent {
   };
 
   grid: ItmGridConfig<User> = {
-    areas: ['firstName', 'lastName', 'ipAddress'].map(key => ({key, cell: user => user[key]})),
     template: `
       firstName = lastName  =
       ipAddress = =         =

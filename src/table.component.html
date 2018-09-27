@@ -36,13 +36,12 @@
   <!-- Columns -->
   <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
     <th *matHeaderCellDef mat-header-cell [ngClass]="getHeaderCellClass(column)">
-      <!-- <ng-container
+      <ng-container
         [itmArea]="column.header"
         [target]="itemsChanges"
-        [action]="event"></ng-container> -->
+        [action]="event"></ng-container>
     </th>
     <td *matCellDef="let item" mat-cell [ngClass]="getCellClass(column)">
-      <pre>column {{column | json}}</pre>
       <ng-container
         [itmArea]="column"
         [target]="item"

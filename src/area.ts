@@ -1,5 +1,4 @@
 import { StaticProvider } from '@angular/core';
-import { of } from 'rxjs';
 
 import { ItmPipe, ItmPipeLike, deferPipe, ITM_TARGET } from './item';
 import { ComponentType, isComponentType } from './utils';
@@ -27,9 +26,10 @@ export class ItmArea<T = {}> implements ItmAreaConfig<T> {
   readonly providers: StaticProvider[] = [];
 
   constructor(
-    cfg: ItmAreaConfig<T>,
+    cfg: string | ItmAreaConfig<T>,
     defaults: { cell?: ComponentType, text?: ItmPipe<T, string> } = {}
   ) {
+    if (typeof cfg === 'string') (cfg = {key: cfg});
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
     // tslint:disable-next-line:max-line-length
     else throw new TypeError('InvalidItmAreaConfig : Expected [key] as string for ItmAreaConfig');
@@ -43,7 +43,7 @@ export class ItmArea<T = {}> implements ItmAreaConfig<T> {
     );
     this.defaultCell = isComponentType(defaults.cell) ? defaults.cell : null;
     this.defaultText = (
-      typeof defaults.text === 'function' ? deferPipe(this.defaultText) : null
+      typeof defaults.text === 'function' ? deferPipe(defaults.text) : null
     );
     this.providers = [...(cfg.providers || [])];
   }

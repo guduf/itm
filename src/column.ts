@@ -25,7 +25,8 @@ export class ItmColumn<I extends Itm = Itm> extends ItmArea<I> implements ItmCol
 
   readonly header: ItmArea<I[]>;
 
-  constructor(cfg: ItmColumnConfig<I>) {
+  constructor(cfg: string | ItmColumnConfig<I>) {
+    if (typeof cfg === 'string') (cfg = {key: cfg});
     super(cfg, {text: item => of(item[this.key])});
     const headerCfg: ItmAreaConfig = cfg.header !== false && {
       ...(cfg as ItmAreaConfig),

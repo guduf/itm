@@ -1,50 +1,35 @@
-import { of } from 'rxjs';
+import { Set, Iterable } from 'immutable';
 
-import { ItmAction } from './action';
-import { ItmColumn } from './column';
+import { ItmAction, ItmActionConfig } from './action';
+import { ItmColumn, ItmColumnConfig } from './column';
 import { Itm, ItmPipe, deferPipe } from './item';
 import { ItmTableConfig } from './table-config';
+import { parseSet } from './utils';
 
 export class ItmTableDef<I extends Itm = Itm> implements ItmTableConfig {
-  /** see [[ItmTableConfig.rowActions]] **/
-  rowActions: ItmAction<I>[];
+  /** see [[ItmTableConfig.rowActions]] */
+  readonly rowActions: Set<ItmAction<I>>;
 
-  /** see [[ItmTableConfig.columns]] **/
-  columns: Map<string, ItmColumn>;
+  /** see [[ItmTableConfig.columns]] */
+  readonly columns: Set<ItmColumn>;
 
-  /** see [[ItmTableConfig.setRowClass]] **/
-  setRowClass: ItmPipe<I, string>;
+  /** see [[ItmTableConfig.setRowClass]] */
+  readonly setRowClass: ItmPipe<I, string>;
 
-  /** see [[ItmTableConfig.canSelect]] **/
-  canSelect: ItmPipe<I, boolean>;
+  /** see [[ItmTableConfig.canSelect]] */
+  readonly canSelect: boolean | ItmPipe<I, boolean>;
 
-  /** see [[ItmTableConfig.selectionLimit]] **/
-  selectionLimit: number;
+  /** see [[ItmTableConfig.selectionLimit]] */
+  readonly selectionLimit: number;
 
   constructor(cfg: ItmTableConfig<I> = {}) {
-    this.rowActions = (
-      !Array.isArray(cfg.rowActions) ? [] :
-        cfg.rowActions.map(actionCfg => new ItmAction<I>(actionCfg))
-    );
-    cfg.columns = (
-      Array.isArray(cfg.columns) ? cfg.columns :
-      cfg.columns instanceof Map ? Array.from(cfg.columns.values()) :
-      []
-    );
-    const columns = new Map<string, ItmColumn<I>>();
-    for (const columnCfg of cfg.columns) {
-      const columnDef = new ItmColumn(
-        typeof columnCfg === 'string' ? {key: columnCfg} : columnCfg
-      );
-      columns.set(columnDef.key, columnDef);
-    }
-    this.columns = columns;
+    this.rowActions = parseSet<ItmAction, string | ItmActionConfig>(cfg.rowActions, ItmAction);
+    this.columns = parseSet<ItmColumn, string | ItmColumnConfig>(cfg.columns, ItmColumn);
     this.canSelect = (
-      typeof cfg.canSelect === 'function' ? deferPipe(cfg.canSelect) :
-      cfg.canSelect === true ? () => of(true) :
-        null
+      typeof cfg.canSelect === 'function' ? deferPipe(cfg.canSelect) : cfg.canSelect === true
     );
     this.setRowClass = typeof cfg.setRowClass === 'function' ? deferPipe(cfg.setRowClass) : null;
     this.selectionLimit = cfg.selectionLimit > 0 ? Math.round(cfg.selectionLimit) : 0;
+    Object.freeze(this);
   }
 }

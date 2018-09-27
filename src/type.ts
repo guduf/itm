@@ -75,7 +75,7 @@ const ITM_TYPE_META = Symbol('ITM_TYPE_META');
 
 export function ItmType<I extends Itm = Itm>(cfg: ItmTypeConfig = {}): ClassDecorator {
   return (type: any) => {
-    const props: Map<keyof I & string, ItmPropDef> = Reflect.get(type, ITM_PROPS_META);
+    const props: Map<keyof I & string, ItmPropDef> = Reflect.get(type.prototype, ITM_PROPS_META);
     Reflect.set(type, ITM_TYPE_META, new ItmTypeDef(type, props, cfg));
   };
 }

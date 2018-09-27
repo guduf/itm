@@ -3,7 +3,7 @@ import { TestBed, async } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 
 // tslint:disable-next-line:max-line-length
-import { ItmActionEvent, ItmActions, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmAction, ItmActionConfig } from './action';
+import { ItmActionEvent, ItmActions, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmAction, ItmActionConfig, ItmActionEmitter } from './action';
 import { ItmButtonMode } from './button.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
 import { Itm, ItmTarget } from './item';

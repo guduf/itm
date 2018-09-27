@@ -4,6 +4,7 @@ import { ItmColumnConfig, ItmColumn } from './column';
 import { Itm, ItmPipeLike } from './item';
 import { ComponentType } from './utils';
 import { ItmFieldConfig, ItmField } from './field';
+import { Map } from 'immutable';
 
 export interface ItmPropConfig<I extends Itm = Itm> {
   key?: keyof I & string;
@@ -13,7 +14,7 @@ export interface ItmPropConfig<I extends Itm = Itm> {
    * In case of string, the value is used as the attribute for default cell. */
   cell?: ItmPipeLike<I, string> | ComponentType | false;
   header?: ItmPipeLike<I[], string> | ComponentType | false;
-  label?: ItmPipeLike<I[], string> | false;
+  label?: ItmPipeLike<I, string> | false;
 
   area?: ItmAreaConfig;
   column?: ItmColumnConfig;
@@ -31,18 +32,27 @@ export class ItmPropDef<I extends Itm = Itm> implements ItmPropConfig<I> {
     else if (key && typeof key === 'string') (this.key = key);
     // tslint:disable-next-line:max-line-length
     else throw new TypeError('InvalidItmPropConfig: Key must be specified in config if prop key is not a string');
-    this.area = new ItmArea(({key, ...(cfg as Partial<ItmAreaConfig<I>>), ...(cfg.area || {})}));
+    this.area = (
+      cfg.area instanceof ItmArea ? cfg.area :
+        new ItmArea(
+          {key, ...(cfg as Partial<ItmAreaConfig<I>>), ...(cfg.area || {})},
+          {text: target => target[key]}
+        )
+    );
     // tslint:disable-next-line:max-line-length
-    this.column = new ItmColumn(({
-      ...this.area,
-      header: cfg.header || cfg.header !== false && cfg.label,
-      ...(cfg.column || {})
-    } as ItmColumnConfig));
-    this.field = new ItmField(({
-      ...this.area,
+    this.column = (
+      cfg.column instanceof ItmColumn ? cfg.column :
+        new ItmColumn({
+          ...this.area as ItmColumnConfig,
+          header: cfg.header,
+          ...(cfg.column || {})
+        })
+    );
+    this.field = new ItmField({
+      ...this.area as ItmFieldConfig,
       label: cfg.label,
-      ...(cfg.column || {})
-    } as ItmFieldConfig));
+      ...(cfg.field || {})
+    });
   }
 }
 
@@ -53,16 +63,13 @@ export function ItmProp<I extends Itm = Itm>(cfg: ItmPropConfig<I> = {}): Proper
   return (proto: any, key: string & keyof I) => {
     if (typeof key !== 'string') return;
     let props: Map<keyof I, ItmPropDef> = Reflect.get(proto, ITM_PROPS_META);
-    if (!props) {
-      props = new Map();
-      Reflect.set(proto, ITM_PROPS_META, props);
-    }
+    if (!props) (props = Map());
     let propDef: ItmPropDef;
     try { propDef = new ItmPropDef<I>(key, cfg); }
     catch (err) {
       console.error(err);
-      throw new TypeError(`Failed to create ItmPropDef for key '${String(key)}': ${proto}`);
+      throw new TypeError(`Failed to create ItmPropDef for key '${String(key)}'`);
     }
-    props.set(key, propDef);
+    Reflect.set(proto, ITM_PROPS_META, props.set(key, propDef));
   };
 }

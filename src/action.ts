@@ -2,9 +2,11 @@ import { InjectionToken } from '@angular/core';
 import { Observable, Subscriber, Subject } from 'rxjs';
 
 import { deferPipe, ItmPipeLike, ItmPipe } from './item';
+import { Collection, List } from 'immutable';
 
 /** The token for display mode of row actions buttons. */
 export const ITM_TABLE_ACTIONS_BUTTONS_MODE = new InjectionToken('ITM_TABLE_ACTIONS_BUTTONS_MODE');
+export const ITM_ACTIONS = new InjectionToken('ITM_ACTIONS');
 
 /** A generic action configuration. */
 export interface ItmActionConfig<T = {}> {
@@ -25,17 +27,14 @@ export class ItmAction<T = {}> implements ItmActionConfig {
   /** see [[ItmActionConfig.text]]. */
   text: ItmPipe<T, string>;
 
-  constructor(cfg: ItmActionConfig) {
+  constructor(cfg: string | ItmActionConfig) {
+    if (typeof cfg === 'string') cfg = {key: cfg};
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
     else throw new TypeError('InvalidItmActionConfig : Expected [key] as string for event config');
     this.icon = cfg.icon === false ? null : deferPipe(cfg.icon || this.key);
     this.text = cfg.text === false ? null : deferPipe(cfg.text || this.key);
   }
 }
-
-/** A array of generic action definitions. */
-// tslint:disable-next-line:max-line-length
-export abstract class ItmActions<T = {}, A extends ItmAction<T> = ItmAction<T>> extends Array<A> { }
 
 /** A generic event with a action definition, a target. */
 export class ItmActionEvent<T = {}, A extends ItmAction = ItmAction> {
