@@ -1,3 +1,4 @@
+import { Map } from 'immutable';
 import { Observable, observable, ObservableLike } from 'rxjs';
 
 import { Itm, ItmPipeLike } from './item';
@@ -21,7 +22,7 @@ export interface ItmAreaConfig<T = {}> {
   cell?: ItmPipeLike<T, string> | ComponentType | false;
 
   /** The plain object to access custom data in cell components. */
-  providers?: StaticProvider[];
+  providers?: ({ provide: any, useValue: any } | [any, any])[] | Map<any, any>;
 
   /** The size of column based on 24 slots for the viewport width. Default: 2 */
   size?: number;

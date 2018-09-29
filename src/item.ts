@@ -23,7 +23,9 @@ export type ItmsSource<I extends Itm = Itm> = I[] | ItmsChanges<I>;
 /** Data for the injected ItmColumn for ItmCellComponent. */
 export type ItmPipe<T = void, R = void> = (target: T) => Observable<R>;
 
-export type ItmPipeLike<T = void, R = {}> = R | ((target: T) => R) | ItmPipe<T, R>;
+export type ItmPipeLike<T = void, R = {}> = (
+  ((target: T) => R) | ((target: T) => Promise<R>) | ItmPipe<T, R>
+);
 
 export function deferPipe<T = void, R = {}>(pipe: ItmPipeLike<T, R>): ItmPipe<T, R> {
   if (typeof pipe === 'undefined') throw new TypeError('Expected ItmPipeLike');

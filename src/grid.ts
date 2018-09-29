@@ -1,4 +1,4 @@
-import { ItmArea } from './area';
+import { ItmArea, AREA_SELECTOR_PATTERN } from './area';
 import { ItmAreaConfig } from './area-config';
 
 export type ItmAreasConfig<T = {}> = (
@@ -155,8 +155,6 @@ export class ItmGrid implements ItmGridConfig {
 }
 const AREA_KEY_PATTERN = '[a-z]\\w+(?:\\.[a-z]\\w+)*';
 const AREA_KEY_REGEX = new RegExp(`^${AREA_KEY_PATTERN}$`);
-const AREA_SELECTOR_PATTERN = '[a-z]\\w+';
-const AREA_SELECTOR_REGEX = new RegExp(`^${AREA_SELECTOR_PATTERN}$`);
 const AREA_SELECTOR_CALL_PATTERN = `${AREA_SELECTOR_PATTERN}:${AREA_KEY_PATTERN}`;
 const AREA_FRAGMENT_PATTERN = `(?:(?:${AREA_KEY_PATTERN})|(?:${AREA_SELECTOR_CALL_PATTERN})|=|\\.)`;
 const AREA_FRAGMENT_REGEX = new RegExp(`^${AREA_FRAGMENT_PATTERN}$`);
