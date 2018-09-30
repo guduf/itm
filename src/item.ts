@@ -1,6 +1,6 @@
+import { InjectionToken, Inject } from '@angular/core';
 import { Observable, defer, of } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { InjectionToken } from '@angular/core';
 
 /** Represents the generic item used this module. */
 export abstract class Itm {
@@ -24,19 +24,29 @@ export type ItmsSource<I extends Itm = Itm> = I[] | ItmsChanges<I>;
 export type ItmPipe<T = void, R = void> = (target: T) => Observable<R>;
 
 export type ItmPipeLike<T = void, R = {}> = (
-  ((target: T) => R) | ((target: T) => Promise<R>) | ItmPipe<T, R>
+  R | ((target: T) => R) | ItmPipe<T, R>
 );
 
-export function deferPipe<T = void, R = {}>(pipe: ItmPipeLike<T, R>): ItmPipe<T, R> {
+// tslint:disable-next-line:max-line-length
+export function deferPipe<T = void, R = {}>(pipe: (target: T) => (R | Observable<R>) ): ItmPipe<T, R> {
   if (typeof pipe === 'undefined') throw new TypeError('Expected ItmPipeLike');
   if (typeof pipe !== 'function') return () => of(pipe as R);
   return value => defer(() => {
-    let res: Observable<R>;
-    try { res = (pipe as ((target: T) => (Observable<R>)))(value); }
+    let res: any;
+    try { res = (pipe as (target: T) => any)(value); }
     catch (err) { console.error(err); }
     if (res instanceof Observable) res = res.pipe(distinctUntilChanged());
     else res = of(res);
     return res;
   });
+}
+
+// tslint:disable-next-line:max-line-length
+export function fromStringPipe<T = void>(pipe: ItmPipeLike<T, string>, target: T): Observable<string> {
+  return (
+    typeof pipe === 'string' ? of(pipe) :
+    typeof pipe === 'function' ? deferPipe(pipe)(target) :
+      of(null)
+  );
 }
 

@@ -3,10 +3,10 @@ import { TestBed, async } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 
 // tslint:disable-next-line:max-line-length
-import { ItmActionEvent, ItmActions, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmAction, ItmActionConfig, ItmActionEmitter } from './action';
+import { ItmActionEvent, ITM_ACTIONS, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmAction, ItmActionConfig, ItmActionEmitter } from './action';
 import { ItmButtonMode } from './button.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
-import { Itm, ItmTarget } from './item';
+import { Itm, ITM_TARGET } from './item';
 import { ItmMaterialModule } from './material.module';
 import { ItmButtonsComponent } from './buttons.component';
 
@@ -48,8 +48,8 @@ describe('ItmActionsAreaComponent', () => {
         ItmActionsAreaComponent
       ],
       providers: [
-        {provide: ItmActions, useValue: actions},
-        {provide: ItmTarget, useValue: target},
+        {provide: ITM_ACTIONS, useValue: actions},
+        {provide: ITM_TARGET, useValue: target},
         {provide: ItmActionEmitter, useValue: ItmActionEmitter},
         {provide: ITM_TABLE_ACTIONS_BUTTONS_MODE, useValue: buttonsMode}
       ]

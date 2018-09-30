@@ -7,8 +7,8 @@ import { distinctUntilChanged, first, map, mergeMap, reduce, startWith, skip, ta
 // tslint:enable:max-line-length
 
 import { ItmActionEvent, ItmAction, ITM_ACTIONS, ITM_TABLE_ACTIONS_BUTTONS_MODE } from './action';
-import { ItmArea } from './area';
-import { ItmColumn } from './column';
+import Area from './area';
+import Column from './column';
 import { ItmButtonMode } from './button.component';
 import { ItmConfig } from './config';
 import { Itm, ItmsChanges, ItmsSource, deferPipe, ItmPipe } from './item';
@@ -52,7 +52,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   rowActions: Set<ItmAction>;
 
   /** The columns transcluded to the MatTable */
-  columns: ItmColumn[];
+  columns: Column.Record[];
 
   /** The keys of the columns to display. */
   displayedColumns: string[];
@@ -77,7 +77,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     return SELECTOR;
   }
 
-  actionArea = new ItmArea({key: '$actions', cell: ItmActionsAreaComponent});
+  actionArea = Area.factory.serialize({key: '$actions', cell: ItmActionsAreaComponent});
 
   get actionCellClass(): string {
     const size  = Math.ceil(this.rowActions.size * 40 / 60);
@@ -256,11 +256,11 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     );
   }
 
-  getCellClass(column: ItmColumn) {
+  getCellClass(column: Column.Record) {
     return `itm-cell itm-slot-${column.size}`;
   }
 
-  getHeaderCellClass(column: ItmColumn) {
+  getHeaderCellClass(column: Column.Record) {
     return `itm-header-cell itm-slot-${column.size}`;
   }
 

@@ -1,13 +1,6 @@
-/**
- * Invalid row start:
- *   name =  | name =
- *   name id | name .
- */
-
-// tslint:disable:max-line-length
+import Area from './area';
 import { ItmGrid, ItmGridArea } from './grid';
-import { ItmAreaConfig } from './area-config';
-import { ItmArea } from './area';
+
 describe('ItmGrid', () => {
   it('should create with minimal config', () => {
     expect(new ItmGrid({template: 'name', areas: ['name']})).toBeTruthy();
@@ -17,7 +10,7 @@ describe('ItmGrid', () => {
     expect(new ItmGrid({template: 'id', areas: [{key: 'id'}]})).toBeTruthy();
   });
 
-  const areas: ItmAreaConfig[] = [{key: 'id'}, {key: 'name'}, {key: 'email'}];
+  const areas: Area.Config[] = [{key: 'id'}, {key: 'name'}, {key: 'email'}];
 
   it('should create a single line template', () => {
     const def = new ItmGrid({template: 'id = id name', areas});
@@ -29,7 +22,7 @@ describe('ItmGrid', () => {
   });
 
   it('should create a multi line template', () => {
-    const areasDef = areas.map(cfg => new ItmArea(cfg));
+    const areasDef = areas.map(cfg => Area.factory.serialize(cfg));
     const template = `
       id  .             name =
       id  control:email name =

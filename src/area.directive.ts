@@ -12,7 +12,7 @@ import {
 
 import { ITM_TARGET } from './item';
 import { ItmActionEvent, ItmAction, ItmActionEmitter } from './action';
-import { ItmArea } from './area';
+import ItmArea from './area';
 import { ItmConfig } from './config';
 
 /** The abstract directive to create area component. */
@@ -21,7 +21,7 @@ import { ItmConfig } from './config';
 export class ItmAreaDirective<T = {}, A extends ItmAction = ItmAction<T>> implements OnInit {
   // tslint:disable-next-line:no-input-rename
   @Input('itmArea')
-  area: ItmArea;
+  area: ItmArea.Record;
 
   /** The emitter of action events. */
   @Input()
@@ -42,7 +42,7 @@ export class ItmAreaDirective<T = {}, A extends ItmAction = ItmAction<T>> implem
   ) { }
 
   ngOnInit() {
-    if (!(this.area instanceof ItmArea)) throw new TypeError('Expected area');
+    if (ItmArea.factory.isFactoryRecord(this.area)) throw new TypeError('Expected area');
     if (typeof this.target !== 'object') throw new TypeError('Expected target');
     if (!(this.action instanceof EventEmitter)) throw new TypeError('Expected action');
     const providers = [
@@ -50,11 +50,13 @@ export class ItmAreaDirective<T = {}, A extends ItmAction = ItmAction<T>> implem
       {provide: ItmActionEmitter, useValue: this.action},
       {provide: ItmArea, useValue: this.area},
       {provide: ITM_TARGET, useValue: this.target},
-      ...(this.area ? this.area.getProviders(this.target) : [])
+      this.area.providers
+        .map((useValue, provide) => ({provide, useValue} as StaticProvider))
+        .toArray()
     ];
     const injector = Injector.create(providers, this._injector);
     const component = (
-      this.area.cell || this.area.defaultCell || this._injector.get(ItmConfig).defaultTextAreaComp
+      this.area.cell || this._injector.get(ItmConfig).defaultTextAreaComp
     );
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory(component);
     this._viewContainerRef.clear();

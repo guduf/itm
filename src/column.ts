@@ -1,12 +1,12 @@
 
-import { Itm, ItmPipeLike, deferPipe, ItmPipe } from './item';
-import { ItmAreaConfig } from './area-config';
-import { ComponentType, isComponentType } from './utils';
-import { ItmArea } from './area';
-import { of } from 'rxjs';
+import { Itm, ItmPipeLike } from './item';
+import { ComponentType } from './utils';
+import Area from './area';
+import RecordFactory from './record-factory';
+import { RecordOf } from 'immutable';
 
 /** The definition of a column used by ItmTableConfig. */
-export interface ItmColumnConfig<I extends Itm = Itm> extends ItmAreaConfig<I> {
+interface ItmColumnConfig<I extends Itm = Itm> {
   /** Used by MatTable. */
   sortable?: boolean;
   /**
@@ -14,26 +14,42 @@ export interface ItmColumnConfig<I extends Itm = Itm> extends ItmAreaConfig<I> {
    * In case of component class, the value is used by the component factory.
    * In case of string, the value is used as the attribute for default header cell.
    * In case of false, none header is displayed. */
-  header?: ItmPipeLike<I[], string> | ComponentType | false | ItmAreaConfig<I[]>;
+  header?: ItmPipeLike<I[], string> | ComponentType | false | Area.Config<I[]>;
 }
 
-/** The definition of a column used by ItmTableComponent */
-// tslint:disable-next-line:max-line-length
-export class ItmColumn<I extends Itm = Itm> extends ItmArea<I> implements ItmColumnConfig {
-  /** Whether the column is sortable. */
-  readonly sortable: boolean;
+export module ItmColumn {
+  export type Config<I extends Itm = Itm> = ItmColumnConfig<I>;
 
-  readonly header: ItmArea<I[]>;
-
-  constructor(cfg: string | ItmColumnConfig<I>) {
-    if (typeof cfg === 'string') (cfg = {key: cfg});
-    super(cfg);
-    const headerCfg: ItmAreaConfig = cfg.header !== false && {
-      ...(cfg as ItmAreaConfig),
-      cell: typeof cfg.header === 'function' ? cfg.header : null,
-      ...(typeof cfg.header === 'object' ? cfg.header : {})
-    };
-    if (headerCfg) (this.header = new ItmArea(headerCfg));
-    if (cfg.sortable === true) (this.sortable = true);
+  export interface Model<I extends Itm = Itm> extends ItmColumn.Config<I> {
+    sortable: boolean;
+    header: Area.Record<I[]>;
   }
+
+  export type Record<I extends Itm = Itm> = RecordOf<Area.Model<I> & ItmColumn.Model<I>>;
+
+  const serializer = (cfg: ItmColumn.Config, ancestor: Area.Record): ItmColumn.Model => {
+    if (!Area.factory.isFactoryRecord(ancestor)) throw new TypeError('Expected area record');
+    const header: Area.Record = (
+      cfg.header === false ? null :
+      Area.factory.isFactoryRecord(cfg.header) ? cfg.header as Area.Record :
+        Area.factory.serialize(ancestor, (
+          typeof cfg.header === 'function' ? {cell: cfg.header} :
+          typeof cfg.header === 'object' ? cfg.header :
+            {}
+        ))
+    );
+    return {header, sortable: cfg.sortable === true};
+  };
+
+  const selector = 'column';
+
+  // tslint:disable-next-line:max-line-length
+  export const factory: RecordFactory<ItmColumn.Record, Area.Config & ItmColumn.Config> = RecordFactory.build({
+    selector,
+    serializer,
+    model: {header: null, sortable: false},
+    ancestors: [Area.factory]
+  });
 }
+
+export default ItmColumn;

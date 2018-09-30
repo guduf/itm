@@ -1,7 +1,8 @@
-import { Component, HostBinding, Inject } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { ItmArea } from './area';
-import { ITM_TARGET } from './item';
+import Area from './area';
+import { deferPipe } from './item';
+import Inject from './di';
 
 const SELECTOR = 'itm-text-area';
 
@@ -21,12 +22,15 @@ export class ItmTextAreaComponent<T = {}> {
   rendered: Observable<string>;
 
   constructor(
-    area: ItmArea,
-    @Inject(ITM_TARGET)
+    @Inject.area
+    area: Area.Record,
+    @Inject.target
     target: T
   ) {
     this.rendered = (
-      typeof area.defaultText === 'function' ? area.defaultText(target) : of(area.key)
+      typeof area.text === 'function' ? deferPipe(area.text)(target) :
+      typeof area.text === 'string' ? of(area.text) :
+        of(area.key)
     );
   }
 }

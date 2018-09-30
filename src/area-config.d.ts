@@ -13,7 +13,7 @@ export interface ItmAreaConfig<T = {}> {
   /** The flex behavior of the container. */
   grow?: number;
 
-  text?: ItmPipeLike<T, string> ;
+  text?: ItmPipeLike<T, string> | false;
 
   /**
    * The component displayed in the container.
@@ -22,7 +22,7 @@ export interface ItmAreaConfig<T = {}> {
   cell?: ItmPipeLike<T, string> | ComponentType | false;
 
   /** The plain object to access custom data in cell components. */
-  providers?: ({ provide: any, useValue: any } | [any, any])[] | Map<any, any>;
+  providers?: { provide: any, useValue: any }[] | Map<any, any>;
 
   /** The size of column based on 24 slots for the viewport width. Default: 2 */
   size?: number;

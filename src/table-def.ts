@@ -1,17 +1,16 @@
-import { Set, Iterable } from 'immutable';
+import { Set } from 'immutable';
 
 import { ItmAction, ItmActionConfig } from './action';
-import { ItmColumn, ItmColumnConfig } from './column';
+import Column from './column';
 import { Itm, ItmPipe, deferPipe } from './item';
 import { ItmTableConfig } from './table-config';
-import { parseSet } from './utils';
 
 export class ItmTableDef<I extends Itm = Itm> implements ItmTableConfig {
   /** see [[ItmTableConfig.rowActions]] */
   readonly rowActions: Set<ItmAction<I>>;
 
   /** see [[ItmTableConfig.columns]] */
-  readonly columns: Set<ItmColumn>;
+  readonly columns: Set<Column.Record>;
 
   /** see [[ItmTableConfig.setRowClass]] */
   readonly setRowClass: ItmPipe<I, string>;
@@ -23,8 +22,8 @@ export class ItmTableDef<I extends Itm = Itm> implements ItmTableConfig {
   readonly selectionLimit: number;
 
   constructor(cfg: ItmTableConfig<I> = {}) {
-    this.rowActions = parseSet<ItmAction, string | ItmActionConfig>(cfg.rowActions, ItmAction);
-    this.columns = parseSet<ItmColumn, string | ItmColumnConfig>(cfg.columns, ItmColumn);
+    // this.rowActions = parseSet<ItmAction, string | ItmActionConfig>(cfg.rowActions, ItmAction);
+    this.columns = Set(cfg.columns).map(colCfg => Column.factory.serialize(colCfg));
     this.canSelect = (
       typeof cfg.canSelect === 'function' ? deferPipe(cfg.canSelect) : cfg.canSelect === true
     );

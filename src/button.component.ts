@@ -3,6 +3,7 @@ import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter, HostB
 import { Observable } from 'rxjs';
 
 import { ItmActionConfig, ItmAction, ItmActionEvent } from './action';
+import { fromStringPipe } from './item';
 
 /** The possible display modes for the button. */
 export type ItmButtonMode = 'icon' | 'menu';
@@ -65,8 +66,8 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
       }
       catch (err) { console.error(err); }
     if (!this.actionDef) return;
-    this.icon = this.actionDef.icon(this.target);
-    this.text = this.actionDef.text(this.target);
+    this.icon = fromStringPipe(this.actionDef.icon, this.target);
+    this.text = fromStringPipe(this.actionDef.text, this.target);
   }
 
   /** Emits a event action. */

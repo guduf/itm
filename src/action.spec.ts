@@ -2,6 +2,7 @@
 import { fakeAsync, tick } from '@angular/core/testing';
 
 import { ItmActionConfig, ItmAction, ItmActionEvent } from './action';
+import { fromStringPipe } from './item';
 
 describe('ItmAction', () => {
   it('should create with a valid minimal config', () => {
@@ -24,9 +25,9 @@ describe('ItmAction', () => {
     };
     const def = new ItmAction(config);
     let renderedIcon: string;
-    def.icon({}).subscribe(value => renderedIcon = value);
+    fromStringPipe(def.icon, {}).subscribe(value => renderedIcon = value);
     let renderedText: string;
-    def.text({}).subscribe(value => renderedText = value);
+    fromStringPipe(def.text, {}).subscribe(value => renderedText = value);
     tick();
     expect(renderedIcon).toBe(expectedIcon);
     expect(renderedText).toBe(expectedText);

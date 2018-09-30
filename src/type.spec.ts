@@ -1,4 +1,4 @@
-import { ItmProp, ItmPropDef } from './prop';
+import { ItmProp, ItmPropDef, ITM_PROPS_META } from './prop';
 import { getItmTypeDef, ItmType, ItmTypeDef } from './type';
 
 class User { name: string; }
@@ -23,16 +23,14 @@ describe('ItmType', () => {
 });
 
 describe('ItmProp', () => {
-  it('should decorate the item type class', () => {
+  it('should decorate the item prop method', () => {
     const expectedKey = 'firstName';
     class Person { name: string; }
-    ItmProp({key: expectedKey})(Person, 'name');
+    ItmProp({key: expectedKey})(Person.prototype, 'name');
     ItmType()(Person);
     const typeDef = getItmTypeDef(Person);
-    expect(typeDef instanceof ItmTypeDef).toBeTruthy('Expected ItmTypeDef');
     const propDef = typeDef.getProp('name');
     expect(propDef instanceof ItmPropDef).toBeTruthy('Expected ItmPropDef');
     expect(propDef.key).toBe(expectedKey);
-    expect(typeDef.getProp(expectedKey)).toBe(propDef, 'Expected same prop def with key');
   });
 });

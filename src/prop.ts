@@ -1,9 +1,9 @@
-import { ItmArea } from './area';
+import Area from './area';
 import { ItmAreaConfig } from './area-config';
-import { ItmColumnConfig, ItmColumn } from './column';
+import Column from './column';
 import { Itm, ItmPipeLike } from './item';
 import { ComponentType } from './utils';
-import { ItmFieldConfig, ItmField } from './field';
+import Field from './field';
 import { Map } from 'immutable';
 
 export interface ItmPropConfig<I extends Itm = Itm> {
@@ -16,43 +16,26 @@ export interface ItmPropConfig<I extends Itm = Itm> {
   header?: ItmPipeLike<I[], string> | ComponentType | false;
   label?: ItmPipeLike<I, string> | false;
 
-  area?: ItmAreaConfig;
-  column?: ItmColumnConfig;
-  field?: ItmFieldConfig;
+  area?: Area.Config;
+  column?: Column.Config;
+  field?: Field.Config;
 }
 
 export class ItmPropDef<I extends Itm = Itm> implements ItmPropConfig<I> {
   readonly key: string;
-  readonly area: ItmArea<I>;
-  readonly column: ItmColumnConfig<I>;
-  readonly field: ItmFieldConfig<I>;
+
+  readonly area: Area.Record<I>;
+  readonly column: Column.Record<I>;
+  readonly field: Field.Record<I>;
 
   constructor(key: string, cfg: ItmPropConfig<I> & Partial<ItmAreaConfig<I>>) {
     if (cfg.key && typeof cfg.key === 'string') (this.key = cfg.key);
     else if (key && typeof key === 'string') (this.key = key);
     // tslint:disable-next-line:max-line-length
     else throw new TypeError('InvalidItmPropConfig: Key must be specified in config if prop key is not a string');
-    this.area = (
-      cfg.area instanceof ItmArea ? cfg.area :
-        new ItmArea(
-          {key, ...(cfg as Partial<ItmAreaConfig<I>>), ...(cfg.area || {})},
-          {text: target => target[key]}
-        )
-    );
-    // tslint:disable-next-line:max-line-length
-    this.column = (
-      cfg.column instanceof ItmColumn ? cfg.column :
-        new ItmColumn({
-          ...this.area as ItmColumnConfig,
-          header: cfg.header,
-          ...(cfg.column || {})
-        })
-    );
-    this.field = new ItmField({
-      ...this.area as ItmFieldConfig,
-      label: cfg.label,
-      ...(cfg.field || {})
-    });
+    this.area = Area.factory.serialize({key, text: item => item[key]}, cfg, cfg.area);
+    this.column = Column.factory.serialize(this.area, {header: cfg.header}, cfg.column);
+    this.field = Field.factory.serialize(this.area, {label: cfg.label}, cfg.field);
   }
 }
 

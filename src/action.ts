@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { Observable, Subscriber, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { deferPipe, ItmPipeLike, ItmPipe } from './item';
 import { Collection, List } from 'immutable';
@@ -23,16 +23,16 @@ export class ItmAction<T = {}> implements ItmActionConfig {
   /** see [[ItmActionConfig.key]]. */
   key: string;
   /** see [[ItmActionConfig.icon]]. */
-  icon: ItmPipe<T, string>;
+  icon: ItmPipeLike<T, string>;
   /** see [[ItmActionConfig.text]]. */
-  text: ItmPipe<T, string>;
+  text: ItmPipeLike<T, string>;
 
   constructor(cfg: string | ItmActionConfig) {
     if (typeof cfg === 'string') cfg = {key: cfg};
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
     else throw new TypeError('InvalidItmActionConfig : Expected [key] as string for event config');
-    this.icon = cfg.icon === false ? null : deferPipe(cfg.icon || this.key);
-    this.text = cfg.text === false ? null : deferPipe(cfg.text || this.key);
+    this.icon = cfg.icon === false ? null : cfg.icon || this.key;
+    this.text = cfg.text === false ? null : cfg.text || this.key;
   }
 }
 

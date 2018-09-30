@@ -1,15 +1,15 @@
-import { ItmColumnConfig } from './column';
+import Column from './column';
 import { Itm, ItmPipeLike } from './item';
-import { SetLike } from './utils';
 import { ItmActionConfig } from './action';
+import { Set } from 'immutable';
 
 /** The ItmTableComponent is the lowest component used to display tables by this module. */
 export class ItmTableConfig<I extends Itm = Itm> {
   /** The actions to attached to the rows */
-  rowActions?: SetLike<ItmActionConfig<I>>;
+  rowActions?: ItmActionConfig<I>[] | Set<ItmActionConfig<I>>;
 
   /** The columns displayed by the table. */
-  columns?: SetLike<ItmColumnConfig<I>>;
+  columns?: Column.Config<I>[] | Set<Column.Config<I>>;
 
   /** The function returns the CSS class added to the MatRowElement. Default: undefined */
   setRowClass?: ItmPipeLike<I, string>;

@@ -1,12 +1,12 @@
 import { Injectable, Pipe, PipeTransform } from '@angular/core';
-import { Set } from 'immutable';
+import { Set, Record } from 'immutable';
 
 import { Itm } from './item';
 import { ItmTableDef } from './table-def';
 import { ItmTypeDefs, ItmTypeDef } from './type';
 import { ItmTableConfig } from './table-config';
 import { ItmGridConfig, ItmGrid } from './grid';
-import { ItmColumn } from './column';
+import Column from './column';
 
 @Injectable()
 export class ItmTypeService {
@@ -60,7 +60,7 @@ export class ItmTableTypePipe implements PipeTransform {
     def = new ItmTableDef({
       ...(typeDef.table as ItmTableConfig),
       ...cfg,
-      columns: Set<ItmColumn>().concat(def.columns, typeDef.table.columns)
+      columns: Set<Column.Record>().concat(def.columns, typeDef.table.columns)
     });
     return def;
   }

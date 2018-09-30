@@ -1,29 +1,38 @@
 
-import { Itm, ItmPipeLike, deferPipe, ItmPipe } from './item';
-import { ItmAreaConfig } from './area-config';
-import { ItmArea } from './area';
-import { of } from 'rxjs';
+import { RecordOf } from 'immutable';
 
-/** The definition of a column used by ItmTableConfig. */
-export interface ItmFieldConfig<I extends Itm = Itm> extends ItmAreaConfig<I> {
-  /**
-   * The component displayed in the header.
-   * In case of string, the value is used as the attribute for default header cell.
-   * In case of false, none header is displayed. */
-  label?: ItmPipeLike<I, string> | false;
-}
+import Area from './area';
+import { Itm, ItmPipeLike } from './item';
+import RecordFactory from './record-factory';
 
-/** The definition of a column used by ItmTableComponent */
-// tslint:disable-next-line:max-line-length
-export class ItmField<I extends Itm = Itm> extends ItmArea<I> implements ItmFieldConfig {
-  readonly defaultLabel?: ItmPipe<I, string>;
-
-  constructor(cfg: ItmFieldConfig<I>) {
-    super(cfg, {text: item => of(item[this.key])});
-    if (this.defaultText) (this.defaultLabel = (
-      cfg.label !== false ? null :
-      typeof cfg.label === 'function' ? deferPipe(cfg.label) :
-        () => of(this.key)
-    ));
+export module ItmField {
+  export interface Config<I extends Itm = Itm> {
+    label: ItmPipeLike<I, string> | false;
   }
+
+  export interface Model<I extends Itm = Itm> extends ItmField.Config<I> {
+    label: ItmPipeLike<I, string>;
+  }
+
+  export type Record<I extends Itm = Itm> = RecordOf<Area.Model<I> & ItmField.Model<I>>;
+
+  const selector = 'field';
+
+  const serializer = (cfg: RecordOf<ItmField.Config>, area: Area.Record): ItmField.Model => ({
+    label: (
+      cfg.label === false ? null :
+      cfg.label && ['string', 'function'].includes(typeof cfg.label) ? cfg.label :
+      area ? area.key :
+        null
+    )
+  });
+
+  export const factory: RecordFactory<ItmField.Record, ItmField.Config> = RecordFactory.build({
+    selector,
+    serializer,
+    model: {label: null},
+    ancestors: [Area.factory]
+  });
 }
+
+export default ItmField;

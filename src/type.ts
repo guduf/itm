@@ -3,7 +3,7 @@ import { ItmTableConfig } from './table-config';
 import { ItmTableDef } from './table-def';
 import { ItmGrid, ItmGridConfig } from './grid';
 import { ItmPropDef, ITM_PROPS_META } from './prop';
-import { ItmArea } from './area';
+import Area from './area';
 
 export class ItmTypeConfig<I extends Itm = Itm> {
   key?: string;
@@ -39,9 +39,11 @@ export class ItmTypeDef<I extends Itm = Itm> implements ItmTypeConfig {
     });
     const gridCfg = cfg.grid && typeof cfg.grid === 'object' ? cfg.grid : {};
     const areasCfg = ItmGrid.parseAreas(gridCfg.areas);
-    const areas = new Map<string, Map<string, ItmArea>>();
-    const defaultAreas = Array.from(this._props.keys())
-      .reduce((keys, key) => keys.set(key, this._props.get(key).area), new Map<string, ItmArea>());
+    const areas = new Map<string, Map<string, Area.Record>>();
+    const defaultAreas = Array.from(this._props.keys()).reduce(
+      (keys, key) => keys.set(key, this._props.get(key).area),
+      new Map<string, Area.Record>()
+    );
     areas.set('$default', defaultAreas);
     if (areasCfg) areasCfg
       .forEach((keys, areaSelector) => keys.forEach((areaCfg, areaKey) => {

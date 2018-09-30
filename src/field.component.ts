@@ -1,7 +1,8 @@
 import { Component, HostBinding } from '@angular/core';
-import { Itm } from './item';
 import { Observable } from 'rxjs';
-import { ItmField } from './field';
+import Inject from './di';
+import { Itm, fromStringPipe } from './item';
+import Field from './field';
 
 const SELECTOR = 'itm-field';
 
@@ -24,10 +25,12 @@ export class ItmFieldComponent {
   get hostClass(): string { return SELECTOR; }
 
   constructor(
-    area: ItmField,
+    @Inject.area
+    area: Field.Record,
+    @Inject.target
     item: Itm
   ) {
-    this.renderedLabel = area.defaultLabel(item);
-    this.renderedText = area.defaultText(item);
+    this.renderedLabel = fromStringPipe(area.label, item);
+    this.renderedText = fromStringPipe(area.text, item);
   }
 }

@@ -1,9 +1,9 @@
 import { TestBed, async } from '@angular/core/testing';
-import { of, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 import { ItmTextAreaComponent } from './text-area.component';
-import { ItmArea } from './area';
-import { ItmTarget } from './item';
+import Area from './area';
+import { ITM_AREA_TOKEN, ITM_TARGET_TOKEN } from './di';
 
 describe('ItmTextAreaComponent', () => {
   beforeEach(async(() => {
@@ -12,8 +12,8 @@ describe('ItmTextAreaComponent', () => {
         ItmTextAreaComponent
       ],
       providers: [
-        {provide: ItmArea, useValue: new ItmArea({key: 'name'})},
-        {provide: ItmTarget, useValue: {id: 63, name: 'Scott'}}
+        {provide: ITM_AREA_TOKEN, useValue: Area.factory.serialize({key: 'name'})},
+        {provide: ITM_TARGET_TOKEN, useValue: {id: 63, name: 'Scott'}}
       ]
     }).compileComponents();
   }));
@@ -27,8 +27,8 @@ describe('ItmTextAreaComponent', () => {
   it('should display expected values', async(() => {
     const expectedText = 'Scott';
     const textChanges = new BehaviorSubject(expectedText);
-    TestBed.overrideProvider(ItmArea, {
-      useValue: new ItmArea({key: 'id', cell: () => textChanges})
+    TestBed.overrideProvider(ITM_AREA_TOKEN, {
+      useValue: Area.factory.serialize({key: 'id', cell: () => textChanges})
     });
     const fixture = TestBed.createComponent(ItmTextAreaComponent);
     const el: HTMLElement = fixture.nativeElement;

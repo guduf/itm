@@ -1,10 +1,10 @@
-import { ItmArea, AREA_SELECTOR_PATTERN } from './area';
-import { ItmAreaConfig } from './area-config';
+import Area from './area';
+import RecordFactory from './record-factory';
 
 export type ItmAreasConfig<T = {}> = (
-  (string | ItmAreaConfig<T>)[] |
-  { $default: (string | ItmAreaConfig<T>)[], [selector: string]: (string | ItmAreaConfig<T>)[] } |
-  Map<string, Map<string, ItmAreaConfig<T>>>
+  (string | Area.Config<T>)[] |
+  { $default: (string | Area.Config<T>)[], [selector: string]: (string | Area.Config<T>)[] } |
+  Map<string, Map<string, Area.Config<T>>>
 );
 
 export interface ItmGridConfig<T = {}> {
@@ -14,7 +14,7 @@ export interface ItmGridConfig<T = {}> {
 
 export class ItmGridArea {
   constructor(
-    readonly area: ItmArea,
+    readonly area: Area.Record,
     readonly selector: string,
     readonly key: string,
     readonly row: number,
@@ -26,15 +26,15 @@ export class ItmGridArea {
 
 // tslint:disable-next-line:max-line-length
 export class ItmGrid implements ItmGridConfig {
-  readonly areas: Map<string, Map<string, ItmArea>>;
+  readonly areas: Map<string, Map<string, Area.Record>>;
   readonly template: string[][];
   readonly gridAreas: ItmGridArea[];
 
   static parseAreas(
     cfg: ItmAreasConfig,
-    extraAreas?: { [selector: string]: (string | ItmAreaConfig)[] }
-  ): Map<string, Map<string, ItmArea>> {
-    const selectors: { selector: string, areas: (string | ItmAreaConfig)[] }[] = [
+    extraAreas?: { [selector: string]: (string | Area.Config)[] }
+  ): Map<string, Map<string, Area.Record>> {
+    const selectors: { selector: string, areas: (string | Area.Config)[] }[] = [
       ...(
         Array.isArray(cfg) ?
           [{selector: '$default', areas: cfg}] :
@@ -55,16 +55,16 @@ export class ItmGrid implements ItmGridConfig {
     ];
     return selectors.reduce(
       (selectorsAcc, {selector, areas}) => {
-        if (selector !== '$default' && !AREA_SELECTOR_REGEX.test(selector))
+        if (selector !== '$default' && !RecordFactory.selectorRegex.test(selector))
           throw new TypeError('Expected selector pattern or $default');
         const keysMap = areas
           .map(areaCfg => {
-            if (!areaCfg) throw new TypeError('Expected ItmAreaConfig or string');
+            if (!areaCfg) throw new TypeError('Expected Area.Config or string');
             if (typeof areaCfg === 'string') areaCfg = {key: areaCfg};
             // tslint:disable-next-line:max-line-length
-            else if (typeof areaCfg !== 'object') throw new TypeError('Expected ItmAreaConfig or string');
+            else if (typeof areaCfg !== 'object') throw new TypeError('Expected Area.Config or string');
             if (!AREA_KEY_REGEX.test(areaCfg.key)) throw new TypeError('Expected string as [key]');
-            return areaCfg instanceof ItmArea ? areaCfg : new ItmArea(areaCfg);
+            return Area.factory.serialize(areaCfg);
           })
           .reduce((keysAcc, areaCfg) => keysAcc.set(areaCfg.key, areaCfg), new Map());
         selectorsAcc.set(selector, keysMap);
@@ -76,7 +76,7 @@ export class ItmGrid implements ItmGridConfig {
 
   constructor(
     cfg: ItmGridConfig = {},
-    extraAreas?: { [selector: string]: (string | ItmAreaConfig)[] }
+    extraAreas?: { [selector: string]: (string | Area.Config)[] }
   ) {
     this.template = this._parseTemplate(cfg.template);
     this.areas = ItmGrid.parseAreas(cfg.areas, extraAreas);
@@ -155,7 +155,7 @@ export class ItmGrid implements ItmGridConfig {
 }
 const AREA_KEY_PATTERN = '[a-z]\\w+(?:\\.[a-z]\\w+)*';
 const AREA_KEY_REGEX = new RegExp(`^${AREA_KEY_PATTERN}$`);
-const AREA_SELECTOR_CALL_PATTERN = `${AREA_SELECTOR_PATTERN}:${AREA_KEY_PATTERN}`;
+const AREA_SELECTOR_CALL_PATTERN = `${RecordFactory.selectorPattern}:${AREA_KEY_PATTERN}`;
 const AREA_FRAGMENT_PATTERN = `(?:(?:${AREA_KEY_PATTERN})|(?:${AREA_SELECTOR_CALL_PATTERN})|=|\\.)`;
 const AREA_FRAGMENT_REGEX = new RegExp(`^${AREA_FRAGMENT_PATTERN}$`);
 const TEMPLATE_ROW_PATTERN = ` *(${AREA_FRAGMENT_PATTERN}(?: +${AREA_FRAGMENT_PATTERN})*) *`;
