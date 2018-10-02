@@ -1,7 +1,7 @@
 import { Itm } from './item';
 import Table from './table';
 import Grid from './grid';
-import { ItmPropDef, ITM_PROPS_META } from './prop';
+import Prop from './prop';
 import Area from './area';
 import { Map, RecordOf } from 'immutable';
 import RecordFactory from './record-factory';
@@ -11,7 +11,7 @@ const ITM_TYPE_META = Symbol('ITM_TYPE_META');
 
 export function ItmType<I extends Itm = Itm>(cfg: ItmType.Config<I> = {}): ClassDecorator {
   return (target: any) => {
-    const props: Map<keyof I & string, ItmPropDef> = Reflect.get(target.prototype, ITM_PROPS_META);
+    const props: Map<keyof I & string, Prop.Record> = Prop.get(target);
     Reflect.set(target, ITM_TYPE_META, ItmType.factory.serialize({target, props, ...cfg}));
   };
 }
@@ -22,7 +22,7 @@ export module ItmType {
     grid?: Grid.Config<I>;
     table?: Table.Config<I>;
     target?: any;
-    props?: Map<string & keyof I, ItmPropDef>;
+    props?: Map<string & keyof I, Prop.Record>;
   }
 
   export interface Model<I extends Itm = Itm> extends Config<I> {
@@ -30,7 +30,7 @@ export module ItmType {
     grid: Grid.Record<I>;
     table: Table.Record<I>;
     target: any;
-    props: Map<string & keyof I, ItmPropDef>;
+    props: Map<string & keyof I, Prop.Record>;
   }
 
   export type Record<I extends Itm = Itm> = RecordOf<Model<I>>;

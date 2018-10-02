@@ -1,10 +1,10 @@
-import { ItmProp, ItmPropDef, ITM_PROPS_META } from './prop';
+import Prop from './prop';
 import Type from './type';
 import { Map } from 'immutable';
 
 class User { name: string; }
-const props = Map<string, ItmPropDef>();
-props.set('name', new ItmPropDef('name', {}));
+const props = Map<string, Prop.Record>();
+props.set('name', Prop.factory.serialize({key: 'name'}, {}));
 
 describe('ItmTypeDef', () => {
   it('should create with minimal config', () => {
@@ -27,11 +27,11 @@ describe('ItmProp', () => {
   it('should decorate the item prop method', () => {
     const expectedKey = 'firstName';
     class Person { name: string; }
-    ItmProp({key: expectedKey})(Person.prototype, 'name');
+    Prop({key: expectedKey})(Person.prototype, 'name');
     Type()(Person);
     const typeDef = Type.get(Person);
     const propDef = typeDef.props.get('name');
-    expect(propDef instanceof ItmPropDef).toBeTruthy('Expected ItmPropDef');
+    expect(Prop.factory.isFactoryRecord(propDef)).toBeTruthy('Expected ItmPropDef');
     expect(propDef.key).toBe(expectedKey);
   });
 });

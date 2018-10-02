@@ -1,8 +1,9 @@
-import { Component, HostBinding } from '@angular/core';
+import { Component, HostBinding, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Itm, fromStringPipe } from './item';
 import Field from './field';
+import Area from './area';
 
 const SELECTOR = 'itm-field';
 
@@ -25,6 +26,7 @@ export class ItmFieldComponent {
   get hostClass(): string { return SELECTOR; }
 
   constructor(
+    @Inject(Area.RECORD_TOKEN)
     area: Field.Record,
     item: Itm
   ) {
