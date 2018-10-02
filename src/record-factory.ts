@@ -1,7 +1,6 @@
-import { RecordOf, Record, OrderedMap, Collection, isCollection, Set } from 'immutable';
-import { Reference } from '@angular/compiler/src/render3/r3_ast';
+import { RecordOf, Record, OrderedMap, Collection, Set } from 'immutable';
 
-export class ItmRecordFactory<R extends RecordOf<T> = RecordOf<T>, C = {}, T extends C = C> {
+export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M extends C = C> {
   private _cfgFactory: Record.Factory<C>;
 
   static build<T extends C = C, C extends Object = {}>(
@@ -46,8 +45,8 @@ export class ItmRecordFactory<R extends RecordOf<T> = RecordOf<T>, C = {}, T ext
   private constructor(
     readonly selector: string,
     private readonly _ancestors: OrderedMap<string, ItmRecordFactory>,
-    private readonly _model: T,
-    private readonly _serializer?: (cfg: RecordOf<C>, ancestor?: RecordOf<any>) => T
+    private readonly _model: M,
+    private readonly _serializer?: (cfg: RecordOf<C>, ancestor?: RecordOf<any>) => M
   ) {
     if (this._ancestors.has(selector)) throw new TypeError('Ancestors has selector');
     this._cfgFactory = Record(this._model);
@@ -66,7 +65,7 @@ export class ItmRecordFactory<R extends RecordOf<T> = RecordOf<T>, C = {}, T ext
     if (maybeCfgs.length < 1) return null;
     if (maybeCfgs.length === 1 && this.isFactoryRecord(maybeCfgs[0])) return maybeCfgs[0] as any;
     // tslint:disable-next-line:max-line-length
-    const rootCfg = maybeCfgs.reduce<RecordOf<C>>((acc, maybeCfg) => acc.merge(maybeCfg), this._cfgFactory());
+    const rootCfg = maybeCfgs.reduce<RecordOf<C>>((acc, maybeCfg) => acc.mergeDeep(maybeCfg), this._cfgFactory());
     return this._ancestors.toSet()
       .add(this)
       .reduce<{ record: R, ancestors: Set<ItmRecordFactory> }>(
@@ -80,12 +79,11 @@ export class ItmRecordFactory<R extends RecordOf<T> = RecordOf<T>, C = {}, T ext
             .join(ItmRecordFactory.selectorSeparator);
           const serializer = factory._serializer;
           record = Record(this._model, descriptiveName)(
-            !serializer ? record :
-              (record || rootCfg as R).merge(serializer(rootCfg, record))
+            !serializer ? record.mergeDeep(serializer(rootCfg, record)) : record
           ) as R;
           return {ancestors, record};
         },
-        {record: null, ancestors: Set<ItmRecordFactory>()}
+        {record: rootCfg as R, ancestors: Set<ItmRecordFactory>()}
       )
       .record;
   }

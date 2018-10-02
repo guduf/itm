@@ -6,7 +6,7 @@ import { MatIconModule, MatButtonModule } from '@angular/material';
 import { ItmButtonComponent, ItmButtonMode } from './button.component';
 import { ItmConfig } from './config';
 import { DEFAULT_CONFIG } from './itm.module';
-import { ItmActionConfig, ItmAction } from './action';
+import Action from './action';
 import { By } from '@angular/platform-browser';
 import { changeInputs } from './helpers.spec';
 
@@ -23,7 +23,7 @@ export class ItmButtonHotTestComponent {
   target?: any;
   mode?: ItmButtonMode;
   event?: any;
-  action?: string | ItmActionConfig;
+  action?: string | Action.Config;
 }
 
 describe('ItmButtonComponent', () => {
@@ -70,7 +70,7 @@ describe('ItmButtonComponent', () => {
   }
 
   it('should create the action definition observing the action input', async(() => {
-    let action: string | ItmActionConfig | ItmAction = 'create';
+    let action: string | Action.Config = 'create';
     const {fixture, instance} = setup({action});
     expect(instance.actionDef).toBeDefined();
     expect(instance.actionDef.key).toBe(action, 'Expected action definition with expected key when action is as string');
@@ -78,7 +78,7 @@ describe('ItmButtonComponent', () => {
     changeInputs(fixture, {action});
     expect(instance.actionDef).toBeDefined();
     expect(instance.actionDef.key).toBe(action.key, 'Expected action definition with expected key when action is as string');
-    action = new ItmAction({key: 'delete'});
+    action = Action.factory.serialize({key: 'delete'});
     changeInputs(fixture, {action});
     expect(instance.actionDef).toBeDefined();
     expect(instance.actionDef.key).toBe(action.key, 'Expected action definition with expected key when action is as string');
@@ -94,7 +94,7 @@ describe('ItmButtonComponent', () => {
   }));
 
   it('should display the text and the icon observing the column definition', async(() => {
-    const action: string | ItmActionConfig = {key: 'print'};
+    const action: string | Action.Config = {key: 'print'};
     const {fixture, getButton} = setup({action});
     expect(getButton().attributes['mat-button']).toBeDefined();
   }));

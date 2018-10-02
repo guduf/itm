@@ -1,9 +1,11 @@
 
-import { ItmPipeLike } from './item';
-import { ComponentType, isComponentType } from './utils';
+import { InjectionToken } from '@angular/core';
 import { Map, RecordOf } from 'immutable';
-import RecordFactory from './record-factory';
+
 import { ItmAreaConfig } from './area-config';
+import { ItmPipeLike } from './item';
+import RecordFactory from './record-factory';
+import { ComponentType, isComponentType } from './utils';
 
 /** The definition of a column used by ItmTableComponent */
 class ItmAreaModel<T = {}> implements ItmArea.Config<T> {
@@ -56,11 +58,13 @@ export module ItmArea {
 
   export type Record<T = {}> = RecordOf<Model<T>>;
 
-  export const factory: RecordFactory<ItmArea.Record, ItmArea.Config> = RecordFactory.build({
+  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
-    serializer: (cfg: ItmArea.Config) => new ItmAreaModel(cfg),
+    serializer: (cfg: Config) => new ItmAreaModel(cfg),
     model: {key: null, size: null, grow: null, cell: null, text: null, providers: Map()}
   });
+
+  export const RECORD_TOKEN = new InjectionToken('ITM_AREA_RECORD');
 }
 
 export default ItmArea;

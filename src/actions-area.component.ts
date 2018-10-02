@@ -1,7 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ITM_ACTIONS, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmActionEmitter, ItmAction } from './action';
+import Action from './action';
+import ActionEvent from './action-event';
 import { ItmButtonMode } from './button.component';
 import { ITM_TARGET } from './item';
 
@@ -17,11 +18,12 @@ import { ITM_TARGET } from './item';
 })
 export class ItmActionsAreaComponent<T = {}> {
   constructor(
-    @Inject(ITM_ACTIONS)
-    readonly actions: Set<ItmAction>,
-    @Inject(ITM_TABLE_ACTIONS_BUTTONS_MODE)
+    @Inject(Action.SET_TOKEN)
+    readonly actions: Set<Action.Record>,
+    @Inject(Action.BUTTON_MODE_TOKEN)
     readonly buttonsMode: Observable<ItmButtonMode>,
-    readonly emitter: ItmActionEmitter,
+    @Inject(ActionEvent.EMITTER_TOKEN)
+    readonly emitter: ActionEvent.Emitter,
     @Inject(ITM_TARGET)
     readonly target: T
   ) { }

@@ -1,6 +1,6 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 
-import { ItmActionConfig, ItmAction, ItmActionEvent } from './action';
+import Action from './action';
 import { ItmButtonMode } from './button.component';
 
 @Component({
@@ -18,7 +18,7 @@ export class ItmButtonsComponent<T = {}> {
 
   @Input()
   /** The action definitions iterated to create buttons. */
-  actions: (ItmActionConfig | ItmAction)[];
+  actions: Action.Config[];
 
   @Input()
   /** The icon of menu button. */
@@ -26,5 +26,5 @@ export class ItmButtonsComponent<T = {}> {
 
   @Output()
   /** The emitter of buttons events. */
-  event = new EventEmitter<ItmActionEvent>();
+  event = new EventEmitter();
 }

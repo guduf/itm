@@ -6,15 +6,15 @@ import { BehaviorSubject, from, fromEvent , merge, Observable, of, Subscription 
 import { distinctUntilChanged, first, map, mergeMap, reduce, startWith, skip, tap } from 'rxjs/operators';
 // tslint:enable:max-line-length
 
-import { ItmActionEvent, ItmAction, ITM_ACTIONS, ITM_TABLE_ACTIONS_BUTTONS_MODE } from './action';
+import Action from './action';
+import ActionEvent from './action-event';
 import Area from './area';
 import Column from './column';
 import { ItmButtonMode } from './button.component';
 import { ItmConfig } from './config';
 import { Itm, ItmsChanges, ItmsSource, deferPipe, ItmPipe } from './item';
-import { ItmTableConfig } from './table-config';
 import { ItmActionsAreaComponent } from './actions-area.component';
-import { ItmTableDef } from './table-def';
+import Table from './table';
 
 const SELECTOR = 'itm-table';
 
@@ -36,11 +36,11 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
 
   @Input()
   /** The table definition to configure the MatTable. */
-  table: ItmTableConfig<I>;
+  table: Table.Config<I>;
 
   @Output()
   /** @Output Emitter of action events */
-  readonly event = new EventEmitter<ItmActionEvent<I>>();
+  readonly event = new EventEmitter<ActionEvent<I>>();
 
   @Output()
   /** @Output Emits selected items changes. */
@@ -49,7 +49,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   rowActionsProviders: StaticProvider[];
 
   /** The actions for the row cell */
-  rowActions: Set<ItmAction>;
+  rowActions: Set<Action.Record>;
 
   /** The columns transcluded to the MatTable */
   columns: Column.Record[];
@@ -179,15 +179,15 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     if (tableChanges) {
       const previous = (
         tableChanges.isFirstChange ? {columns: []} : tableChanges.previousValue
-      ) as ItmTableConfig<I>;
+      ) as Table.Config<I>;
       const {rowActions, columns, canSelect, setRowClass, selectionLimit} = (
-        this.table instanceof ItmTableDef ? this.table : new ItmTableDef(this.table)
+        Table.factory.serialize(this.table)
       );
       if (previous.rowActions !== rowActions) {
         this.rowActions = rowActions;
         this.rowActionsProviders = [
-          {provide: ITM_TABLE_ACTIONS_BUTTONS_MODE, useValue: this.actionsButtonsMode},
-          {provide: ITM_ACTIONS, useValue: this.rowActions}
+          {provide: Action.BUTTON_MODE_TOKEN, useValue: this.actionsButtonsMode},
+          {provide: Action.SET_TOKEN, useValue: this.rowActions}
         ];
       }
       if (previous.canSelect !== canSelect) {

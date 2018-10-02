@@ -1,23 +1,24 @@
 import { ItmProp, ItmPropDef, ITM_PROPS_META } from './prop';
-import { getItmTypeDef, ItmType, ItmTypeDef } from './type';
+import Type from './type';
+import { Map } from 'immutable';
 
 class User { name: string; }
-const props = new Map<string, ItmPropDef>();
+const props = Map<string, ItmPropDef>();
 props.set('name', new ItmPropDef('name', {}));
 
 describe('ItmTypeDef', () => {
   it('should create with minimal config', () => {
-    expect(new ItmTypeDef(User, props, {}));
+    expect(Type.factory.serialize({target: User, props}));
   });
 });
 
 describe('ItmType', () => {
   it('should decorate the item type class', () => {
     const expectedKey = 'user';
-    @ItmType({key: expectedKey})
+    @Type({key: expectedKey})
     class Person { }
-    const typeDef = getItmTypeDef(Person);
-    expect(typeDef instanceof ItmTypeDef).toBeTruthy('Expected ItmTypeDef');
+    const typeDef = Type.get(Person);
+    expect(Type.factory.isFactoryRecord(typeDef)).toBeTruthy('Expected ItmTypeDef');
     expect(typeDef.key).toBe(expectedKey);
   });
 });
@@ -27,9 +28,9 @@ describe('ItmProp', () => {
     const expectedKey = 'firstName';
     class Person { name: string; }
     ItmProp({key: expectedKey})(Person.prototype, 'name');
-    ItmType()(Person);
-    const typeDef = getItmTypeDef(Person);
-    const propDef = typeDef.getProp('name');
+    Type()(Person);
+    const typeDef = Type.get(Person);
+    const propDef = typeDef.props.get('name');
     expect(propDef instanceof ItmPropDef).toBeTruthy('Expected ItmPropDef');
     expect(propDef.key).toBe(expectedKey);
   });

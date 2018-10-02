@@ -1,24 +1,22 @@
 import Area from './area';
-import { ItmGrid, ItmGridArea } from './grid';
+import Grid from './grid';
+import GridArea from './grid-area';
+import { List } from 'immutable';
 
 describe('ItmGrid', () => {
   it('should create with minimal config', () => {
-    expect(new ItmGrid({template: 'name', areas: ['name']})).toBeTruthy();
+    expect(Grid.factory.serialize({template: 'name', areas: [{key: 'name'}]})).toBeTruthy();
   });
 
   it('should create with simple template', () => {
-    expect(new ItmGrid({template: 'id', areas: [{key: 'id'}]})).toBeTruthy();
+    expect(Grid.factory.serialize({template: 'id', areas: [{key: 'id'}]})).toBeTruthy();
   });
 
   const areas: Area.Config[] = [{key: 'id'}, {key: 'name'}, {key: 'email'}];
 
   it('should create a single line template', () => {
-    const def = new ItmGrid({template: 'id = id name', areas});
-    expect(def.template).toEqual([['id', 'id', 'id', 'name']]);
-    // const expectedPositions = new Map<string, [[number, number], [number, number]]>();
-    // expectedPositions.set('id', [[0, 0], [0, 2]]);
-    // expectedPositions.set('name', [[0, 3], [0, 3]]);
-    // expect (def.gridAreas).toEqual(expectedPositions);
+    const def = Grid.factory.serialize({template: 'id = id name', areas});
+    expect(def.template.equals(List([List(['id', 'id', 'id', 'name'])]))).toBeTruthy();
   });
 
   it('should create a multi line template', () => {
@@ -27,17 +25,46 @@ describe('ItmGrid', () => {
       id  .             name =
       id  control:email name =
     `;
-    const def = new ItmGrid({template, areas: areasDef}, {control: [areasDef[2]]});
-    expect(def.template).toEqual([
-      ['id', null, 'name', 'name'],
-      ['id', 'control:email', 'name', 'name']
+    const def = Grid.factory.serialize({
+      template, areas:
+      {$default: areasDef, control: [areasDef[2]]}
+    });
+    const expectedTemplate = List([
+      List(['id', null, 'name', 'name']),
+      List(['id', 'control:email', 'name', 'name'])
     ]);
-    const expectedIdPos =  new ItmGridArea(areasDef[0], '$default', 'id', 1, 1, 1, 2);
-    expect(def.gridAreas[0]).toEqual(expectedIdPos);
-    const expectedNamePos =  new ItmGridArea(areasDef[1], '$default', 'name', 1, 3, 2, 2);
-    expect(def.gridAreas[1]).toEqual(expectedNamePos);
-    const expectedEmailPos =  new ItmGridArea(areasDef[2], 'control', 'email', 2, 2, 1, 1);
-    expect(def.gridAreas[2]).toEqual(expectedEmailPos);
+    expect(def.template.equals(expectedTemplate)).toBeTruthy();
+    const expectedIdPos =  GridArea.factory.serialize({
+      ...areasDef[0],
+      selector: '$default',
+      key: 'id',
+      row: 1,
+      col: 1,
+      width: 1,
+      height: 2
+    });
+    const gridAreas = def.gridAreas.toArray();
+    expect(gridAreas[0]).toEqual(expectedIdPos);
+    const expectedNamePos =  GridArea.factory.serialize({
+      ...areasDef[0],
+      selector: '$default',
+      key: 'name',
+      row: 1,
+      col: 2,
+      width: 2,
+      height: 2
+    });
+    expect(gridAreas[1]).toEqual(expectedNamePos);
+    const expectedEmailPos =  GridArea.factory.serialize({
+      ...areasDef[0],
+      selector: '$default',
+      key: 'email',
+      row: 2,
+      col: 2,
+      width: 1,
+      height: 1
+    });
+    expect(gridAreas[2]).toEqual(expectedEmailPos);
   });
 
   it('should throw a type error when template is invalid', () => {
@@ -45,19 +72,19 @@ describe('ItmGrid', () => {
       name name
       name id
     `;
-    expect(() => new ItmGrid({template, areas})).toThrowError(/row.*start/);
+    expect(() => Grid.factory.serialize({template, areas})).toThrowError(/row.*start/);
     template = 'name name id name';
-    expect(() => new ItmGrid({template, areas})).toThrowError(/column.*end/);
+    expect(() => Grid.factory.serialize({template, areas})).toThrowError(/column.*end/);
     template = `
       name  name
       id    name
     `;
-    expect(() => new ItmGrid({template, areas})).toThrowError(/column.*start/);
+    expect(() => Grid.factory.serialize({template, areas})).toThrowError(/column.*start/);
     template = `
       name
       id
       name
     `;
-    expect(() => new ItmGrid({template, areas})).toThrowError(/row.*end/);
+    expect(() => Grid.factory.serialize({template, areas})).toThrowError(/row.*end/);
   });
 });

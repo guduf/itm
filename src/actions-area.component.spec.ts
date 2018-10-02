@@ -3,10 +3,11 @@ import { TestBed, async } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 
 // tslint:disable-next-line:max-line-length
-import { ItmActionEvent, ITM_ACTIONS, ITM_TABLE_ACTIONS_BUTTONS_MODE, ItmAction, ItmActionConfig, ItmActionEmitter } from './action';
+import Action from './action';
+import ActionEvent from './action-event';
 import { ItmButtonMode } from './button.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
-import { Itm, ITM_TARGET } from './item';
+import { ITM_TARGET } from './item';
 import { ItmMaterialModule } from './material.module';
 import { ItmButtonsComponent } from './buttons.component';
 
@@ -19,23 +20,23 @@ export class MockItmButtonsComponent<T> implements Partial<ItmButtonsComponent> 
   mode: ItmButtonMode;
 
   @Input()
-  actions: (ItmActionConfig | ItmAction)[];
+  actions: Action.Config[];
 
   @Input()
   menuIcon = 'more_vert';
 
   @Output()
-  event = new EventEmitter<ItmActionEvent>();
+  event = new EventEmitter<ActionEvent>();
 
 }
 
 describe('ItmActionsAreaComponent', () => {
   const target = {id: 63};
   const actions = [
-    new ItmAction({key: 'add', icon: 'add_circle_outline'}),
-    new ItmAction({key: 'remove', icon: 'remove_circle_outline'})
+    Action.factory.serialize({key: 'add', icon: 'add_circle_outline'}),
+    Action.factory.serialize({key: 'remove', icon: 'remove_circle_outline'})
   ];
-  const eventEmitter = new EventEmitter<ItmActionEvent>();
+  const eventEmitter = new EventEmitter<ActionEvent>();
   const buttonsMode = new BehaviorSubject<ItmButtonMode>('icon');
 
   beforeEach(async(() => {
@@ -48,10 +49,10 @@ describe('ItmActionsAreaComponent', () => {
         ItmActionsAreaComponent
       ],
       providers: [
-        {provide: ITM_ACTIONS, useValue: actions},
+        {provide: Action.SET_TOKEN, useValue: actions},
         {provide: ITM_TARGET, useValue: target},
-        {provide: ItmActionEmitter, useValue: ItmActionEmitter},
-        {provide: ITM_TABLE_ACTIONS_BUTTONS_MODE, useValue: buttonsMode}
+        {provide: ActionEvent.EMITTER_TOKEN, useValue: eventEmitter},
+        {provide: Action.BUTTON_MODE_TOKEN, useValue: buttonsMode}
       ]
     }).compileComponents();
   }));

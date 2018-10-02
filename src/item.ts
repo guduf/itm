@@ -1,4 +1,4 @@
-import { InjectionToken, Inject } from '@angular/core';
+import { InjectionToken } from '@angular/core';
 import { Observable, defer, of } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 

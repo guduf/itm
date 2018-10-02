@@ -18,16 +18,18 @@ interface ItmColumnConfig<I extends Itm = Itm> {
 }
 
 export module ItmColumn {
-  export type Config<I extends Itm = Itm> = ItmColumnConfig<I>;
+  type ModelConfig<I extends Itm = Itm> = ItmColumnConfig<I>;
 
-  export interface Model<I extends Itm = Itm> extends ItmColumn.Config<I> {
+  export type Config<I extends Itm = Itm> = Area.Config<I> & ModelConfig<I>;
+
+  export interface Model<I extends Itm = Itm> extends ModelConfig<I> {
     sortable: boolean;
     header: Area.Record<I[]>;
   }
 
-  export type Record<I extends Itm = Itm> = RecordOf<Area.Model<I> & ItmColumn.Model<I>>;
+  export type Record<I extends Itm = Itm> = RecordOf<Area.Model<I> & Model<I>>;
 
-  const serializer = (cfg: ItmColumn.Config, ancestor: Area.Record): ItmColumn.Model => {
+  const serializer = (cfg: ModelConfig, ancestor: Area.Record): Model => {
     if (!Area.factory.isFactoryRecord(ancestor)) throw new TypeError('Expected area record');
     const header: Area.Record = (
       cfg.header === false ? null :
@@ -44,7 +46,7 @@ export module ItmColumn {
   const selector = 'column';
 
   // tslint:disable-next-line:max-line-length
-  export const factory: RecordFactory<ItmColumn.Record, Area.Config & ItmColumn.Config> = RecordFactory.build({
+  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
     serializer,
     model: {header: null, sortable: false},

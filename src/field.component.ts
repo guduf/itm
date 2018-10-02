@@ -1,6 +1,6 @@
 import { Component, HostBinding } from '@angular/core';
 import { Observable } from 'rxjs';
-import Inject from './di';
+
 import { Itm, fromStringPipe } from './item';
 import Field from './field';
 
@@ -25,9 +25,7 @@ export class ItmFieldComponent {
   get hostClass(): string { return SELECTOR; }
 
   constructor(
-    @Inject.area
     area: Field.Record,
-    @Inject.target
     item: Itm
   ) {
     this.renderedLabel = fromStringPipe(area.label, item);

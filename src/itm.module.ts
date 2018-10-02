@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { CommonModule } from '@angular/common';
 import { NgModule, InjectionToken, ModuleWithProviders, Optional } from '@angular/core';
+import { Map } from 'immutable';
 
 import { ItmButtonComponent } from './button.component';
 import { ItmConfig } from './config';
@@ -8,7 +9,7 @@ import { ItmMaterialModule } from './material.module';
 import { ItmTableComponent } from './table.component';
 import { ItmButtonsComponent } from './buttons.component';
 import { ItmTypeService, ItmTableTypePipe, ItmGridTypePipe } from './type.service';
-import { ItmTypeDef, getItmTypeDef, ItmTypeDefs } from './type';
+import Type from './type';
 import { ItmGridComponent } from './grid.component';
 import { ItmFieldComponent } from './field.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
@@ -54,19 +55,20 @@ const configFactory = (config: ItmConfig = {}): ItmConfig => ({...DEFAULT_CONFIG
 
 export const ITM_TYPES = new InjectionToken('ITM_TYPES');
 
-const typeDefsFactory = (typeCtors: any[] = []): ItmTypeDefs => {
-  const typeDefs = new Map<string, ItmTypeDef>();
-  for (const typeCtor of typeCtors) {
-    const typeDef = getItmTypeDef(typeCtor);
-    if (!typeDef) throw new ReferenceError(`TypeDefNotFound for : ${typeCtor.toString()}`);
-    typeDefs.set(typeDef.key, typeDef);
-  }
-  return typeDefs;
+const typeDefsFactory = (typeCtors: any[] = []): Map<string, Type.Record> => {
+  return typeCtors.reduce(
+    (acc, target) => {
+      const record = Type.get(target);
+      if (!Type.factory.isFactoryRecord(record)) throw new TypeError('Expected ItmType record');
+      return acc.set(record.key, record);
+    },
+    Map()
+  );
 };
 
 const PROVIDERS = [
   {provide: ItmConfig, deps: [[new Optional(), ITM_CONFIG]], useFactory: configFactory},
-  {provide: ItmTypeDefs, deps: [[new Optional(), ITM_TYPES]], useFactory: typeDefsFactory},
+  {provide: Type.MAP_TOKEN, deps: [[new Optional(), ITM_TYPES]], useFactory: typeDefsFactory},
   ItmTypeService,
 ];
 

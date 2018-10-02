@@ -1,15 +1,11 @@
 import { InjectionToken } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { RecordOf } from 'immutable';
 
-import { deferPipe, ItmPipeLike, ItmPipe } from './item';
-import { Collection, List } from 'immutable';
-
-/** The token for display mode of row actions buttons. */
-export const ITM_TABLE_ACTIONS_BUTTONS_MODE = new InjectionToken('ITM_TABLE_ACTIONS_BUTTONS_MODE');
-export const ITM_ACTIONS = new InjectionToken('ITM_ACTIONS');
+import { ItmPipeLike } from './item';
+import RecordFactory from './record-factory';
 
 /** A generic action configuration. */
-export interface ItmActionConfig<T = {}> {
+interface ItmActionConfig<T = {}> {
   /** The identifier of the actions. */
   key: string;
   /** Defines the action icon. */
@@ -18,85 +14,37 @@ export interface ItmActionConfig<T = {}> {
   text?: false | ItmPipeLike<T, string>;
 }
 
-/** A generic action definition. */
-export class ItmAction<T = {}> implements ItmActionConfig {
-  /** see [[ItmActionConfig.key]]. */
-  key: string;
-  /** see [[ItmActionConfig.icon]]. */
-  icon: ItmPipeLike<T, string>;
-  /** see [[ItmActionConfig.text]]. */
-  text: ItmPipeLike<T, string>;
+export module ItmAction {
+  export type Config<T = {}> = ItmActionConfig<T>;
 
-  constructor(cfg: string | ItmActionConfig) {
-    if (typeof cfg === 'string') cfg = {key: cfg};
-    if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
-    else throw new TypeError('InvalidItmActionConfig : Expected [key] as string for event config');
-    this.icon = cfg.icon === false ? null : cfg.icon || this.key;
-    this.text = cfg.text === false ? null : cfg.text || this.key;
+  export interface Model<T = {}> extends Config<T> {
+    key: string;
+    icon: ItmPipeLike<T, string>;
+    text: ItmPipeLike<T, string>;
   }
+
+  export type Record<T = {}> = RecordOf<Model<T>>;
+
+  const serializer = (cfg: RecordOf<Config>): Model => {
+    if (!cfg.key || typeof cfg.key === 'string')
+      throw new TypeError('InvalidItmActionConfig : Expected [key] as string for event config');
+    const key = cfg.key;
+    const icon = cfg.icon === false ? null : cfg.icon || key;
+    const text = cfg.text === false ? null : cfg.text || key;
+    return {key, icon, text};
+  };
+
+  const selector = 'action';
+
+  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+    selector,
+    serializer,
+    model: {key: null, icon: null, text: null}
+  });
+
+  export const SET_TOKEN = new InjectionToken('ITM_ACTION_SET_TOKEN');
+  export const RECORD_TOKEN = new InjectionToken('ITM_ACTION_RECORD_TOKEN');
+  export const BUTTON_MODE_TOKEN = new InjectionToken('ITM_ACTION_BUTTON_MODE_TOKEN');
 }
 
-/** A generic event with a action definition, a target. */
-export class ItmActionEvent<T = {}, A extends ItmAction = ItmAction> {
-  /** The key of the action. */
-  readonly key: string;
-
-  /** Whether the event is completed. */
-  get completed(): boolean { return this._completed; }
-
-  /** Event error if is failed. */
-  get error(): Error { return this._error; }
-
-  /** Whether the event is failed.  */
-  get failed(): boolean { return Boolean(this._completed && this.error); }
-
-  /** Whether the event is succeeded. */
-  get succeeded(): boolean { return Boolean(this._completed && !this._error); }
-
-  /** see [[ItmActionEvent.completed]]. */
-  private _completed = false;
-
-  /** Subscriber to complete the event. */
-  private _completionSubject = new Subject<void>();
-
-  /** see [[ItmActionEvent.error]]. */
-  private _error: Error;
-
-  constructor(
-    /** The action definition of the event. */
-    readonly action: A,
-    /** The native event of the event. */
-    readonly nativeEvent: any,
-    /** The target of the event. */
-    readonly target: T = {} as T
-  ) {
-    if (action instanceof ItmAction) this.key = action.key;
-    else throw new TypeError('ItmActionEvent : Expected (action) as ItmAction');
-    if (!nativeEvent) throw new TypeError('ItmActionEvent : Expected (nativeEvent)');
-  }
-
-  /** Create a observable for the completion of the event. */
-  afterComplete(): Observable<void> {
-    return this._completionSubject.asObservable();
-  }
-
-  /** Complete the event. */
-  complete(): void {
-    if (this._completed) return;
-    this._completed = true;
-    this._completionSubject.next();
-    this._completionSubject.complete();
-  }
-
-  /** Fail the event. */
-  fail(err: Error): void {
-    if (this._completed) return;
-    this._completed = true;
-    this._error = err;
-    this._completionSubject.error(this._error);
-    this._completionSubject.complete();
-  }
-}
-
-// tslint:disable-next-line:max-line-length
-export class ItmActionEmitter<T = {}, A extends ItmAction = ItmAction> extends Subject<ItmActionEvent<T, A>> { }
+export default ItmAction;

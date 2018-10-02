@@ -2,7 +2,8 @@
 import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter, HostBinding } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ItmActionConfig, ItmAction, ItmActionEvent } from './action';
+import Action, { ItmAction } from './action';
+import ActionEvent from './action-event';
 import { fromStringPipe } from './item';
 
 /** The possible display modes for the button. */
@@ -26,11 +27,11 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
 
   @Output()
   /** The emitter of action event. */
-  event = new EventEmitter<ItmActionEvent>();
+  event = new EventEmitter<ActionEvent>();
 
   /** The action configuration managed by the button. */
   @Input()
-  action: string | ItmActionConfig<T>;
+  action: string | ItmAction.Config<T>;
 
   /** The icon of the button. */
   icon: Observable<string>;
@@ -39,7 +40,7 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
   text: Observable<string>;
 
   /** The action definition of the button. */
-  actionDef: ItmAction<T>;
+  actionDef: Action.Record<T>;
 
   @HostBinding('class')
   /** The CSS class of host element. */
@@ -58,9 +59,10 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
 
   ngOnChanges({action: actionChanges}: SimpleChanges) {
     if (actionChanges)
-      if (this.action instanceof ItmAction) this.actionDef = this.action;
+      if (Action.factory.isFactoryRecord(this.action))
+        this.actionDef = this.action as Action.Record;
       else try {
-        this.actionDef = new ItmAction(
+        this.actionDef = Action.factory.serialize(
           typeof this.action === 'string' ? {key: this.action} : this.action
         );
       }
@@ -72,6 +74,6 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
 
   /** Emits a event action. */
   emitEvent(nativeEvent: any) {
-    this.event.emit(new ItmActionEvent(this.actionDef, nativeEvent, this.target));
+    this.event.emit(new ActionEvent(this.actionDef, nativeEvent, this.target));
   }
 }

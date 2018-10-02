@@ -2,8 +2,10 @@
 import { Component, EventEmitter, OnChanges, Input, SimpleChanges, HostBinding, Output, StaticProvider } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
-import { ItmActionEvent } from './action';
-import { ItmGridConfig, ItmGrid, ItmGridArea } from './grid';
+import ActionEvent from './action-event';
+import Grid from './grid';
+import GridArea from './grid-area';
+import { List } from 'immutable';
 
 /** The selector of ItmGridComponent. */
 const SELECTOR = 'itm-grid';
@@ -14,7 +16,7 @@ const SELECTOR = 'itm-grid';
     <div *ngFor="let gridArea of gridAreas"
       [class]="getAreaClass(gridArea)" [style.gridArea]="getAreaStyle(gridArea)">
       <ng-container
-        [itmArea]="gridArea.area"
+        [itmArea]="gridArea"
         [providers]="getAreaProviders(gridArea)"
         [action]="action"
         [target]="target"></ng-container>
@@ -24,7 +26,7 @@ const SELECTOR = 'itm-grid';
 export class ItmGridComponent<T = {}> implements OnChanges {
   @Input()
   /** The configuration of the grid. */
-  grid: ItmGridConfig;
+  grid: Grid.Config<T>;
 
   @Input()
   /** The target of the grid. */
@@ -32,10 +34,10 @@ export class ItmGridComponent<T = {}> implements OnChanges {
 
   @Output()
   /** The emitter of action events. */
-  action = new EventEmitter<ItmActionEvent<T>>();
+  action = new EventEmitter<ActionEvent<T>>();
 
   /** The grid grid area map of the displayed areas. */
-  gridAreas: ItmGridArea[];
+  gridAreas: GridArea.Record[];
 
   /** The grid size of grid. The first member is for columns and the second for rows. */
   size: [number, number];
@@ -56,31 +58,29 @@ export class ItmGridComponent<T = {}> implements OnChanges {
     private _sanitizer: DomSanitizer
   ) { }
 
-  getAreaProviders(gridArea: ItmGridArea): StaticProvider[] {
-    return [{provide: ItmGridArea, useValue: gridArea}];
+  getAreaProviders(gridArea: GridArea.Record): StaticProvider[] {
+    return [{provide: GridArea.RECORD_TOKEN, useValue: gridArea}];
   }
 
-  getAreaStyle(gridArea: ItmGridArea): SafeStyle {
+  getAreaStyle(gridArea: GridArea.Record): SafeStyle {
     const {row, col, width, height} = gridArea;
     return this._sanitizer.bypassSecurityTrustStyle(
       `${row} / ${col} / ${row + height} / ${col + width}`
     );
   }
 
-  getAreaClass(gridArea: ItmGridArea): string {
+  getAreaClass(gridArea: GridArea.Record): string {
     const {key} = gridArea;
     return `${SELECTOR}-area ${SELECTOR}-key-${key}`;
   }
 
   ngOnChanges({grid: gridChanges}: SimpleChanges) {
     if (gridChanges) {
-      const previous: ItmGridConfig = (gridChanges.isFirstChange ? {} : gridChanges.previousValue);
+      const previous: Grid.Config<T> = (gridChanges.isFirstChange ? {} : gridChanges.previousValue);
       if (previous === this.grid) return;
-      const {gridAreas, template}: ItmGrid = (
-        this.grid instanceof ItmGrid ? this.grid : new ItmGrid(this.grid)
-      );
-      this.gridAreas = gridAreas;
-      this.size = [template[0].length, template.length];
+      const {gridAreas, template}: Grid.Record = Grid.factory.serialize(this.grid);
+      this.gridAreas = gridAreas.toArray();
+      this.size = [template.first(List()).size, template.size];
     }
   }
 }
