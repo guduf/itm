@@ -1,7 +1,8 @@
+// tslint:disable:max-line-length
 import Area from './area';
 import Grid from './grid';
 import GridArea from './grid-area';
-import { List } from 'immutable';
+import { List, Record } from 'immutable';
 
 describe('ItmGrid', () => {
   it('should create with minimal config', () => {
@@ -33,38 +34,50 @@ describe('ItmGrid', () => {
       List(['id', null, 'name', 'name']),
       List(['id', 'control:email', 'name', 'name'])
     ]);
-    expect(def.template.equals(expectedTemplate)).toBeTruthy();
-    const expectedIdPos =  GridArea.factory.serialize({
+    expect(def.template.equals(expectedTemplate)).toBeTruthy('Expected same template');
+    const expectedIdPos = GridArea.factory.serialize({
       ...areasDef[0],
       selector: '$default',
       key: 'id',
       row: 1,
       col: 1,
       width: 1,
-      height: 2
+      height: 2,
+      grow: 1,
+      providers: {},
+      size: 1,
+      text: 'id'
     });
     const gridAreas = def.gridAreas.toArray();
-    expect(gridAreas[0]).toEqual(expectedIdPos);
-    const expectedNamePos =  GridArea.factory.serialize({
+    expect(gridAreas[0].toJS()).toEqual(expectedIdPos.toJS(), 'Expected same grid area with key id');
+    const expectedNamePos = GridArea.factory.serialize({
       ...areasDef[0],
       selector: '$default',
       key: 'name',
       row: 1,
-      col: 2,
+      col: 3,
       width: 2,
-      height: 2
+      height: 2,
+      text: 'name',
+      grow: 1,
+      providers: {},
+      size: 1
     });
-    expect(gridAreas[1]).toEqual(expectedNamePos);
-    const expectedEmailPos =  GridArea.factory.serialize({
+    expect(gridAreas[1].toJS()).toEqual(expectedNamePos.toJS(), 'Expected same grid area with key name');
+    const expectedEmailPos = GridArea.factory.serialize({
       ...areasDef[0],
-      selector: '$default',
+      selector: 'control',
       key: 'email',
       row: 2,
       col: 2,
       width: 1,
-      height: 1
+      height: 1,
+      text: 'email',
+      grow: 1,
+      providers: {},
+      size: 1
     });
-    expect(gridAreas[2]).toEqual(expectedEmailPos);
+    expect(gridAreas[2].toJS()).toEqual(expectedEmailPos.toJS(), 'Expected same grid area with key email');
   });
 
   it('should throw a type error when template is invalid', () => {

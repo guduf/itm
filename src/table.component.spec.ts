@@ -1,12 +1,12 @@
 // tslint:disable:max-line-length
-import { ValueProvider, Directive, Input, Component, EventEmitter } from '@angular/core';
+import { ValueProvider, Directive, Input, Component, EventEmitter, StaticProvider } from '@angular/core';
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { of, BehaviorSubject } from 'rxjs';
 
-import { Itm, ItmsChanges, ItmsSource } from './item';
-import Column from './column';
+import { Itm, ItmsSource } from './item';
+import Area from './area';
 import Table from './table';
 import { ItmTableComponent } from './table.component';
 import { ItmMaterialModule } from './material.module';
@@ -14,31 +14,29 @@ import { click, changeInputs } from './helpers.spec';
 import { ItmConfig } from './config';
 import { DEFAULT_CONFIG } from './itm.module';
 import ActionEvent from './action-event';
+import { ItmAreaDirective } from './area.directive';
+import { ItmTextAreaComponent } from './text-area.component';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { ItmActionsAreaComponent } from './actions-area.component';
+import { ItmButtonsComponent } from './buttons.component';
+import { ItmButtonComponent } from './button.component';
 
-@Directive({selector: '[itmColumnCell]'})
+@Directive({selector: '[itmArea]'})
 // tslint:disable-next-line:directive-class-suffix
-class ItmColumnCellMockDirective {
+class ItmAreaMockDirective<T = {}> {
+  // tslint:disable-next-line:no-input-rename
+  @Input('itmArea')
+  area: Area.Record;
+
+  /** The emitter of action events. */
   @Input()
-  action: ActionEvent.Emitter;
+  action: ActionEvent.Emitter<T>;
 
   @Input()
-  area: Column.Record;
+  target: T;
 
   @Input()
-  item: Itm;
-}
-
-@Directive({selector: '[itmColumnHeader]'})
-// tslint:disable-next-line:directive-class-suffix
-class ItmColumnHeaderMockDirective {
-  @Input()
-  action: ActionEvent.Emitter;
-
-  @Input()
-  area: Column.Record;
-
-  @Input()
-  itemsChanges: ItmsChanges<Itm>;
+  providers: StaticProvider[];
 }
 
 @Component({selector: 'itm-table-settings', template: ''})
@@ -54,15 +52,25 @@ describe('ItmTableComponent', () => {
         ItmMaterialModule
       ],
       declarations: [
-        ItmColumnCellMockDirective,
-        ItmColumnHeaderMockDirective,
+        ItmAreaMockDirective,
         ItmTableComponent,
-        ItmTableSettingsComponent
+        ItmTableSettingsComponent,
+        ItmAreaDirective,
+        ItmTextAreaComponent,
+        ItmActionsAreaComponent,
+        ItmButtonsComponent,
+        ItmButtonComponent
       ],
       providers: [
         {provide: ItmConfig, useValue: DEFAULT_CONFIG}
       ]
-    }).compileComponents();
+    });
+    TestBed.overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [ItmTextAreaComponent, ItmActionsAreaComponent]
+      }
+    });
+    TestBed.compileComponents();
   }));
 
   it('should create the component', async(() => {
@@ -105,7 +113,7 @@ describe('ItmTableComponent', () => {
     const {debugElement} = setupTable();
     const debugMatCell = debugElement.query(By.directive(MatCell));
     const providerToken = debugMatCell.childNodes[0].providerTokens[0];
-    expect(providerToken).toBe(ItmColumnCellMockDirective, 'Expected ItmCellDirective as provider token of the first node of the first MatCell');
+    expect(providerToken).toBe(ItmAreaMockDirective, 'Expected AreaDirective as provider token of the first node of the first MatCell');
   }));
 
   // tslint:disable-next-line:max-line-length
@@ -113,7 +121,7 @@ describe('ItmTableComponent', () => {
     const {debugElement} = setupTable();
     const debugMatHeaderCell = debugElement.query(By.directive(MatHeaderCell));
     const providerToken = debugMatHeaderCell.childNodes[0].providerTokens[0];
-    expect(providerToken).toBe(ItmColumnHeaderMockDirective, 'Expected ItmHeaderCellDirective as provider token of the first node of the first MatHeaderCell');
+    expect(providerToken).toBe(ItmAreaMockDirective, 'Expected AreaDirective as provider token of the first node of the first MatHeaderCell');
   }));
 
   it('should remain columns untouched when itemChanges changes', async(() => {

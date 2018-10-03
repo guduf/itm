@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { ItmTextAreaComponent } from './text-area.component';
 import Area from './area';
-import { ITM_AREA_TOKEN, ITM_TARGET_TOKEN } from './di';
+import { ITM_TARGET } from './item';
 
 describe('ItmTextAreaComponent', () => {
   beforeEach(async(() => {
@@ -12,8 +12,8 @@ describe('ItmTextAreaComponent', () => {
         ItmTextAreaComponent
       ],
       providers: [
-        {provide: ITM_AREA_TOKEN, useValue: Area.factory.serialize({key: 'name'})},
-        {provide: ITM_TARGET_TOKEN, useValue: {id: 63, name: 'Scott'}}
+        {provide: Area.RECORD_TOKEN, useValue: Area.factory.serialize({key: 'name'})},
+        {provide: ITM_TARGET, useValue: {id: 63, name: 'Scott'}}
       ]
     }).compileComponents();
   }));
@@ -27,7 +27,7 @@ describe('ItmTextAreaComponent', () => {
   it('should display expected values', async(() => {
     const expectedText = 'Scott';
     const textChanges = new BehaviorSubject(expectedText);
-    TestBed.overrideProvider(ITM_AREA_TOKEN, {
+    TestBed.overrideProvider(Area.RECORD_TOKEN, {
       useValue: Area.factory.serialize({key: 'id', cell: () => textChanges})
     });
     const fixture = TestBed.createComponent(ItmTextAreaComponent);

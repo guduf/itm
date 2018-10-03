@@ -1,9 +1,8 @@
+import { InjectionToken } from '@angular/core';
 import { RecordOf } from 'immutable';
 
 import Area from './area';
-import Grid from './grid';
 import RecordFactory from './record-factory';
-import { InjectionToken } from '@angular/core';
 
 export module ItmGridArea {
   export interface Model {
@@ -18,8 +17,8 @@ export module ItmGridArea {
   export type Record<T = {}> = RecordOf<Area.Model<T> & Model>;
 
   const serializer = (model: RecordOf<Model>): Model => {
-    if (!RecordFactory.selectorRegex.test(model.selector)) throw new TypeError('Expected selector');
-    if (!Grid.keyRegExp.test(model.key)) throw new TypeError('Expected key');
+    if (!ItmGridArea.selectorRegExp.test(model.selector)) throw new TypeError('Expected selector');
+    if (!keyRegExp.test(model.key)) throw new TypeError('Expected key');
     if (!(model.row > 0)) throw new TypeError('Expected positive number');
     if (!(model.col > 0)) throw new TypeError('Expected positive number');
     if (!(model.width > 0)) throw new TypeError('Expected positive number');
@@ -37,6 +36,11 @@ export module ItmGridArea {
   });
 
   export const RECORD_TOKEN = new InjectionToken('ITM_GRID_AREA_RECORD');
+
+  export const keyPattern = '[a-z]\\w+(?:\\.[a-z]\\w+)*';
+  export const keyRegExp = new RegExp(`^${keyPattern}$`);
+  export const selectorPattern = `${RecordFactory.selectorPattern}|\\$default`;
+  export const selectorRegExp = new RegExp(`^${selectorPattern}$`);
 }
 
 export default ItmGridArea;

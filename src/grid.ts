@@ -2,7 +2,6 @@ import Area from './area';
 import GridArea from './grid-area';
 import RecordFactory from './record-factory';
 import { List, Map, RecordOf, Set } from 'immutable';
-import { reduce } from 'rxjs/operators';
 
 export module ItmGrid {
   export type AreasConfig<T = {}> = (
@@ -62,7 +61,8 @@ export module ItmGrid {
         if (!match) throw new TypeError(`Expected Template row Regex: ${i}`);
         return match[1].split(/ +/);
       });
-    else if (!Array.isArray(cfg)) throw new TypeError('Expected Array or string');
+    else if (Array.isArray(cfg)) cfg = List(cfg.map(row => List(row)));
+    else if (!List.isList(cfg)) throw new TypeError('Expected List, Array or string');
     // tslint:disable-next-line:max-line-length
     const colCount = (cfg as any[][]).reduce((max, row) => Math.max(max, row.length), 0);
     const rowCount = (cfg as any[]).length;
@@ -91,7 +91,7 @@ export module ItmGrid {
       .flatten()
       .reduce<Map<string, [[number, number], [number, number]]>>(
         (gridAreas, {col, fragment, row}, i, fragments) => {
-          const prevHash = row && col ? fragments[i - 1].fragment : null;
+          const prevHash = row && col ? fragments.get(i - 1).fragment : null;
           if (
             prevHash &&
             prevHash !== fragment &&
@@ -117,7 +117,7 @@ export module ItmGrid {
         fragment.split(':') :
         ['$default', fragment]
       );
-      const area = this.areas.has(selector) ? areas.get(selector).get(areaKey) : null;
+      const area = areas.has(areaSelector) ? areas.get(areaSelector).get(areaKey) : null;
       if (!area) throw new ReferenceError('Missing area for fragment: ' + fragment);
       const [[row, col], [endRow, endCol]] = map.get(fragment);
       // tslint:disable-next-line:max-line-length
@@ -132,10 +132,8 @@ export module ItmGrid {
     });
   }
 
-  export const keyPattern = '[a-z]\\w+(?:\\.[a-z]\\w+)*';
-  export const keyRegExp = new RegExp(`^${keyPattern}$`);
-  export const selectorCallPattern = `${RecordFactory.selectorPattern}:${keyPattern}`;
-  export const fragmentPattern = `(?:(?:${keyPattern})|(?:${selectorCallPattern})|=|\\.)`;
+  export const selectorCallPattern = `(?:${GridArea.selectorPattern}):${GridArea.keyPattern}`;
+  export const fragmentPattern = `(?:(?:${GridArea.keyPattern})|(?:${selectorCallPattern})|=|\\.)`;
   export const fragmentRegExp = new RegExp(`^${fragmentPattern}$`);
   export const templateRowPattern = ` *(${fragmentPattern}(?: +${fragmentPattern})*) *`;
   export const templateRowRegExp = new RegExp(`^${templateRowPattern}$`);

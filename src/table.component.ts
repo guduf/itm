@@ -80,12 +80,12 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   actionArea = Area.factory.serialize({key: '$actions', cell: ItmActionsAreaComponent});
 
   get actionCellClass(): string {
-    const size  = Math.ceil(this.rowActions.size * 40 / 60);
+    const size = Math.ceil(this.rowActions.size * 40 / 60);
     return `itm-action-cell itm-slot-${size}`;
   }
 
   get actionHeaderCellClass(): string {
-    const size  = Math.ceil(this.rowActions.size * 40 / 60);
+    const size = Math.ceil(this.rowActions.size * 40 / 60);
     return `itm-action-header-cell itm-slot-${size}`;
   }
 
@@ -280,9 +280,7 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   /** Adds the item to the selection or removes it if selected. */
   toggleItemSelection(item: I): void {
     const selection = this._selectionChanges.value;
-    if (selection.has(item)) selection.delete(item);
-    else selection.add(item);
-    this._selectionChanges.next(Set(selection));
+    this._selectionChanges.next(selection.has(item) ? selection.delete(item) : selection.add(item));
   }
 
   /** Adds all items to the selection or removess it if selecteds. */

@@ -7,12 +7,6 @@ import Area from './area';
 import { Itm, fromStringPipe } from './item';
 
 @Component({template: ''})
-class HeaderComponent { }
-
-@Component({template: ''})
-class LabelComponent { }
-
-@Component({template: ''})
 class CellComponent { }
 
 describe('ItmArea', () => {
@@ -21,7 +15,7 @@ describe('ItmArea', () => {
   });
 
   it('should throw a error with invalid key is specified', () => {
-    expect(() => Area.factory.serialize({key: null})).toThrowError(/InvalidItmAreaConfig/);
+    expect(() => Area.factory.serialize({key: null})).toThrowError(/key/);
   });
 
   const item: Itm = {id: 63, firstName: 'Aron'};
@@ -41,16 +35,16 @@ describe('ItmArea', () => {
   };
 
   it('should implements a valid config without component', fakeAsync(() => {
-    const def = Area.factory.serialize(config);
+    const record = Area.factory.serialize(config);
     let renderedText: string;
-    fromStringPipe(def.text, item).subscribe(cell => (renderedText = cell));
+    fromStringPipe(record.text, item).subscribe(cell => (renderedText = cell));
     tick();
-    expect(def.key).toBe(expectedKey, 'Expected key');
-    expect(def.grow).toBe(expectedGrow, 'Expected grow');
+    expect(record.key).toBe(expectedKey, 'Expected key');
+    expect(record.grow).toBe(expectedGrow, 'Expected grow');
     expect(renderedText).toBe(expectedCell, 'Expected cell');
     // tslint:disable-next-line:max-line-length
-    expect(def.providers.equals(Map({[expectedProvider.provide]: expectedProvider.useValue}))).toBeTruthy('Expected provider');
-    expect(def.size).toBe(expectedSize, 'Expected size');
+    expect(record.providers.equals(Map({[expectedProvider.provide]: expectedProvider.useValue}))).toBeTruthy('Expected provider');
+    expect(record.size).toBe(expectedSize, 'Expected size');
   }));
 
   it('should implements a valid config with component', () => {

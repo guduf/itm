@@ -2,7 +2,6 @@
 import { fakeAsync, tick } from '@angular/core/testing';
 
 import Action from './action';
-import ActionEvent from './action-event';
 import { fromStringPipe } from './item';
 
 describe('ItmAction', () => {
@@ -13,7 +12,7 @@ describe('ItmAction', () => {
 
   it('should throw a type error when a invalid config', () => {
     const config = {} as Action.Config;
-    expect(() => Action.factory.serialize(config)).toThrowError(/InvalidItmActionConfig/);
+    expect(() => Action.factory.serialize(config)).toThrowError(/key/);
   });
 
   it('should implements a valid config', fakeAsync(() => {

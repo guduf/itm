@@ -5,7 +5,6 @@ import { Itm } from './item';
 import Table from './table';
 import Type from './type';
 import Grid from './grid';
-import Column from './column';
 
 @Injectable()
 export class ItmTypeService {
@@ -15,8 +14,7 @@ export class ItmTypeService {
   ) { }
 
   get<I extends Itm = Itm>(key: string): Type.Record<I> {
-    if (!this._types.has(key))
-      throw new ReferenceError(`ItmTypeDefNotFound Expected type with key: ${key}`);
+    if (!this._types.has(key)) throw new ReferenceError(`Missing ItmType with key '${key}'`);
     return this._types.get(key);
   }
 }
@@ -28,7 +26,7 @@ export class ItmGridTypePipe implements PipeTransform {
   ) { }
   transform(key: string, cfg?: Grid.Config): Grid.Record {
     const typedGrid = this._typeService.get(key).grid;
-    return  cfg ? Grid.factory.serialize(typedGrid, cfg) : typedGrid;
+    return cfg ? Grid.factory.serialize(typedGrid, cfg) : typedGrid;
   }
 }
 
@@ -40,6 +38,6 @@ export class ItmTableTypePipe implements PipeTransform {
   ) { }
   transform(key: string, cfg?: Table.Config): Table.Record {
     const typedTable = this._typeService.get(key).table;
-    return  cfg ? Table.factory.serialize(typedTable, cfg) : typedTable;
+    return cfg ? Table.factory.serialize(typedTable, cfg) : typedTable;
   }
 }

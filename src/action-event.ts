@@ -13,7 +13,7 @@ export class ItmActionEvent<T = {}, A extends Action.Record = Action.Record> {
   /** Event error if is failed. */
   get error(): Error { return this._error; }
 
-  /** Whether the event is failed.  */
+  /** Whether the event is failed. */
   get failed(): boolean { return Boolean(this._completed && this.error); }
 
   /** Whether the event is succeeded. */

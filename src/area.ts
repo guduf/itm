@@ -24,14 +24,13 @@ class ItmAreaModel<T = {}> implements ItmArea.Config<T> {
 
   constructor(cfg: ItmAreaConfig<T>) {
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
-    // tslint:disable-next-line:max-line-length
-    else throw new TypeError('InvalidItmAreaConfig : Expected [key] as string for ItmAreaConfig');
+    else throw new TypeError('Expected key');
     this.size = cfg.size && typeof cfg.size === 'number' ? cfg.size : 1;
     this.grow = cfg.grow && typeof cfg.grow === 'number' ? cfg.grow : 1;
     this.cell = cfg.cell !== false && isComponentType(cfg.cell) ? cfg.cell as ComponentType : null;
     this.text = (
       cfg.text === false ? null :
-      typeof cfg.text  === 'function' ? cfg.text :
+      typeof cfg.text === 'function' ? cfg.text :
       !this.cell && (typeof cfg.cell === 'string' || typeof cfg.cell === 'function') ?
         cfg.cell as ItmPipeLike<T, string> :
         this.key
@@ -61,7 +60,7 @@ export module ItmArea {
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
     serializer: (cfg: Config) => new ItmAreaModel(cfg),
-    model: {key: null, size: null, grow: null, cell: null, text: null, providers: Map()}
+    model: {key: null, size: null, grow: null, cell: null, text: null, providers: null}
   });
 
   export const RECORD_TOKEN = new InjectionToken('ITM_AREA_RECORD');

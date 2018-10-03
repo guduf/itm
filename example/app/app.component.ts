@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 
-import { ItmTableConfig } from 'src/table-config';
-import { Itm } from '../../src/item';
-import { ItmActionEvent } from 'src/action';
+import Table from 'src/table';
+import { Itm } from 'src/item';
+import ActionEvent from 'src/action-event';
 import { DATA } from './data';
-import { ItmGridConfig } from '../../src/grid';
+import Grid from 'src/grid';
 import { User } from './user';
 
 const tableTemplate  = `
@@ -26,11 +26,12 @@ export class AppComponent {
 
   itemsSource: Itm[] = DATA;
 
-  table: ItmTableConfig = {
-    rowActions: [{key: 'delete'}, {key: 'print'}]
+  table: Table.Config = {
+    rowActions: [{key: 'delete'}, {key: 'print'}],
+    canSelect: true
   };
 
-  grid: ItmGridConfig<User> = {
+  grid: Grid.Config<User> = {
     template: `
       firstName = lastName  =
       ipAddress = =         =
@@ -39,7 +40,7 @@ export class AppComponent {
 
   target = DATA[0];
 
-  onEvent(e: ItmActionEvent<Itm>) {
+  onEvent(e: ActionEvent<Itm>) {
     if (e.key === 'delete') this.remove(e.target);
   }
 

@@ -12,7 +12,7 @@ class ModelTestImpl {
   }
 }
 
-interface ChildModelTestConfig extends ModelTestImpl  { suffix: string; }
+interface ChildModelTestConfig extends ModelTestImpl { suffix: string; }
 
 interface ChildModelTestImpl extends ChildModelTestConfig { childKey: string; }
 

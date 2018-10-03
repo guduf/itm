@@ -26,8 +26,7 @@ export module ItmAction {
   export type Record<T = {}> = RecordOf<Model<T>>;
 
   const serializer = (cfg: RecordOf<Config>): Model => {
-    if (!cfg.key || typeof cfg.key === 'string')
-      throw new TypeError('InvalidItmActionConfig : Expected [key] as string for event config');
+    if (!cfg.key || typeof cfg.key !== 'string') throw new TypeError('Expected key');
     const key = cfg.key;
     const icon = cfg.icon === false ? null : cfg.icon || key;
     const text = cfg.text === false ? null : cfg.text || key;

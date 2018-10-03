@@ -78,12 +78,21 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
             .map(({selector}) => selector)
             .join(ItmRecordFactory.selectorSeparator);
           const serializer = factory._serializer;
+          let model: R;
+          if (!serializer) (model = record);
+          try { model = serializer(rootCfg, record) as R; }
+          catch (err) {
+            console.error('SERIALIZE ERROR', err);
+            // tslint:disable-next-line:max-line-length
+            console.error('SERIALIZE ERROR CONTEXT', {selector: this.selector, cfg: rootCfg.toJS()});
+            throw err;
+          }
           record = Record(this._model, descriptiveName)(
-            !serializer ? record.mergeDeep(serializer(rootCfg, record)) : record
+            serializer ? record.mergeDeep(model) : record
           ) as R;
           return {ancestors, record};
         },
-        {record: rootCfg as R, ancestors: Set<ItmRecordFactory>()}
+        {record: this._cfgFactory() as R, ancestors: Set<ItmRecordFactory>()}
       )
       .record;
   }

@@ -15,6 +15,7 @@ import Action from './action';
 import Area from './area';
 import { ItmConfig } from './config';
 import ActionEvent from './action-event';
+import { Record } from 'immutable';
 
 /** The abstract directive to create area component. */
 @Directive({selector: '[itmArea]'})
@@ -43,7 +44,7 @@ export class ItmAreaDirective<T = {}, A extends Action.Record = Action.Record<T>
   ) { }
 
   ngOnInit() {
-    if (Area.factory.isFactoryRecord(this.area)) throw new TypeError('Expected area');
+    if (!Area.factory.isFactoryRecord(this.area)) throw new TypeError('Expected area');
     if (typeof this.target !== 'object') throw new TypeError('Expected target');
     if (!(this.action instanceof EventEmitter)) throw new TypeError('Expected action');
     const providers = [
