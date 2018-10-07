@@ -1,25 +1,34 @@
 import { RecordOf, Record, OrderedMap, Collection, Set } from 'immutable';
 
-export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M extends C = C> {
+export class ItmRecordFactory<
+  R extends RecordOf<M> = RecordOf<M>,
+  C = {},
+  M extends C = C
+> {
   private _cfgFactory: Record.Factory<C>;
 
-  static build<T extends C = C, C extends Object = {}>(
-    cfg: ItmRecordFactory.ConfigWithoutAncestor<T, C>
-  ): ItmRecordFactory<RecordOf<T>, C>;
+  static build<M extends C = C, C extends Object = {}>(
+    cfg: { selector: string, serializer?: (cfg: RecordOf<C>) => M, model?: M, ancestors?: never }
+  ): ItmRecordFactory<RecordOf<M>, C>;
 
   // tslint:disable-next-line:max-line-length
-  static build<T1 extends C1 = C1, C1 extends Object = {}, T2 extends C2 = C2, C2 extends Object = {}>(
-    cfg: ItmRecordFactory.ConfigWithAncestor<T1, C1, T2, C2>
-  ): ItmRecordFactory<RecordOf<T1 & T2>, C1 & C2>;
+  static build<M extends C, C extends Object, AR extends FC & RecordOf<FC>, FC extends Object = {}>(
+    cfg: {
+      selector: string,
+      serializer?: (cfg: RecordOf<C>, ancestor: AR) => M,
+      model?: M,
+      ancestors: [ItmRecordFactory<AR, FC>]
+    }
+  ): ItmRecordFactory<AR & RecordOf<M>, FC & C, any>;
 
-  static build<T extends C = C, C = {}>(
+  static build<M extends C = C, C = {}>(
     cfg: {
       selector: string;
-      serializer?: (cfg: RecordOf<C>, ancestor?: RecordOf<any>) => T;
-      model?: T;
+      serializer?: (cfg: RecordOf<C>, ancestor?: RecordOf<any>) => M;
+      model?: M;
       ancestors?: ItmRecordFactory[]
     }
-  ): ItmRecordFactory<RecordOf<T>, C> {
+  ): ItmRecordFactory<RecordOf<M>, C> {
     // tslint:disable-next-line:max-line-length
     if (!ItmRecordFactory.selectorRegex.test(cfg.selector)) throw new TypeError('Expected selector pattern');
     const selector = cfg.selector;
@@ -33,7 +42,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
       OrderedMap<string, ItmRecordFactory>()
     );
     // tslint:disable-next-line:max-line-length
-    const serializer: (cfg: RecordOf<C>) => T = typeof cfg.serializer === 'function' ? cfg.serializer : null;
+    const serializer: (cfg: RecordOf<C>) => M = typeof cfg.serializer === 'function' ? cfg.serializer : null;
     const model = ancestors
       .toStack()
       .map(ancestor => ancestor._model)
@@ -79,8 +88,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
             .join(ItmRecordFactory.selectorSeparator);
           const serializer = factory._serializer;
           let model: R;
-          if (!serializer) (model = record);
-          try { model = serializer(rootCfg, record) as R; }
+          if (serializer) try { model = serializer(rootCfg, record) as R; }
           catch (err) {
             console.error('SERIALIZE ERROR', err);
             // tslint:disable-next-line:max-line-length
@@ -88,7 +96,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
             throw err;
           }
           record = Record(this._model, descriptiveName)(
-            serializer ? record.mergeDeep(model) : record
+            model ? record.mergeDeep(model) : record
           ) as R;
           return {ancestors, record};
         },
@@ -102,12 +110,6 @@ export module ItmRecordFactory {
   export const selectorPattern = '[a-z]\\w+';
   export const selectorRegex = new RegExp(`^${ItmRecordFactory.selectorPattern}$`);
   export const selectorSeparator = ',';
-
-  export interface ConfigWithoutAncestor<M extends C = C, C extends Object = {}> {
-    selector: string;
-    serializer?: (cfg: RecordOf<C>) => M;
-    model?: M;
-  }
 
   export interface ConfigWithAncestor<
     M1 extends C1 = C1,

@@ -7,18 +7,12 @@ import RecordFactory from './record-factory';
 
 export module ItmField {
   export interface ModelConfig<I extends Itm = Itm> {
-    label: ItmPipeLike<I, string> | false;
+    label?: ItmPipeLike<I, string> | false;
   }
-
-  export type Config<I extends Itm = Itm> = Area.Config<I> & ModelConfig<I>;
 
   export interface Model<I extends Itm = Itm> extends ModelConfig<I> {
-    label: ItmPipeLike<I, string>;
+    label: ItmPipeLike<I, string> | false;
   }
-
-  export type Record<I extends Itm = Itm> = RecordOf<Area.Model<I> & Model<I>>;
-
-  const selector = 'field';
 
   const serializer = (cfg: RecordOf<ModelConfig>, area: Area.Record): Model => ({
     label: (
@@ -28,6 +22,12 @@ export module ItmField {
         null
     )
   });
+
+  const selector = 'field';
+
+  export type Config<I extends Itm = Itm> = Area.Config<I> & ModelConfig<I>;
+
+  export type Record<I extends Itm = Itm> = Area.Record<I> & RecordOf<Model<I>>;
 
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
