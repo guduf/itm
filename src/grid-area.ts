@@ -68,7 +68,7 @@ export module ItmGridArea {
         Map()
     );
     return Set(map.keys()).map(fragment => {
-      const areaPath = fragment.indexOf(':') >= 0 ? fragment.split(':') : ['$default', fragment];
+      const areaPath = fragment.indexOf(':') >= 0 ? fragment.split(':') : [Area.selector, fragment];
       const area = areas.getIn(areaPath);
       if (!area) throw new ReferenceError('Missing area for fragment: ' + fragment);
       const [[row, col], [endRow, endCol]] = map.get(fragment);
@@ -88,7 +88,7 @@ export module ItmGridArea {
 
   export const keyPattern = '[a-z]\\w+(?:\\.[a-z]\\w+)*';
   export const keyRegExp = new RegExp(`^${keyPattern}$`);
-  export const selectorPattern = `${RecordFactory.selectorPattern}|\\$default`;
+  export const selectorPattern = `${RecordFactory.selectorPattern}|\\Area.selector`;
   export const selectorRegExp = new RegExp(`^${selectorPattern}$`);
 }
 

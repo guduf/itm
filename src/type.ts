@@ -44,10 +44,11 @@ export module ItmType {
     );
     if (!key) throw new TypeError('Expected key');
     const props: Map<string, Prop.Record> = Map.isMap(cfg.props) ? cfg.props : Map();
-    const areas = Map<string, Map<string, Area.Record>>().set('$default', props.toSet().reduce(
-      (acc, prop) => acc.set(prop.key, prop.area),
-      Map<string, Area.Record>()
-    ));
+    const areas = Map<string, Map<string, Area.Record>>()
+      .set(Area.selector, props.toSet().reduce(
+        (acc, prop) => acc.set(prop.key, prop.area),
+        Map<string, Area.Record>()
+      ));
     const template = props.reduce<string[][]>(
       (templateAcc, {area}) => [
         ...templateAcc,

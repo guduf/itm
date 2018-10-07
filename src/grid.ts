@@ -1,7 +1,7 @@
 import Area from './area';
 import GridArea from './grid-area';
 import RecordFactory from './record-factory';
-import { Map, RecordOf, Set, Range } from 'immutable';
+import { Map, RecordOf, Range } from 'immutable';
 
 export module ItmGrid {
   export type Template = Map<number, Map<number, string>>;
@@ -36,7 +36,7 @@ export module ItmGrid {
   });
 
   export function parseAreas(cfg: AreasConfig): Map<string, Map<string, Area.Record>> {
-    if (Array.isArray(cfg)) cfg = {$default: cfg};
+    if (Array.isArray(cfg)) cfg = {[Area.selector]: cfg};
     const selectorsCfg: Map<string, Map<string, Area.Config>> = (
       Map.isMap(cfg) ? cfg :
         Map(cfg).map(areaCfgs => areaCfgs.reduce(
@@ -84,7 +84,6 @@ export module ItmGrid {
         Map()
       );
   }
-
 
   export const selectorCallPattern = `(?:${GridArea.selectorPattern}):${GridArea.keyPattern}`;
   export const fragmentPattern = `(?:(?:${GridArea.keyPattern})|(?:${selectorCallPattern})|=|\\.)`;

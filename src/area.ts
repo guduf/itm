@@ -49,7 +49,7 @@ class ItmAreaModel<T = {}> implements ItmArea.Config<T> {
 }
 
 export module ItmArea {
-  const selector = 'area';
+  export const selector = 'area';
 
   export type Config<T = {}> = ItmAreaConfig<T>;
 

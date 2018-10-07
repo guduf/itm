@@ -1,12 +1,11 @@
-import { Map } from 'immutable';
-
-import GridArea from './grid-area';
+import Area from './area';
 import Grid from './grid';
+import GridArea from './grid-area';
 
 describe('ItmGridArea', () => {
   describe('parseAreas()', () => {
     const areas = Grid.parseAreas({
-      $default: [{key: 'name'}, {key: 'id'}],
+      [Area.selector]: [{key: 'name'}, {key: 'id'}],
       control: [{key: 'email'}]
     });
 
@@ -38,8 +37,8 @@ describe('ItmGridArea', () => {
       `);
       const gridAreas = GridArea.parseGridAreas(template, areas).toArray();
       const expectedIdPos = {
-        area: areas.getIn(['$default', 'id']).toJS(),
-        selector: '$default',
+        area: areas.getIn([Area.selector, 'id']).toJS(),
+        selector: Area.selector,
         key: 'id',
         row: 1,
         col: 1,
@@ -48,8 +47,8 @@ describe('ItmGridArea', () => {
       };
       expect(gridAreas[0].toJS()).toEqual(expectedIdPos, 'Expected same grid area with key id');
       const expectedNamePos = {
-        area: areas.getIn(['$default', 'name']).toJS(),
-        selector: '$default',
+        area: areas.getIn([Area.selector, 'name']).toJS(),
+        selector: Area.selector,
         key: 'name',
         row: 1,
         col: 3,

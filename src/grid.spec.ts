@@ -29,7 +29,7 @@ describe('ItmGrid', () => {
     `;
     const def = Grid.factory.serialize({
       template, areas:
-      {$default: areasDef, control: [areasDef[2]]}
+      {[Area.selector]: areasDef, control: [areasDef[2]]}
     });
     const expectedTemplate = {
       0: {0: 'id', 1: null, 2: 'name', 3: 'name'},
