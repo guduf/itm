@@ -103,22 +103,22 @@ export module ItmRecordFactory {
   export const selectorRegex = new RegExp(`^${ItmRecordFactory.selectorPattern}$`);
   export const selectorSeparator = ',';
 
-  export interface ConfigWithoutAncestor<T extends C = C, C extends Object = {}> {
+  export interface ConfigWithoutAncestor<M extends C = C, C extends Object = {}> {
     selector: string;
-    serializer?: (cfg: RecordOf<C>) => T;
-    model?: T;
+    serializer?: (cfg: RecordOf<C>) => M;
+    model?: M;
   }
 
   export interface ConfigWithAncestor<
-    T1 extends C1 = C1,
+    M1 extends C1 = C1,
     C1 extends Object = {},
-    T2 extends C2 = C2,
+    M2 extends C2 = C2,
     C2 extends Object = {}
   > {
     selector: string;
-    serializer?: (cfg: RecordOf<C1>, ancestor: RecordOf<T2>) => T1;
-    model?: T1;
-    ancestors: [ItmRecordFactory<RecordOf<T2>, C2>];
+    serializer?: (cfg: RecordOf<C1>, ancestor: RecordOf<M2>) => M1;
+    model?: M1;
+    ancestors: [ItmRecordFactory<RecordOf<M2>, C2>, ...ItmRecordFactory<RecordOf<M2>, C2>[]];
   }
 }
 
