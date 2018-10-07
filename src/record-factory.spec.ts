@@ -28,12 +28,12 @@ const childModelSerializer = (
 describe('ItmRecordFactory', () => {
   function setup<T extends C = C, C extends Object = {}>(
     // tslint:disable-next-line:max-line-length
-    {ancestors, selector, serializer, model}: Partial<ItmRecordFactory.ConfigWithoutAncestor<T, C> & ItmRecordFactory.ConfigWithAncestor<T, C>> = {},
+    {ancestors, selector, serializer, model}: any = {},
   ): ItmRecordFactory<RecordOf<T>, C> {
     if (typeof selector === 'undefined') selector = modelTestImplImplSelector;
     if (typeof serializer === 'undefined') serializer = cfg => new ModelTestImpl(cfg as any) as any;
     if (typeof model === 'undefined') model = {key: null} as any;
-    return ItmRecordFactory.build<T, C>({selector, serializer, model, ancestors});
+    return ItmRecordFactory.build({selector, serializer, model, ancestors}) as any;
   }
 
   it('should create with minimal config', () => {

@@ -120,7 +120,7 @@ export module ItmRecordFactory {
     selector: string;
     serializer?: (cfg: RecordOf<C1>, ancestor: RecordOf<M2>) => M1;
     model?: M1;
-    ancestors: [ItmRecordFactory<RecordOf<M2>, C2>, ...ItmRecordFactory<RecordOf<M2>, C2>[]];
+    ancestors: [ItmRecordFactory<RecordOf<M2>, C2>];
   }
 }
 

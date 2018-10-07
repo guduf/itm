@@ -1,33 +1,30 @@
 import Area from './area';
 import GridArea from './grid-area';
 import RecordFactory from './record-factory';
-import { List, Map, RecordOf, Set } from 'immutable';
+import { Map, RecordOf, Set, Range } from 'immutable';
 
 export module ItmGrid {
-  export type AreasConfig<T = {}> = (
-    Area.Config<T>[] |
-    { [key: string]: Area.Config<T>[] } |
-    Map<string, Map<string, Area.Config<T>>>
-  );
+  export type Template = Map<number, Map<number, string>>;
+
+  // tslint:disable-next-line:max-line-length
+  export type AreasConfig<T = {}> = Area.Config<T>[] | { [selector: string]: Area.Config<T>[] } | Map<string, Map<string, Area.Config<T>>>;
 
   export interface Config<T = {}> {
-    areas?: AreasConfig<T>;
-    template?: string | string[][] | List<List<string>>;
+    areas?: AreasConfig;
+    template?: string | string[][] | Template;
   }
 
   export interface Model<T = {}> extends Config<T> {
     areas: Map<string, Map<string, Area.Record<T>>>;
-    template: List<List<string>>;
-    gridAreas: Set<GridArea.Record<T>>;
+    template: Template;
   }
 
-  export type Record<T = {}> = RecordOf<Model>;
+  export type Record<T = {}> = RecordOf<Model<T>>;
 
   const serializer = (cfg: RecordOf<Config>): Model => {
     const template = parseTemplate(cfg.template);
     const areas = ItmGrid.parseAreas(cfg.areas);
-    const gridAreas = template ? parseGridAreas(template, areas) : null;
-    return {template, areas, gridAreas};
+    return {template, areas};
   };
 
   const selector = 'grid';
@@ -35,7 +32,7 @@ export module ItmGrid {
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
     serializer,
-    model: {areas: null, template: null, gridAreas : null}
+    model: {areas: null, template: null}
   });
 
   export function parseAreas(cfg: AreasConfig): Map<string, Map<string, Area.Record>> {
@@ -52,7 +49,8 @@ export module ItmGrid {
     );
   }
 
-  export function parseTemplate(cfg: string | string[][] | List<List<string>>): List<List<string>> {
+  // tslint:disable-next-line:max-line-length
+  export function parseTemplate(cfg: string | string[][] | Template): Template {
     if (typeof cfg === 'string') cfg = cfg
       .split(/\s*\n+\s*/)
       .filter(rowTemplate => rowTemplate.length)
@@ -61,76 +59,32 @@ export module ItmGrid {
         if (!match) throw new TypeError(`Expected Template row Regex: ${i}`);
         return match[1].split(/ +/);
       });
-    else if (Array.isArray(cfg)) cfg = List(cfg.map(row => List(row)));
-    else if (!List.isList(cfg)) throw new TypeError('Expected List, Array or string');
-    // tslint:disable-next-line:max-line-length
-    const colCount = (cfg as any[][]).reduce((max, row) => Math.max(max, row.length), 0);
-    const rowCount = (cfg as any[]).length;
-    const template: string[][] = [[]];
-    for (let row = 0; row < rowCount; row++) for (let col = 0; col < colCount; col++) {
-      if (row && !col) template.push([]);
-      const prev = template[row][col - 1] || null;
-      let fragment = cfg[row][col] || null;
-      if (fragment)
-        if (typeof fragment !== 'string') throw new TypeError('Expected optional string');
-        else if (!fragmentRegExp.test(fragment))
-          throw new TypeError('Expected Area fragment pattern');
-        else if (fragment.length < 2) fragment = fragment === '=' ? prev : null;
-      template[row][col] = fragment;
-    }
-    return List(template).map(row => List(row));
-  }
-
-  export function parseGridAreas(
-    template: List<List<string>>,
-    areas: Map<string, Map<string, Area.Record>>
-  ): Set<GridArea.Record> {
-    const map: Map<string, [[number, number], [number, number]]> =
-      template
-      .map((fragments, row) => fragments.map((fragment, col) => ({col, fragment, row})))
-      .flatten()
-      .reduce<Map<string, [[number, number], [number, number]]>>(
-        (gridAreas, {col, fragment, row}, i, fragments) => {
-          const prevHash = row && col ? fragments.get(i - 1).fragment : null;
-          if (
-            prevHash &&
-            prevHash !== fragment &&
-            gridAreas.get(prevHash)[1][1] >= col
-          ) throw new TypeError(`Invalid row start: '${fragment}'`);
-          if (!fragment) return gridAreas;
-          if (!gridAreas.has(fragment)) return gridAreas.set(fragment, [[row, col], [row, col]]);
-          const [[startRow, startCol], [endRow, endCol]] = gridAreas.get(fragment);
-          if (row === startRow && col - 1 > endCol)
-            throw new TypeError(`Invalid column end: '${fragment}'`);
-          if (row > startRow && fragment !== prevHash && col > startCol)
-            throw new TypeError(`Invalid column start: '${fragment}'`);
-          if (row - 1 > endRow)
-            throw new TypeError(`Invalid row end: '${fragment}'`);
-          // tslint:disable-next-line:max-line-length
-          return gridAreas.set(fragment, [[startRow, startCol], [Math.max(row, endRow), Math.max(col, endCol)]]);
+    if (Array.isArray(cfg)) cfg = cfg.reduce<Template>(
+      (cfgAcc, fragments, row) => {
+        const rowTemplate = fragments
+          .reduce((rowAcc, fragment, col) => rowAcc.set(col, fragment), Map<number, string>());
+        return cfgAcc.set(row, rowTemplate);
+      },
+      Map()
+    );
+    if (!Map.isMap(cfg)) throw new TypeError('Expected Template, Array or string');
+    const colCount = cfg.reduce((max, row) => Math.max(max, row.size), 0);
+    return Range(0, cfg.size)
+      .flatMap(row => Range(0, colCount).map(col => ({row, col})))
+      .reduce<Template>(
+        (templateAcc, {row, col}) => {
+          const prev = templateAcc.getIn([row, col - 1]) || null;
+          let fragment = (cfg as Map<number, Map<number, string>>).getIn([row, col]) || null;
+          if (fragment)
+            // tslint:disable-next-line:max-line-length
+            if (!fragmentRegExp.test(fragment)) throw new TypeError('Expected Area fragment pattern');
+            else if (fragment.length < 2) fragment = fragment === '=' ? prev : null;
+          return templateAcc.setIn([row, col], fragment);
         },
         Map()
-    );
-    return Set(map.keys()).map(fragment => {
-      const [areaSelector, areaKey] = (
-        fragment.indexOf(':') >= 0 ?
-        fragment.split(':') :
-        ['$default', fragment]
       );
-      const area = areas.has(areaSelector) ? areas.get(areaSelector).get(areaKey) : null;
-      if (!area) throw new ReferenceError('Missing area for fragment: ' + fragment);
-      const [[row, col], [endRow, endCol]] = map.get(fragment);
-      // tslint:disable-next-line:max-line-length
-      return GridArea.factory.serialize(area, {
-        selector: areaSelector,
-        key: areaKey,
-        row: row + 1,
-        col: col + 1,
-        width: endCol - col + 1,
-        height: endRow - row + 1
-      });
-    });
   }
+
 
   export const selectorCallPattern = `(?:${GridArea.selectorPattern}):${GridArea.keyPattern}`;
   export const fragmentPattern = `(?:(?:${GridArea.keyPattern})|(?:${selectorCallPattern})|=|\\.)`;

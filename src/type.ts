@@ -48,9 +48,12 @@ export module ItmType {
       (acc, prop) => acc.set(prop.key, prop.area),
       Map<string, Area.Record>()
     ));
-    const template = props.reduce(
-      (acc, {area}) => acc.push(Range(0, area.size).toList().map(() => area.key).toList()),
-      List<List<string>>()
+    const template = props.reduce<string[][]>(
+      (templateAcc, {area}) => [
+        ...templateAcc,
+        Range(0, area.size).map(() => area.key).toArray()
+      ],
+      []
     );
     const grid = Grid.factory.serialize(cfg.grid, {template, areas});
     const columns = props.toSet().map(prop => prop.column);

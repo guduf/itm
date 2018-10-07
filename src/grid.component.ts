@@ -16,7 +16,7 @@ const SELECTOR = 'itm-grid';
     <div *ngFor="let gridArea of gridAreas"
       [class]="getAreaClass(gridArea)" [style.gridArea]="getAreaStyle(gridArea)">
       <ng-container
-        [itmArea]="gridArea"
+        [itmArea]="gridArea.area"
         [providers]="getAreaProviders(gridArea)"
         [action]="action"
         [target]="target"></ng-container>
@@ -78,8 +78,8 @@ export class ItmGridComponent<T = {}> implements OnChanges {
     if (gridChanges) {
       const previous: Grid.Config<T> = (gridChanges.isFirstChange ? {} : gridChanges.previousValue);
       if (previous === this.grid) return;
-      const {gridAreas, template}: Grid.Record = Grid.factory.serialize(this.grid);
-      this.gridAreas = gridAreas.toArray();
+      const {areas, template}: Grid.Record = Grid.factory.serialize(this.grid);
+      this.gridAreas = GridArea.parseGridAreas(template, areas).toArray();
       this.size = [template.first(List()).size, template.size];
     }
   }

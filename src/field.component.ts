@@ -30,7 +30,7 @@ export class ItmFieldComponent {
     area: Field.Record,
     item: Itm
   ) {
-    this.renderedLabel = fromStringPipe(area.label, item);
+    this.renderedLabel = area.label === false ? null : fromStringPipe(area.label, item);
     this.renderedText = fromStringPipe(area.text, item);
   }
 }
