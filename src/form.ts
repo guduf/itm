@@ -1,34 +1,42 @@
-import Field from './area';
-import RecordFactory from './record-factory';
-import { RecordOf } from 'immutable';
-import { Itm } from './item';
+import { Map, RecordOf } from 'immutable';
 
-export module ItmControl {
-  export interface Model {
-    required: boolean;
-    pattern: RegExp;
+import Area from './area';
+import Control from './control';
+import { ItmControlComponent } from './control.component';
+import Grid from './grid';
+import { Itm } from './item';
+import RecordFactory from './record-factory';
+
+export module ItmForm {
+  interface ModelConfig<I extends Itm = Itm> {
+    controls?: Area.Configs<Control.Config<I>>;
   }
 
-  export type Config = Partial<Model>;
+  export type Config<I extends Itm = Itm> = Grid.Config<I> & ModelConfig<I>;
 
-  export type Record<I extends Itm = Itm> = RecordOf<Field.Model<I> & Model>;
+  export interface Model<I extends Itm = Itm> extends ModelConfig<I> {
+    defaultSelector: string;
+    areas: Map<string, Map<string, Area.Record<I>>>;
+    controls: Map<string, Control.Record<I>>;
+  }
 
-  const selector = 'control';
+  export type Record<I extends Itm = Itm> = Grid.Record<I> & RecordOf<Model<I>>;
 
-  const serializer = (cfg: RecordOf<Config>): Model => {
-    if (cfg.required !== null && typeof cfg.required !== 'boolean')
-      throw new TypeError('Expected optionnal boolean');
-    const required = cfg.required === true;
-    if (cfg.pattern !== null && !(cfg.pattern instanceof RegExp))
-      throw new TypeError('Expected optionnal RegExp');
-    const pattern = cfg.pattern;
-    return {required, pattern};
+  const serializer = (cfg: ModelConfig): Model => {
+    const defaultSelector = 'control';
+    const controls = Area.serializeAreas(cfg.controls, Control.factory)
+    .map(control => control.cell ? control : control.set('cell', ItmControlComponent));
+    return {areas: Map({[Control.selector]: controls}), defaultSelector, controls};
   };
+
+  export const selector = 'form';
 
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
     serializer,
-    model: {required: null, pattern: null},
-    ancestors: [Field.factory]
+    model: {areas: null, defaultSelector: null, controls: null},
+    ancestors: [Grid.factory]
   });
 }
+
+export default ItmForm;

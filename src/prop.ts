@@ -1,5 +1,6 @@
 import Area from './area';
 import Column from './column';
+import Control from './control';
 import { Itm, ItmPipeLike } from './item';
 import { ComponentType } from './utils';
 import Field from './field';
@@ -31,12 +32,15 @@ export module ItmProp {
     area?: Area.Config;
     column?: Column.Config;
     field?: Field.Config;
+    control?: Control.Config;
+    type?: Control.Type;
   }
 
   export interface Model<I extends Itm = Itm> extends Config<I> {
     area: Area.Record<I>;
     column: Column.Record<I>;
     field: Field.Record<I>;
+    control: Control.Record<I>;
   }
 
   export type Record<I extends Itm = Itm> = RecordOf<Model<I>>;
@@ -49,13 +53,15 @@ export module ItmProp {
     const area = Area.factory.serialize({key, text: item => item[key]}, cfg, cfg.area);
     const column = Column.factory.serialize(area, {header: cfg.header}, cfg.column);
     const field = Field.factory.serialize(area, {label: cfg.label}, cfg.field);
-    return {key, area, column, field};
+    const control = Control.factory.serialize(field, {type: cfg.type}, cfg.control);
+    return {key, area, column, control, field};
   };
 
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector: selector,
     serializer,
-    model: {key: null, cell: null, header: null, label: null, area: null, column: null, field: null}
+    // tslint:disable-next-line:max-line-length
+    model: {key: null, cell: null, control: null, header: null, label: null, area: null, column: null, field: null}
   });
 
   export const MAP_META = Symbol('ITM_PROPS_META');

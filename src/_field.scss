@@ -1,10 +1,10 @@
-@mixin itm-card-area($config) {
-  $selector: 'itm-card-area';
+@mixin itm-field($config) {
+  $selector: 'itm-field';
 
   .#{$selector} {
     display: block;
 
-    & > .label {
+    & > .#{$selector}-label {
       font-size: 12px;
       font-weight: 500;
       color: rgba(0, 0, 0, 0.54);

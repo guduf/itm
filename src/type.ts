@@ -5,6 +5,7 @@ import { Map, Range, RecordOf } from 'immutable';
 import Area from './area';
 import Card from './card';
 import Field from './field';
+import Form from './form';
 import Grid from './grid';
 import { Itm } from './item';
 import Prop from './prop';
@@ -28,6 +29,7 @@ export module ItmType {
     grid?: Grid.Config<I>;
     card?: Card.Config<I>;
     table?: Table.Config<I>;
+    form?: Form.Config<I>;
   }
 
   export interface Model<I extends Itm = Itm> extends Config<I> {
@@ -35,6 +37,7 @@ export module ItmType {
     grid: Grid.Record<I>;
     table: Table.Record<I>;
     card: Card.Record<I>;
+    form: Form.Record<I>;
     target: any;
     props: Map<string & keyof I, Prop.Record>;
   }
@@ -63,6 +66,11 @@ export module ItmType {
       []
     );
     const grid = Grid.factory.serialize({template, areas}, cfg.grid);
+    const controls = props.reduce<Map<string, Field.Config>>(
+      (acc, prop) => acc.set(prop.key, prop.field),
+      Map()
+    );
+    const form = Form.factory.serialize(grid, {controls}, cfg.form);
     const columns = props.toSet().map(prop => prop.column);
     const table = Table.factory.serialize(grid, {columns}, cfg.table);
     const fields = props.reduce<Map<string, Field.Config>>(
@@ -70,13 +78,13 @@ export module ItmType {
       Map()
     );
     const card = Card.factory.serialize(grid, cfg.card, {fields});
-    return {key, card, target, props, grid, table};
+    return {key, card, target, props, form, grid, table};
   };
 
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
     serializer,
-    model: {key: null, card: null, target: null, props: null, grid: null, table: null}
+    model: {key: null, card: null, form: null, target: null, props: null, grid: null, table: null}
   });
 
   export function get<I extends Itm = Itm>(target: any): Record<I> {

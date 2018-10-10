@@ -8,13 +8,14 @@ import { ItmConfig } from './config';
 import { ItmMaterialModule } from './material.module';
 import { ItmTableComponent } from './table.component';
 import { ItmButtonsComponent } from './buttons.component';
-import { ItmTypeService, ItmTableTypePipe, ItmGridTypePipe, ItmCardTypePipe } from './type.service';
+import { ItmTypeService, ItmTableTypePipe, ItmGridTypePipe, ItmCardTypePipe, ItmFormTypePipe } from './type.service';
 import Type from './type';
 import { ItmGridComponent } from './grid.component';
 import { ItmFieldComponent } from './field.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
 import { ItmTextAreaComponent } from './text-area.component';
 import { ItmAreaDirective } from './area.directive';
+import { ItmControlComponent } from './control.component';
 
 const IMPORTS = [
   CommonModule,
@@ -24,7 +25,8 @@ const IMPORTS = [
 const ENTRY_COMPONENTS = [
   ItmActionsAreaComponent,
   ItmFieldComponent,
-  ItmTextAreaComponent
+  ItmTextAreaComponent,
+  ItmControlComponent
 ];
 
 const DECLARATIONS = [
@@ -36,6 +38,7 @@ const EXPORTED_DECLARATIONS = [
   ItmButtonsComponent,
   ItmGridComponent,
   ItmGridTypePipe,
+  ItmFormTypePipe,
   ItmTableComponent,
   ItmTableTypePipe,
   ItmCardTypePipe

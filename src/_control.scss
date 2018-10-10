@@ -1,0 +1,11 @@
+@mixin itm-control($config) {
+  $selector: 'itm-control';
+
+  .#{$selector} {
+    display: block;
+
+    & > .mat-form-field {
+      width: 100%;
+    }
+  }
+}

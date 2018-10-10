@@ -40,9 +40,14 @@ export class ItmRecordFactory<
     // tslint:disable-next-line:max-line-length
     if (cfg.serializer && !cfg.model) throw new TypeError('Expected model when serializer is specified');
     const ancestors = Collection(cfg.ancestors).reduce(
-      (acc, val) => {
-        if (!(val instanceof ItmRecordFactory)) throw new TypeError('Expected ItmRecordFactory');
-        return acc.set(val.selector, val);
+      (acc, ancestor) => {
+        // tslint:disable-next-line:max-line-length
+        if (!(ancestor instanceof ItmRecordFactory)) throw new TypeError('Expected ItmRecordFactory');
+        ancestor._ancestors.forEach((superAncestor, superSelector) => {
+          if (acc.has(superSelector) && superAncestor !== acc.get(superSelector))
+            throw new ReferenceError(`Different ancestor: ${superSelector}`);
+        });
+        return acc.merge(ancestor._ancestors).set(ancestor.selector, ancestor);
       },
       OrderedMap<string, ItmRecordFactory>()
     );
@@ -93,7 +98,9 @@ export class ItmRecordFactory<
             .join(ItmRecordFactory.selectorSeparator);
           const serializer = factory._serializer;
           let model: R;
-          if (serializer) try { model = serializer(rootCfg, record) as R; }
+          if (serializer) try {
+            model = serializer(rootCfg, record) as R;
+          }
           catch (err) {
             console.error('SERIALIZE ERROR', err);
             // tslint:disable-next-line:max-line-length

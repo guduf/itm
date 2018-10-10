@@ -1,5 +1,6 @@
 @import './button';
-@import './card-area';
+@import './control';
+@import './field';
 @import './grid';
 @import './slot';
 @import './table';
@@ -11,7 +12,8 @@
 
   @include itm-slot($config);
   @include itm-grid($config);
-  @include itm-card-area($config);
+  @include itm-field($config);
+  @include itm-control($config);
   @include itm-button($config);
   @include itm-table($config);
 }

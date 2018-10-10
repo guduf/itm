@@ -3,9 +3,10 @@ import { Map } from 'immutable';
 
 import { Itm } from './item';
 import Card from './card';
+import Grid from './grid';
+import Form from './form';
 import Table from './table';
 import Type from './type';
-import Grid from './grid';
 
 @Injectable()
 export class ItmTypeService {
@@ -28,6 +29,17 @@ export class ItmCardTypePipe implements PipeTransform {
   transform(key: string, cfg?: Card.Config): Card.Record {
     const typedCard = this._typeService.get(key).card;
     return cfg ? Card.factory.serialize(typedCard, cfg) : typedCard;
+  }
+}
+
+@Pipe({name: 'itmFormType'})
+export class ItmFormTypePipe implements PipeTransform {
+  constructor(
+    private _typeService: ItmTypeService
+  ) { }
+  transform(key: string, cfg?: Form.Config): Form.Record {
+    const typedForm = this._typeService.get(key).form;
+    return cfg ? Form.factory.serialize(typedForm, cfg) : typedForm;
   }
 }
 
