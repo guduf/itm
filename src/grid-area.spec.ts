@@ -1,3 +1,5 @@
+import { Set } from 'immutable';
+
 import Area from './area';
 import Grid from './grid';
 import GridArea from './grid-area';
@@ -9,33 +11,37 @@ describe('ItmGridArea', () => {
       control: [{key: 'email'}]
     });
 
+    function parseGridAreas(template: string): Set<GridArea.Record> {
+      return GridArea.parseGridAreas(Grid.factory.serialize({template, areas}));
+    }
+
     it('should throw a type error when template is invalid', () => {
-      let template = Grid.parseTemplate(`
+      let template = `
         name name
         name id
-      `);
-      expect(() => GridArea.parseGridAreas(template, areas)).toThrowError(/row.*start/);
-      template = Grid.parseTemplate('name name id name');
-      expect(() => GridArea.parseGridAreas(template, areas)).toThrowError(/column.*end/);
-      template = Grid.parseTemplate(`
+      `;
+      expect(() => parseGridAreas(template)).toThrowError(/row.*start/);
+      template = 'name name id name';
+      expect(() => parseGridAreas(template)).toThrowError(/column.*end/);
+      template = `
         name  name
         id    name
-      `);
-      expect(() => GridArea.parseGridAreas(template, areas)).toThrowError(/column.*start/);
-      template = Grid.parseTemplate(`
+      `;
+      expect(() => parseGridAreas(template)).toThrowError(/column.*start/);
+      template = `
         name
         id
         name
-      `);
-      expect(() => GridArea.parseGridAreas(template, areas)).toThrowError(/row.*end/);
+      `;
+      expect(() => parseGridAreas(template)).toThrowError(/row.*end/);
     });
 
     it('should set expected positions', () => {
-      const template = Grid.parseTemplate(`
+      const template = `
         id  .             name =
         id  control:email name =
-      `);
-      const gridAreas = GridArea.parseGridAreas(template, areas).toArray();
+      `;
+      const gridAreas = parseGridAreas(template).toArray();
       const expectedIdPos = {
         area: areas.getIn([Area.selector, 'id']).toJS(),
         selector: Area.selector,

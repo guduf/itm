@@ -46,20 +46,18 @@ export module ItmTable {
     return {columns, canSelect, setRowClass, selectionLimit, rowActions};
   };
 
-  const model: Model = {
-    columns: null,
-    canSelect: null,
-    setRowClass: null,
-    selectionLimit: null,
-    rowActions: null
-  };
-
   const selector = 'table';
 
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
     serializer,
-    model
+    model: {
+      columns: null,
+      canSelect: null,
+      setRowClass: null,
+      selectionLimit: null,
+      rowActions: null
+    }
   });
 }
 

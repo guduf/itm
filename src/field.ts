@@ -14,16 +14,17 @@ export module ItmField {
     label: ItmPipeLike<I, string> | false;
   }
 
-  const serializer = (cfg: RecordOf<ModelConfig>, area: Area.Record): Model => ({
-    label: (
+  const serializer = (cfg: RecordOf<ModelConfig>, area: Area.Record): Model => {
+    const label = (
       cfg.label === false ? null :
       cfg.label && ['string', 'function'].includes(typeof cfg.label) ? cfg.label :
       area ? area.key :
         null
-    )
-  });
+    );
+    return {label};
+  };
 
-  const selector = 'field';
+  export const selector = 'field';
 
   export type Config<I extends Itm = Itm> = Area.Config<I> & ModelConfig<I>;
 

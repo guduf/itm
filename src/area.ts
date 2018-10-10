@@ -63,6 +63,19 @@ export module ItmArea {
     model: {key: null, size: null, grow: null, cell: null, text: null, providers: null}
   });
 
+  export type Configs<C extends Config = Config> = C[] | Map<string, C>;
+
+  // tslint:disable-next-line:max-line-length
+  export function serializeAreas<R extends Record<M>, C extends Config, M extends Object>(
+    cfgs: Configs<C>,
+    areaFactory = factory as RecordFactory<R, C, any>
+  ): Map<string, R> {
+    if (Array.isArray(cfgs)) (
+      cfgs = cfgs.reduce((cfgsAcc, cfg) => cfgsAcc.set(cfg.key, cfg), Map<string, C>())
+    );
+    return cfgs.map(cfg => areaFactory.serialize(cfg));
+  }
+
   export const RECORD_TOKEN = new InjectionToken('ITM_AREA_RECORD');
 }
 

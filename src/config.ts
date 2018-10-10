@@ -1,13 +1,11 @@
 /** The global config for the module */
 export class ItmConfig {
-  /** The component to create if not specified. Default: ItmCellComponent */
+  /** The component for text area if not specified. Default: ItmTextAreaComponent */
   defaultTextAreaComp?: any;
   /** The header component to create if not specified. Default: ItmHeaderCellComponent */
   defaultColumnHeaderComp?: any;
   /** The actions component to create if not specified. Default: ItmActionsCellComponent */
   defaultActionsAreaComp?: any;
-  /** The area component to create if not specified. Default: ItmAreaComponent */
-  defaultFieldComp?: any;
   /**
    * The icon to display in the button of selection column when item is selected.
    * Default: 'check_box' */

@@ -1,11 +1,15 @@
-import { Itm } from './item';
-import Table from './table';
-import Grid from './grid';
-import Prop from './prop';
-import Area from './area';
-import { Map, Range, RecordOf, List } from 'immutable';
-import RecordFactory from './record-factory';
+
 import { InjectionToken } from '@angular/core';
+import { Map, Range, RecordOf } from 'immutable';
+
+import Area from './area';
+import Card from './card';
+import Field from './field';
+import Grid from './grid';
+import { Itm } from './item';
+import Prop from './prop';
+import RecordFactory from './record-factory';
+import Table from './table';
 
 const ITM_TYPE_META = Symbol('ITM_TYPE_META');
 
@@ -22,6 +26,7 @@ export module ItmType {
     props?: Map<string & keyof I, Prop.Record>;
     key?: string;
     grid?: Grid.Config<I>;
+    card?: Card.Config<I>;
     table?: Table.Config<I>;
   }
 
@@ -29,6 +34,7 @@ export module ItmType {
     key: string;
     grid: Grid.Record<I>;
     table: Table.Record<I>;
+    card: Card.Record<I>;
     target: any;
     props: Map<string & keyof I, Prop.Record>;
   }
@@ -56,16 +62,21 @@ export module ItmType {
       ],
       []
     );
-    const grid = Grid.factory.serialize(cfg.grid, {template, areas});
+    const grid = Grid.factory.serialize({template, areas}, cfg.grid);
     const columns = props.toSet().map(prop => prop.column);
-    const table = Table.factory.serialize(cfg.table, {columns});
-    return {key, target, props, grid, table};
+    const table = Table.factory.serialize(grid, {columns}, cfg.table);
+    const fields = props.reduce<Map<string, Field.Config>>(
+      (acc, prop) => acc.set(prop.key, prop.field),
+      Map()
+    );
+    const card = Card.factory.serialize(grid, cfg.card, {fields});
+    return {key, card, target, props, grid, table};
   };
 
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
     serializer,
-    model: {key: null, target: null, props: null, grid: null, table: null}
+    model: {key: null, card: null, target: null, props: null, grid: null, table: null}
   });
 
   export function get<I extends Itm = Itm>(target: any): Record<I> {

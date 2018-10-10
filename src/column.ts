@@ -49,7 +49,7 @@ export module ItmColumn {
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
     serializer,
-    model: {header: null, sortable: false},
+    model: {header: null, sortable: null},
     ancestors: [Area.factory]
   });
 }

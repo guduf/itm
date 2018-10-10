@@ -1,7 +1,7 @@
 import { Component, HostBinding, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Itm, fromStringPipe } from './item';
+import { Itm, fromStringPipe, ITM_TARGET } from './item';
 import Field from './field';
 import Area from './area';
 
@@ -10,8 +10,8 @@ const SELECTOR = 'itm-field';
 @Component({
   selector: SELECTOR,
   template: `
-    <span class="label">{{renderedLabel | async}}</span><br />
-    <span class="text">{{renderedText | async}}<span>
+    <span class="${SELECTOR}-label">{{renderedLabel | async}}</span><br />
+    <span class="${SELECTOR}-text">{{renderedText | async}}<span>
   `
 })
 export class ItmFieldComponent {
@@ -28,6 +28,7 @@ export class ItmFieldComponent {
   constructor(
     @Inject(Area.RECORD_TOKEN)
     area: Field.Record,
+    @Inject(ITM_TARGET)
     item: Itm
   ) {
     this.renderedLabel = area.label === false ? null : fromStringPipe(area.label, item);

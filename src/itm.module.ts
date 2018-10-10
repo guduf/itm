@@ -8,7 +8,7 @@ import { ItmConfig } from './config';
 import { ItmMaterialModule } from './material.module';
 import { ItmTableComponent } from './table.component';
 import { ItmButtonsComponent } from './buttons.component';
-import { ItmTypeService, ItmTableTypePipe, ItmGridTypePipe } from './type.service';
+import { ItmTypeService, ItmTableTypePipe, ItmGridTypePipe, ItmCardTypePipe } from './type.service';
 import Type from './type';
 import { ItmGridComponent } from './grid.component';
 import { ItmFieldComponent } from './field.component';
@@ -37,12 +37,12 @@ const EXPORTED_DECLARATIONS = [
   ItmGridComponent,
   ItmGridTypePipe,
   ItmTableComponent,
-  ItmTableTypePipe
+  ItmTableTypePipe,
+  ItmCardTypePipe
 ];
 
 export const DEFAULT_CONFIG: ItmConfig = {
   defaultActionsAreaComp: ItmActionsAreaComponent,
-  defaultFieldComp: ItmFieldComponent,
   defaultTextAreaComp: ItmTextAreaComponent,
   selectedCheckBoxIcon: 'check_box',
   unselectedCheckBoxIcon: 'check_box_outline_blank',

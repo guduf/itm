@@ -2,6 +2,7 @@ import { Injectable, Pipe, PipeTransform, Inject } from '@angular/core';
 import { Map } from 'immutable';
 
 import { Itm } from './item';
+import Card from './card';
 import Table from './table';
 import Type from './type';
 import Grid from './grid';
@@ -19,6 +20,17 @@ export class ItmTypeService {
   }
 }
 
+@Pipe({name: 'itmCardType'})
+export class ItmCardTypePipe implements PipeTransform {
+  constructor(
+    private _typeService: ItmTypeService
+  ) { }
+  transform(key: string, cfg?: Card.Config): Card.Record {
+    const typedCard = this._typeService.get(key).card;
+    return cfg ? Card.factory.serialize(typedCard, cfg) : typedCard;
+  }
+}
+
 @Pipe({name: 'itmGridType'})
 export class ItmGridTypePipe implements PipeTransform {
   constructor(
@@ -29,7 +41,6 @@ export class ItmGridTypePipe implements PipeTransform {
     return cfg ? Grid.factory.serialize(typedGrid, cfg) : typedGrid;
   }
 }
-
 
 @Pipe({name: 'itmTableType'})
 export class ItmTableTypePipe implements PipeTransform {

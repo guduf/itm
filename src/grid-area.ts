@@ -2,11 +2,12 @@ import { InjectionToken } from '@angular/core';
 import { Map, RecordOf, Set } from 'immutable';
 
 import Area from './area';
+import Grid from './grid';
 import RecordFactory from './record-factory';
 
 export module ItmGridArea {
-  export interface Model {
-    area: Area.Record;
+  export interface Model<T extends Object = {}> {
+    area: Area.Record<T>;
     selector: string;
     key: string;
     row: number;
@@ -36,11 +37,8 @@ export module ItmGridArea {
     model: {selector: null, key: null, area: null, row: null, col: null, width: null, height: null}
   });
 
-  export function parseGridAreas(
-    template: Map<number, Map<number, string>>,
-    areas: Map<string, Map<string, Area.Record>>
-  ): Set<Record> {
-    const map: Map<string, [[number, number], [number, number]]> = template
+  export function parseGridAreas<T extends Object>(grid: Grid.Record<T>): Set<Record> {
+    const map: Map<string, [[number, number], [number, number]]> = grid.template
       .toList()
       .map((fragments, row) => fragments.toList().map((fragment, col) => ({col, fragment, row})))
       .flatten()
@@ -68,8 +66,11 @@ export module ItmGridArea {
         Map()
     );
     return Set(map.keys()).map(fragment => {
-      const areaPath = fragment.indexOf(':') >= 0 ? fragment.split(':') : [Area.selector, fragment];
-      const area = areas.getIn(areaPath);
+      const areaPath = (
+        fragment.indexOf(':') >= 0 ? fragment.split(':') :
+          [grid.defaultSelector || Area.selector, fragment]
+      );
+      const area = grid.areas.getIn(areaPath);
       if (!area) throw new ReferenceError('Missing area for fragment: ' + fragment);
       const [[row, col], [endRow, endCol]] = map.get(fragment);
       return factory.serialize({
@@ -88,7 +89,7 @@ export module ItmGridArea {
 
   export const keyPattern = '[a-z]\\w+(?:\\.[a-z]\\w+)*';
   export const keyRegExp = new RegExp(`^${keyPattern}$`);
-  export const selectorPattern = `${RecordFactory.selectorPattern}|\\Area.selector`;
+  export const selectorPattern = `${RecordFactory.selectorPattern}`;
   export const selectorRegExp = new RegExp(`^${selectorPattern}$`);
 }
 

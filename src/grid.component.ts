@@ -78,9 +78,9 @@ export class ItmGridComponent<T = {}> implements OnChanges {
     if (gridChanges) {
       const previous: Grid.Config<T> = (gridChanges.isFirstChange ? {} : gridChanges.previousValue);
       if (previous === this.grid) return;
-      const {areas, template}: Grid.Record = Grid.factory.serialize(this.grid);
-      this.gridAreas = GridArea.parseGridAreas(template, areas).toArray();
-      this.size = [template.first(List()).size, template.size];
+      const grid: Grid.Record = Grid.factory.serialize(this.grid);
+      this.gridAreas = GridArea.parseGridAreas(grid).toArray();
+      this.size = [grid.template.first(List()).size, grid.template.size];
     }
   }
 }

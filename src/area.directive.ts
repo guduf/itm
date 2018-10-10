@@ -15,7 +15,6 @@ import Action from './action';
 import Area from './area';
 import { ItmConfig } from './config';
 import ActionEvent from './action-event';
-import { Record } from 'immutable';
 
 /** The abstract directive to create area component. */
 @Directive({selector: '[itmArea]'})

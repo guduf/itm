@@ -8,7 +8,12 @@ export class ItmRecordFactory<
   private _cfgFactory: Record.Factory<C>;
 
   static build<M extends C = C, C extends Object = {}>(
-    cfg: { selector: string, serializer?: (cfg: RecordOf<C>) => M, model?: M, ancestors?: never }
+    cfg: {
+      selector: string,
+      serializer?: (cfg: RecordOf<C>) => M,
+      model?: { [P in keyof M]: null },
+      ancestors?: never
+    }
   ): ItmRecordFactory<RecordOf<M>, C>;
 
   // tslint:disable-next-line:max-line-length
@@ -16,7 +21,7 @@ export class ItmRecordFactory<
     cfg: {
       selector: string,
       serializer?: (cfg: RecordOf<C>, ancestor: AR) => M,
-      model?: M,
+      model?: { [P in keyof M]: null },
       ancestors: [ItmRecordFactory<AR, FC>]
     }
   ): ItmRecordFactory<AR & RecordOf<M>, FC & C, any>;
@@ -25,8 +30,8 @@ export class ItmRecordFactory<
     cfg: {
       selector: string;
       serializer?: (cfg: RecordOf<C>, ancestor?: RecordOf<any>) => M;
-      model?: M;
-      ancestors?: ItmRecordFactory[]
+      model?: { [P in keyof M]: null };
+      ancestors?: ItmRecordFactory[];
     }
   ): ItmRecordFactory<RecordOf<M>, C> {
     // tslint:disable-next-line:max-line-length
@@ -110,18 +115,6 @@ export module ItmRecordFactory {
   export const selectorPattern = '[a-z]\\w+';
   export const selectorRegex = new RegExp(`^${ItmRecordFactory.selectorPattern}$`);
   export const selectorSeparator = ',';
-
-  export interface ConfigWithAncestor<
-    M1 extends C1 = C1,
-    C1 extends Object = {},
-    M2 extends C2 = C2,
-    C2 extends Object = {}
-  > {
-    selector: string;
-    serializer?: (cfg: RecordOf<C1>, ancestor: RecordOf<M2>) => M1;
-    model?: M1;
-    ancestors: [ItmRecordFactory<RecordOf<M2>, C2>];
-  }
 }
 
 export default ItmRecordFactory;

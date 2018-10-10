@@ -16,7 +16,7 @@ const tableTemplate  = `
 @Component({
   selector: 'app-root',
   template: `
-    <itm-grid [grid]="'user' | itmGridType:grid" [target]="target"></itm-grid>
+    <itm-grid [grid]="'user' | itmCardType:grid" [target]="target"></itm-grid>
     <itm-table [table]="'user' | itmTableType:table" [itemsSource]="itemsSource"></itm-table>
   `,
   styleUrls: ['./app.component.scss']

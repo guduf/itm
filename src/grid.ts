@@ -12,11 +12,13 @@ export module ItmGrid {
   export interface Config<T = {}> {
     areas?: AreasConfig;
     template?: string | string[][] | Template;
+    defaultSelector?: string;
   }
 
   export interface Model<T = {}> extends Config<T> {
     areas: Map<string, Map<string, Area.Record<T>>>;
     template: Template;
+    defaultSelector?: string;
   }
 
   export type Record<T = {}> = RecordOf<Model<T>>;
@@ -24,7 +26,10 @@ export module ItmGrid {
   const serializer = (cfg: RecordOf<Config>): Model => {
     const template = parseTemplate(cfg.template);
     const areas = ItmGrid.parseAreas(cfg.areas);
-    return {template, areas};
+    if (cfg.defaultSelector && !RecordFactory.selectorRegex.test(cfg.defaultSelector))
+      throw new TypeError('Expected optionnal selector pattern as defaultSelector');
+    const defaultSelector = cfg.defaultSelector || null;
+    return {template, areas, defaultSelector};
   };
 
   const selector = 'grid';
@@ -32,7 +37,7 @@ export module ItmGrid {
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
     serializer,
-    model: {areas: null, template: null}
+    model: {areas: null, template: null, defaultSelector: null}
   });
 
   export function parseAreas(cfg: AreasConfig): Map<string, Map<string, Area.Record>> {
