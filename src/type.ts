@@ -3,10 +3,9 @@ import { InjectionToken } from '@angular/core';
 import { Map, Range, RecordOf } from 'immutable';
 
 import Area from './area';
-import Card from './card';
+import Control from './control';
 import Field from './field';
-import Form from './form';
-import Grid from './grid';
+import TypeGrid from './type-grid';
 import { Itm } from './item';
 import Prop from './prop';
 import RecordFactory from './record-factory';
@@ -26,18 +25,14 @@ export module ItmType {
     target?: any;
     props?: Map<string & keyof I, Prop.Record>;
     key?: string;
-    grid?: Grid.Config<I>;
-    card?: Card.Config<I>;
+    grid?: TypeGrid.Config<I>;
     table?: Table.Config<I>;
-    form?: Form.Config<I>;
   }
 
   export interface Model<I extends Itm = Itm> extends Config<I> {
     key: string;
-    grid: Grid.Record<I>;
+    grid: TypeGrid.Record<I>;
     table: Table.Record<I>;
-    card: Card.Record<I>;
-    form: Form.Record<I>;
     target: any;
     props: Map<string & keyof I, Prop.Record>;
   }
@@ -53,11 +48,18 @@ export module ItmType {
     );
     if (!key) throw new TypeError('Expected key');
     const props: Map<string, Prop.Record> = Map.isMap(cfg.props) ? cfg.props : Map();
-    const areas = Map<string, Map<string, Area.Record>>()
-      .set(Area.selector, props.toSet().reduce(
-        (acc, prop) => acc.set(prop.key, prop.area),
-        Map<string, Area.Record>()
-      ));
+    const areasMap = props.toSet().reduce(
+        (acc, prop) => ({
+          areas: acc.areas.setIn([Area.selector, prop.key], prop.area),
+          fields: acc.fields.set(prop.key, prop.field),
+          controls: acc.controls.set(prop.key, prop.control)
+        }),
+        {
+          areas: Map<string, Map<string, Area.Record>>().set(Area.selector, Map()),
+          fields: Map<string, Field.Record>(),
+          controls: Map<string, Control.Record>()
+        }
+      );
     const template = props.reduce<string[][]>(
       (templateAcc, {area}) => [
         ...templateAcc,
@@ -65,26 +67,16 @@ export module ItmType {
       ],
       []
     );
-    const grid = Grid.factory.serialize({template, areas}, cfg.grid);
-    const controls = props.reduce<Map<string, Field.Config>>(
-      (acc, prop) => acc.set(prop.key, prop.field),
-      Map()
-    );
-    const form = Form.factory.serialize(grid, {controls}, cfg.form);
+    const grid = TypeGrid.factory.serialize({template, ...areasMap}, cfg.grid);
     const columns = props.toSet().map(prop => prop.column);
     const table = Table.factory.serialize(grid, {columns}, cfg.table);
-    const fields = props.reduce<Map<string, Field.Config>>(
-      (acc, prop) => acc.set(prop.key, prop.field),
-      Map()
-    );
-    const card = Card.factory.serialize(grid, cfg.card, {fields});
-    return {key, card, target, props, form, grid, table};
+    return {key, target, props, grid, table};
   };
 
   export const factory: RecordFactory<Record, Config> = RecordFactory.build({
     selector,
     serializer,
-    model: {key: null, card: null, form: null, target: null, props: null, grid: null, table: null}
+    model: {key: null, target: null, props: null, grid: null, table: null}
   });
 
   export function get<I extends Itm = Itm>(target: any): Record<I> {

@@ -67,7 +67,8 @@ export module ItmGridArea {
     );
     return Set(map.keys()).map(fragment => {
       const areaPath = (
-        fragment.indexOf(':') >= 0 ? fragment.split(':') :
+        !fragment.indexOf(':') ? [Area.selector, fragment.slice(1)] :
+        fragment.indexOf(':') > 0 ? fragment.split(':') :
           [grid.defaultSelector || Area.selector, fragment]
       );
       const area = grid.areas.getIn(areaPath);

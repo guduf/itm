@@ -90,7 +90,7 @@ export module ItmGrid {
       );
   }
 
-  export const selectorCallPattern = `(?:${GridArea.selectorPattern}):${GridArea.keyPattern}`;
+  export const selectorCallPattern = `(?:${GridArea.selectorPattern})?:${GridArea.keyPattern}`;
   export const fragmentPattern = `(?:(?:${GridArea.keyPattern})|(?:${selectorCallPattern})|=|\\.)`;
   export const fragmentRegExp = new RegExp(`^${fragmentPattern}$`);
   export const templateRowPattern = ` *(${fragmentPattern}(?: +${fragmentPattern})*) *`;

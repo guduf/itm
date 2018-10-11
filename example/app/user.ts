@@ -12,15 +12,17 @@ export class User {
   firstName: string;
 
   @ItmProp({
-    // required: true,
-    // maxLength: 120
+    control: {
+      required: true
+    }
   })
   lastName: string;
 
   @ItmProp({
-    // required: true,
-    // pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-    // size: 3
+    control: {
+      required: true,
+      pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
+    }
   })
   email: string;
 
@@ -32,5 +34,5 @@ export class User {
   @ItmProp({
     // pattern: /^\d{2,3}(\.\d{2,3}){2}$/
   })
-  ipAddress: string;
+  ipAddress;
 }

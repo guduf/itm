@@ -29,11 +29,11 @@ export module ItmProp {
     header?: ItmPipeLike<I[], string> | ComponentType | false;
     label?: ItmPipeLike<I, string> | false;
 
-    area?: Area.Config;
-    column?: Column.Config;
-    field?: Field.Config;
-    control?: Control.Config;
-    type?: Control.Type;
+    area?: Partial<Area.Config>;
+    column?: Partial<Column.Config>;
+    field?: Partial<Field.Config>;
+    control?: Partial<Control.Config>;
+    type?: Partial<Control.Type>;
   }
 
   export interface Model<I extends Itm = Itm> extends Config<I> {

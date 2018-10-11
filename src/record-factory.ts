@@ -26,6 +26,14 @@ export class ItmRecordFactory<
     }
   ): ItmRecordFactory<AR & RecordOf<M>, FC & C, any>;
 
+  // tslint:disable-next-line:max-line-length
+  static build<R1 extends RecordOf<M1>, C1 extends Object, M1 extends C1, R2 extends RecordOf<M2>, C2 extends Object, M2 extends C2>(
+    cfg: {
+      selector: string,
+      ancestors: [ItmRecordFactory<R1, C1>, ItmRecordFactory<R2, C2>]
+    }
+  ): ItmRecordFactory<R1 & R2, C1 & C2, any>;
+
   static build<M extends C = C, C = {}>(
     cfg: {
       selector: string;
