@@ -33,10 +33,12 @@ export class AppComponent {
 
   grid: Grid.Config<User> = {
     template: `
-      :id    . .         .
-      firstName   = lastName  =
-      field:ipAddress  = =         =
-    `
+      id        . gender
+      firstName = lastName  =
+      email     =
+      ipAddress =
+    `,
+    defaultSelector: 'control'
   };
 
   target = DATA[0];

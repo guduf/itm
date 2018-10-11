@@ -9,6 +9,7 @@ import RecordFactory from './record-factory';
 
 export module ItmCard {
   interface ModelConfig<I extends Itm = Itm> {
+    defaultSelector?: string;
     fields?: Area.Configs<Field.Config<I>>;
   }
 
@@ -23,7 +24,7 @@ export module ItmCard {
   export type Record<I extends Itm = Itm> = Grid.Record<I> & RecordOf<Model<I>>;
 
   const serializer = (cfg: ModelConfig): Model => {
-    const defaultSelector = 'field';
+    const defaultSelector = cfg.defaultSelector || 'field';
     const fields = Area.serializeAreas(cfg.fields, Field.factory)
       .map(field => field.cell ? field : field.set('cell', ItmFieldComponent));
     return {areas: Map({[Field.selector]: fields}), defaultSelector, fields};
