@@ -1,8 +1,14 @@
 import 'reflect-metadata';
-import { CommonModule } from '@angular/common';
-import { NgModule, InjectionToken, ModuleWithProviders, Optional } from '@angular/core';
-import { Map } from 'immutable';
 
+import { CommonModule } from '@angular/common';
+// tslint:disable-next-line:max-line-length
+import { NgModule, InjectionToken, ModuleWithProviders, Optional, StaticProvider } from '@angular/core';
+import { Map, List } from 'immutable';
+
+import Area from './area';
+import Column from './column';
+import Control from './control';
+import Field from './field';
 import { ItmButtonComponent } from './button.component';
 import { ItmConfig } from './config';
 import { ItmMaterialModule } from './material.module';
@@ -54,23 +60,53 @@ export const ITM_CONFIG = new InjectionToken('ITM_CONFIG');
 
 const configFactory = (config: ItmConfig = {}): ItmConfig => ({...DEFAULT_CONFIG, ...config});
 
-export const ITM_TYPES = new InjectionToken('ITM_TYPES');
+const TYPES_INIT_TOKEN = new InjectionToken<any[]>('ITM_TYPES_INIT_TOKEN');
 
-const typeDefsFactory = (typeCtors: any[] = []): Map<string, Type.Record> => {
-  return typeCtors.reduce(
-    (acc, target) => {
+const TYPE_RECORD_MAP_PROVIDER: StaticProvider = {
+  provide: Type.RECORD_MAP_TOKEN,
+  deps: [[new Optional(), TYPES_INIT_TOKEN]],
+  useFactory: (typeCtors: any[] = []) => typeCtors.reduce(
+    (map, target) => {
       const record = Type.get(target);
       if (!Type.factory.isFactoryRecord(record)) throw new TypeError('Expected ItmType record');
-      return acc.set(record.key, record);
+      return map.set(record.key, record);
     },
-    Map()
-  );
+    Map<string, Type.Record>()
+  )
 };
 
-const PROVIDERS = [
+const BUILTIN_AREA_FACTORIES: Area.Factory[] = [
+  Area.factory,
+  Column.factory,
+  Control.factory,
+  Field.factory
+];
+
+// tslint:disable-next-line:max-line-length
+const AREA_FACTORIES_INIT_TOKEN = new InjectionToken<Area.Factory[]>('ITM_AREA_FACTORIES_INIT_TOKEN');
+
+const AREA_FACTORY_MAP_PROVIDER = {
+  provide: Area.FACTORY_MAP_TOKEN,
+  deps: [[new Optional(), AREA_FACTORIES_INIT_TOKEN]],
+  useFactory: (factories: Area.Factory[] = []) => List(factories)
+    .merge(BUILTIN_AREA_FACTORIES)
+    .reduce(
+      (map, factory) => {
+        if (!Area.factory.isExtendedFactory(factory)) throw new TypeError('Expected Area factory');
+        return map.set(factory.selector, factory);
+      },
+      Map<string, Area.Factory>()
+    )
+};
+
+const PROVIDERS: StaticProvider[] = [
   {provide: ItmConfig, deps: [[new Optional(), ITM_CONFIG]], useFactory: configFactory},
-  {provide: Type.MAP_TOKEN, deps: [[new Optional(), ITM_TYPES]], useFactory: typeDefsFactory},
-  ItmTypeService,
+  AREA_FACTORY_MAP_PROVIDER,
+  TYPE_RECORD_MAP_PROVIDER
+];
+
+const SERVICES = [
+  ItmTypeService
 ];
 
 @NgModule({
@@ -78,16 +114,25 @@ const PROVIDERS = [
   exports: [...EXPORTED_DECLARATIONS],
   declarations: [...DECLARATIONS, ...ENTRY_COMPONENTS, ...EXPORTED_DECLARATIONS],
   entryComponents: ENTRY_COMPONENTS,
-  providers: PROVIDERS
+  providers: [...PROVIDERS, ...SERVICES]
 })
 /** The main module of the library. */
-export class ItmModule {
-  static create(types: any[], config?: ItmConfig): ModuleWithProviders {
+export class ItmModule { }
+
+export module ItmModule {
+  export interface Init {
+    types?: any[];
+    areaFactories?: Area.Factory[];
+    config?: ItmConfig;
+  }
+
+  export function create(init: Init): ModuleWithProviders<ItmModule> {
     return {
       ngModule: ItmModule,
       providers: [
-        {provide: ITM_CONFIG, useValue: config},
-        {provide: ITM_TYPES, useValue: types}
+        {provide: ITM_CONFIG, useValue: init.config || {}},
+        {provide: AREA_FACTORIES_INIT_TOKEN, useValue: init.areaFactories || []},
+        {provide: TYPES_INIT_TOKEN, useValue: init.types || []}
       ]
     };
   }

@@ -48,7 +48,8 @@ export module ItmColumn {
   export const factory: Area.Factory<Record, Config> = Area.factory.extend({
     selector,
     serializer,
-    model: {header: null, sortable: null}
+    model: {header: null, sortable: null},
+    shared: new Area.Shared({})
   });
 }
 

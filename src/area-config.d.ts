@@ -21,9 +21,6 @@ export interface ItmAreaConfig<T = {}> {
    * In case of string, the value is used as the attribute for default cell. */
   cell?: ItmPipeLike<T, string> | ComponentType | false;
 
-  /** The plain object to access custom data in cell components. */
-  providers?: { provide: any, useValue: any }[] | Map<any, any>;
-
   /** The size of column based on 24 slots for the viewport width. Default: 2 */
   size?: number;
 }

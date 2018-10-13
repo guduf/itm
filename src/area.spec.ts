@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
-import { Map } from 'immutable';
 
-import { ItmAreaConfig } from './area-config';
 import Area from './area';
+import { ItmAreaConfig } from './area-config';
 import { Itm, fromStringPipe } from './item';
 
 @Component({template: ''})
@@ -23,14 +22,12 @@ describe('ItmArea', () => {
   const expectedKey = 'name';
   const expectedGrow = 4;
   const expectedCell = item.firstName;
-  const expectedProvider = {provide: 'foo', useValue: 'FOO'};
   const expectedSize = 4;
 
   const config: ItmAreaConfig = {
     key: expectedKey,
     grow: expectedGrow,
     cell: t => t['firstName'],
-    providers: [expectedProvider],
     size: expectedSize
   };
 
@@ -42,8 +39,6 @@ describe('ItmArea', () => {
     expect(record.key).toBe(expectedKey, 'Expected key');
     expect(record.grow).toBe(expectedGrow, 'Expected grow');
     expect(renderedText).toBe(expectedCell, 'Expected cell');
-    // tslint:disable-next-line:max-line-length
-    expect(record.providers.equals(Map({[expectedProvider.provide]: expectedProvider.useValue}))).toBeTruthy('Expected provider');
     expect(record.size).toBe(expectedSize, 'Expected size');
   }));
 

@@ -83,7 +83,7 @@ export module ItmType {
     return Reflect.get(target, ITM_TYPE_META);
   }
 
-  export const MAP_TOKEN = new InjectionToken('MAP_TOKEN');
+  export const RECORD_MAP_TOKEN = new InjectionToken<Map<string, Record>>('ITM_TYPE_MAP_TOKEN');
 }
 
 export default ItmType;

@@ -34,7 +34,7 @@ export module ItmField {
     selector,
     serializer,
     model: {label: null},
-    shared: new Area.Shared({defaultCell: ItmFieldComponent})
+    shared: new Area.Shared({defaultComp: ItmFieldComponent})
   });
 }
 

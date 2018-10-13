@@ -10,7 +10,7 @@ import Type from './type';
 @Injectable()
 export class ItmTypeService {
   constructor(
-    @Inject(Type.MAP_TOKEN)
+    @Inject(Type.RECORD_MAP_TOKEN)
     private readonly _types: Map<string, Type.Record>
   ) { }
 

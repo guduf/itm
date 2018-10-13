@@ -1,12 +1,14 @@
 // tslint:disable:max-line-length
-import { ValueProvider, Directive, Input, Component, EventEmitter, StaticProvider } from '@angular/core';
+import { ValueProvider, Directive, Input, Component, StaticProvider } from '@angular/core';
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { MatTable, MatCell, MatHeaderCell } from '@angular/material';
 import { By } from '@angular/platform-browser';
+import { Map } from 'immutable';
 import { of, BehaviorSubject } from 'rxjs';
 
 import { Itm, ItmsSource } from './item';
 import Area from './area';
+import Column from './column';
 import Table from './table';
 import { ItmTableComponent } from './table.component';
 import { ItmMaterialModule } from './material.module';
@@ -62,7 +64,8 @@ describe('ItmTableComponent', () => {
         ItmButtonComponent
       ],
       providers: [
-        {provide: ItmConfig, useValue: DEFAULT_CONFIG}
+        {provide: ItmConfig, useValue: DEFAULT_CONFIG},
+        {provide: Area.FACTORY_MAP_TOKEN, useValue: Map({area: Area.factory, column: Column.factory})}
       ]
     });
     TestBed.overrideModule(BrowserDynamicTestingModule, {

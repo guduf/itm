@@ -1,3 +1,5 @@
+import { InjectionToken } from '@angular/core';
+import { AbstractControl, FormControl } from '@angular/forms';
 import { Map, RecordOf } from 'immutable';
 
 import Area from './area';
@@ -37,12 +39,27 @@ export module ItmControl {
 
   export type Record<I extends Itm = Itm> = Field.Record<I> & RecordOf<Model<I>>;
 
+  export const ABSTRACT_CONTROL_TOKEN = new InjectionToken<AbstractControl>('ITM_ABSTRACT_CONTROL');
+
   export const factory: Area.Factory<Record, Config> = Field.factory.extend({
     selector,
     serializer,
     model: {type: null, pattern: null, required: null},
-    shared: new Area.Shared({defaultCell: ItmControlComponent})
+    shared: new Area.Shared({
+      defaultComp: ItmControlComponent,
+      provide: (record: Record, target: Itm) => (
+        Map<InjectionToken<any>, any>()
+          .set(ABSTRACT_CONTROL_TOKEN, buildFormControl(record, target))
+      )
+    })
   });
+
+  export function buildFormControl<I extends Itm = Itm>(
+    record: ItmControl.Record<I>,
+    target: I
+  ): AbstractControl {
+    return new FormControl(target[record.key]);
+  }
 }
 
 export default ItmControl;

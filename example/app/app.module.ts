@@ -17,7 +17,7 @@ import { User } from './user';
     BrowserAnimationsModule,
     MatCheckboxModule,
     MatTableModule,
-    ItmModule.create([User])
+    ItmModule.create({types: [User]})
   ],
   providers: [],
   bootstrap: [AppComponent]
