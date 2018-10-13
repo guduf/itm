@@ -1,8 +1,9 @@
-import { RecordOf } from 'immutable';
+import { Map, RecordOf } from 'immutable';
 
+import Area from './area';
 import Field from './field';
 import { Itm } from './item';
-import RecordFactory from './record-factory';
+import { ItmControlComponent } from './control.component';
 
 export module ItmControl {
   export type Type = 'string' | 'number';
@@ -36,11 +37,11 @@ export module ItmControl {
 
   export type Record<I extends Itm = Itm> = Field.Record<I> & RecordOf<Model<I>>;
 
-  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+  export const factory: Area.Factory<Record, Config> = Field.factory.extend({
     selector,
     serializer,
     model: {type: null, pattern: null, required: null},
-    ancestors: [Field.factory]
+    shared: new Area.Shared({defaultCell: ItmControlComponent})
   });
 }
 

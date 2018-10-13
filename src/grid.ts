@@ -10,7 +10,7 @@ export module ItmGrid {
   export type AreasConfig<T = {}> = Area.Config<T>[] | { [selector: string]: Area.Config<T>[] } | Map<string, Map<string, Area.Config<T>>>;
 
   export interface Config<T = {}> {
-    areas?: AreasConfig;
+    areas?: AreasConfig<T>;
     template?: string | string[][] | Template;
     defaultSelector?: string;
   }
@@ -34,7 +34,10 @@ export module ItmGrid {
 
   const selector = 'grid';
 
-  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+  // tslint:disable-next-line:max-line-length
+  export type Factory<R extends ItmGrid.Record = ItmGrid.Record , C extends ItmGrid.Config = ItmGrid.Config> = RecordFactory<R, C, any>;
+
+  export const factory: Factory = RecordFactory.build({
     selector,
     serializer,
     model: {areas: null, template: null, defaultSelector: null}

@@ -3,9 +3,8 @@ import { Map, RecordOf } from 'immutable';
 import Area from './area';
 import Control from './control';
 import { ItmControlComponent } from './control.component';
-import Card from './grid';
+import Grid from './grid';
 import { Itm } from './item';
-import RecordFactory from './record-factory';
 
 export module ItmForm {
   interface ModelConfig<I extends Itm = Itm> {
@@ -13,7 +12,7 @@ export module ItmForm {
     controls?: Area.Configs<Control.Config<I>>;
   }
 
-  export type Config<I extends Itm = Itm> = Card.Config<I> & ModelConfig<I>;
+  export type Config<I extends Itm = Itm> = Grid.Config<I> & ModelConfig<I>;
 
   export interface Model<I extends Itm = Itm> extends ModelConfig<I> {
     defaultSelector: string;
@@ -21,22 +20,21 @@ export module ItmForm {
     controls: Map<string, Control.Record<I>>;
   }
 
-  export type Record<I extends Itm = Itm> = Card.Record<I> & RecordOf<Model<I>>;
+  export type Record<I extends Itm = Itm> = Grid.Record<I> & RecordOf<Model<I>>;
 
   const serializer = (cfg: ModelConfig): Model => {
     const defaultSelector = cfg.defaultSelector || 'control';
     const controls = Area.serializeAreas(cfg.controls, Control.factory)
-    .map(control => control.cell ? control : control.set('cell', ItmControlComponent));
+      .map(control => control.cell ? control : control.set('cell', ItmControlComponent));
     return {areas: Map({[Control.selector]: controls}), defaultSelector, controls};
   };
 
   export const selector = 'form';
 
-  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+  export const factory: Grid.Factory<Record, Config> = Grid.factory.extend({
     selector,
     serializer,
-    model: {areas: null, defaultSelector: null, controls: null},
-    ancestors: [Card.factory]
+    model: {areas: null, defaultSelector: null, controls: null}
   });
 }
 

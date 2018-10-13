@@ -1,6 +1,6 @@
 
 import { InjectionToken } from '@angular/core';
-import { Map, RecordOf } from 'immutable';
+import { Map, RecordOf, Collection } from 'immutable';
 
 import { ItmAreaConfig } from './area-config';
 import { ItmPipeLike } from './item';
@@ -20,7 +20,7 @@ class ItmAreaModel<T = {}> implements ItmArea.Config<T> {
 
   readonly text?: ItmPipeLike<T, string>;
 
-  readonly providers: Map<any, any>;
+  readonly providers: Map<InjectionToken<any>, any>;
 
   constructor(cfg: ItmAreaConfig<T>) {
     if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
@@ -43,7 +43,7 @@ class ItmAreaModel<T = {}> implements ItmArea.Config<T> {
             if (!provide || !useValue) throw new TypeError('Expected value provider');
             return [provide, useValue];
           })
-          .reduce((acc, [key, val]) => acc.set(key, val), Map<any, any>())
+          .reduce((acc, [key, val]) => acc.set(key, val), Map<InjectionToken<any>, any>())
     );
   }
 }
@@ -57,18 +57,38 @@ export module ItmArea {
 
   export type Record<T = {}> = RecordOf<Model<T>>;
 
-  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+  export class Shared<R extends ItmArea.Record<T> = ItmArea.Record<T>, T = {}> {
+    readonly defaultCell?: ComponentType;
+    readonly provide?: (record: R, target: T) => Map<InjectionToken<any>, any>;
+
+    constructor(shared: Shared<R>) { Object.assign(this, shared); }
+  }
+
+  // tslint:disable-next-line:max-line-length
+  export type Factory<R extends ItmArea.Record = ItmArea.Record , C extends ItmArea.Config = ItmArea.Config> = RecordFactory<R, C, any, Shared<R>>;
+
+  export const factory: Factory = RecordFactory.build({
     selector,
     serializer: (cfg: Config) => new ItmAreaModel(cfg),
-    model: {key: null, size: null, grow: null, cell: null, text: null, providers: null}
+    model: {key: null, size: null, grow: null, cell: null, text: null, providers: null},
+    shared: new Shared({})
   });
+
+  export function getFactoriesProviders(
+    factories: Collection<string, Factory>,
+    record: Record,
+    target: Object
+  ): Map<InjectionToken<any>, any> {
+    return factory.getShared(factories, record)
+      .flatMap(({provide}) => (provide ? provide(record, target) : Map()));
+  }
 
   export type Configs<C extends Config = Config> = C[] | Map<string, C>;
 
   // tslint:disable-next-line:max-line-length
   export function serializeAreas<R extends Record<M>, C extends Config, M extends Object>(
     cfgs: Configs<C>,
-    areaFactory = factory as RecordFactory<R, C, any>
+    areaFactory = factory as Factory<R>
   ): Map<string, R> {
     if (Array.isArray(cfgs)) (
       cfgs = cfgs.reduce((cfgsAcc, cfg) => cfgsAcc.set(cfg.key, cfg), Map<string, C>())

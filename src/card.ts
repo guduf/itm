@@ -5,7 +5,6 @@ import Field from './field';
 import { ItmFieldComponent } from './field.component';
 import Grid from './grid';
 import { Itm } from './item';
-import RecordFactory from './record-factory';
 
 export module ItmCard {
   interface ModelConfig<I extends Itm = Itm> {
@@ -32,11 +31,10 @@ export module ItmCard {
 
   export const selector = 'card';
 
-  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+  export const factory: Grid.Factory<Record, Config> = Grid.factory.extend({
     selector,
     serializer,
-    model: {areas: null, defaultSelector: null, fields: null},
-    ancestors: [Grid.factory]
+    model: {areas: null, defaultSelector: null, fields: null}
   });
 }
 

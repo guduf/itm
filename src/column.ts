@@ -45,12 +45,10 @@ export module ItmColumn {
 
   export type Record<I extends Itm = Itm> = Area.Record<I> & RecordOf<Model<I>>;
 
-  // tslint:disable-next-line:max-line-length
-  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+  export const factory: Area.Factory<Record, Config> = Area.factory.extend({
     selector,
     serializer,
-    model: {header: null, sortable: null},
-    ancestors: [Area.factory]
+    model: {header: null, sortable: null}
   });
 }
 

@@ -3,7 +3,7 @@ import { RecordOf } from 'immutable';
 
 import Area from './area';
 import { Itm, ItmPipeLike } from './item';
-import RecordFactory from './record-factory';
+import { ItmFieldComponent } from './field.component';
 
 export module ItmField {
   export interface ModelConfig<I extends Itm = Itm> {
@@ -30,11 +30,11 @@ export module ItmField {
 
   export type Record<I extends Itm = Itm> = Area.Record<I> & RecordOf<Model<I>>;
 
-  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+  export const factory: Area.Factory<Record, Config> = Area.factory.extend({
     selector,
     serializer,
     model: {label: null},
-    ancestors: [Area.factory]
+    shared: new Area.Shared({defaultCell: ItmFieldComponent})
   });
 }
 
