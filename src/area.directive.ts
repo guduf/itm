@@ -19,6 +19,9 @@ import { ItmConfig } from './config';
 import { ITM_TARGET } from './item';
 import { ComponentType } from './utils';
 
+// tslint:disable-next-line:max-line-length
+export const ITM_AREA_FACTORY_MAP_TOKEN = new InjectionToken<Map<string, Area.Factory>>('ITM_AREA_FACTORY_MAP_TOKEN');
+
 /** The abstract directive to create area component. */
 @Directive({selector: '[itmArea]'})
 // tslint:disable-next-line:max-line-length
@@ -41,7 +44,7 @@ export class ItmAreaDirective<T = {}, A extends Action = Action<T>> implements O
     private _injector: Injector,
     private _componentFactoryResolver: ComponentFactoryResolver,
     private _viewContainerRef: ViewContainerRef,
-    @Inject(Area.FACTORY_MAP_TOKEN)
+    @Inject(ITM_AREA_FACTORY_MAP_TOKEN)
     private _areaFactories: Map<string, Area.Factory<Area<T>>>
   ) { }
 

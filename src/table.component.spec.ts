@@ -16,7 +16,7 @@ import { click, changeInputs } from './helpers.spec';
 import { ItmConfig } from './config';
 import { DEFAULT_CONFIG } from './itm.module';
 import ActionEvent from './action-event';
-import { ItmAreaDirective } from './area.directive';
+import { ItmAreaDirective, ITM_AREA_FACTORY_MAP_TOKEN } from './area.directive';
 import { ItmTextAreaComponent } from './text-area.component';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { ItmActionsAreaComponent } from './actions-area.component';
@@ -65,7 +65,7 @@ describe('ItmTableComponent', () => {
       ],
       providers: [
         {provide: ItmConfig, useValue: DEFAULT_CONFIG},
-        {provide: Area.FACTORY_MAP_TOKEN, useValue: Map({area: Area.factory, column: Column.factory})}
+        {provide: ITM_AREA_FACTORY_MAP_TOKEN, useValue: Map({area: Area.factory, column: Column.factory})}
       ]
     });
     TestBed.overrideModule(BrowserDynamicTestingModule, {

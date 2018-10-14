@@ -20,7 +20,7 @@ import { ItmGridComponent } from './grid.component';
 import { ItmFieldComponent } from './field.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
 import { ItmTextAreaComponent } from './text-area.component';
-import { ItmAreaDirective } from './area.directive';
+import { ItmAreaDirective, ITM_AREA_FACTORY_MAP_TOKEN } from './area.directive';
 import { ItmControlComponent } from './control.component';
 
 const IMPORTS = [
@@ -85,8 +85,9 @@ const BUILTIN_AREA_FACTORIES: Area.Factory[] = [
 // tslint:disable-next-line:max-line-length
 const AREA_FACTORIES_INIT_TOKEN = new InjectionToken<Area.Factory[]>('ITM_AREA_FACTORIES_INIT_TOKEN');
 
+// tslint:disable-next-line:max-line-length
 const AREA_FACTORY_MAP_PROVIDER = {
-  provide: Area.FACTORY_MAP_TOKEN,
+  provide: ITM_AREA_FACTORY_MAP_TOKEN,
   deps: [[new Optional(), AREA_FACTORIES_INIT_TOKEN]],
   useFactory: (factories: Area.Factory[] = []) => List(factories)
     .merge(BUILTIN_AREA_FACTORIES)
