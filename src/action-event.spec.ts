@@ -15,7 +15,7 @@ describe('ItmActionEvent', () => {
   });
 
   it('should throw type error with invalid config', () => {
-    expect(() => new ActionEvent({} as Action.Record, expectedEvent)).toThrowError(TypeError);
+    expect(() => new ActionEvent({} as Action, expectedEvent)).toThrowError(TypeError);
     expect(() => new ActionEvent(expectedAction, null)).toThrowError(TypeError);
   });
 

@@ -14,6 +14,8 @@ interface ItmActionConfig<T = {}> {
   text?: false | ItmPipeLike<T, string>;
 }
 
+export type ItmAction<T = {}> = RecordOf<ItmAction.Model<T>>;
+
 export module ItmAction {
   export type Config<T = {}> = ItmActionConfig<T>;
 
@@ -22,8 +24,6 @@ export module ItmAction {
     icon: ItmPipeLike<T, string>;
     text: ItmPipeLike<T, string>;
   }
-
-  export type Record<T = {}> = RecordOf<Model<T>>;
 
   const serializer = (cfg: RecordOf<Config>): Model => {
     if (!cfg.key || typeof cfg.key !== 'string') throw new TypeError('Expected key');
@@ -35,7 +35,7 @@ export module ItmAction {
 
   const selector = 'action';
 
-  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+  export const factory: RecordFactory<ItmAction, Config> = RecordFactory.build({
     selector,
     serializer,
     model: {key: null, icon: null, text: null}

@@ -22,10 +22,10 @@ import { ComponentType } from './utils';
 /** The abstract directive to create area component. */
 @Directive({selector: '[itmArea]'})
 // tslint:disable-next-line:max-line-length
-export class ItmAreaDirective<T = {}, A extends Action.Record = Action.Record<T>> implements OnInit {
+export class ItmAreaDirective<T = {}, A extends Action = Action<T>> implements OnInit {
   // tslint:disable-next-line:no-input-rename
   @Input('itmArea')
-  area: Area.Record;
+  area: Area;
 
   /** The emitter of action events. */
   @Input()
@@ -42,7 +42,7 @@ export class ItmAreaDirective<T = {}, A extends Action.Record = Action.Record<T>
     private _componentFactoryResolver: ComponentFactoryResolver,
     private _viewContainerRef: ViewContainerRef,
     @Inject(Area.FACTORY_MAP_TOKEN)
-    private _areaFactories: Map<string, Area.Factory<Area.Record<T>>>
+    private _areaFactories: Map<string, Area.Factory<Area<T>>>
   ) { }
 
   ngOnInit() {

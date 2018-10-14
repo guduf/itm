@@ -19,7 +19,7 @@ import { ITM_TARGET } from './item';
 export class ItmActionsAreaComponent<T = {}> {
   constructor(
     @Inject(Action.SET_TOKEN)
-    readonly actions: Set<Action.Record>,
+    readonly actions: Set<Action>,
     @Inject(Action.BUTTON_MODE_TOKEN)
     readonly buttonsMode: Observable<ItmButtonMode>,
     @Inject(ActionEvent.EMITTER_TOKEN)

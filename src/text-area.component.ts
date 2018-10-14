@@ -22,7 +22,7 @@ export class ItmTextAreaComponent<T = {}> {
 
   constructor(
     @Inject(Area.RECORD_TOKEN)
-    area: Area.Record,
+    area: Area,
     @Inject(ITM_TARGET)
     target: T
   ) {

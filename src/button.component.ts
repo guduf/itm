@@ -40,7 +40,7 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
   text: Observable<string>;
 
   /** The action definition of the button. */
-  actionDef: Action.Record<T>;
+  actionDef: Action<T>;
 
   @HostBinding('class')
   /** The CSS class of host element. */
@@ -60,7 +60,7 @@ export class ItmButtonComponent<T = {}> implements OnChanges {
   ngOnChanges({action: actionChanges}: SimpleChanges) {
     if (actionChanges)
       if (Action.factory.isFactoryRecord(this.action))
-        this.actionDef = this.action as Action.Record;
+        this.actionDef = this.action as Action;
       else try {
         this.actionDef = Action.factory.serialize(
           typeof this.action === 'string' ? {key: this.action} : this.action

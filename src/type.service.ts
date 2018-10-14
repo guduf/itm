@@ -3,7 +3,6 @@ import { Map } from 'immutable';
 
 import { Itm } from './item';
 import Grid from './grid';
-import TypeGrid from './type-grid';
 import Table from './table';
 import Type from './type';
 
@@ -11,10 +10,10 @@ import Type from './type';
 export class ItmTypeService {
   constructor(
     @Inject(Type.RECORD_MAP_TOKEN)
-    private readonly _types: Map<string, Type.Record>
+    private readonly _types: Map<string, Type>
   ) { }
 
-  get<I extends Itm = Itm>(key: string): Type.Record<I> {
+  get<I extends Itm = Itm>(key: string): Type<I> {
     if (!this._types.has(key)) throw new ReferenceError(`Missing ItmType with key '${key}'`);
     return this._types.get(key);
   }
@@ -26,9 +25,9 @@ export class ItmTypeGridPipe implements PipeTransform {
     private _typeService: ItmTypeService
   ) { }
 
-  transform(key: string, cfg?: Grid.Config): TypeGrid.Record {
-    const typeGrid = this._typeService.get(key).grid;
-    return cfg ? TypeGrid.factory.serialize(typeGrid, cfg) : typeGrid;
+  transform(key: string, cfg?: Grid.Config): Grid {
+    const typeGrid = this._typeService.get(key).form;
+    return cfg ? Grid.factory.serialize(typeGrid, cfg) : typeGrid;
   }
 }
 
@@ -38,7 +37,7 @@ export class ItmTableTypePipe implements PipeTransform {
     private _typeService: ItmTypeService
   ) { }
 
-  transform(key: string, cfg?: Table.Config): Table.Record {
+  transform(key: string, cfg?: Table.Config): Table {
     const typedTable = this._typeService.get(key).table;
     return cfg ? Table.factory.serialize(typedTable, cfg) : typedTable;
   }

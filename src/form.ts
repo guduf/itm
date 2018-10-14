@@ -1,40 +1,18 @@
-import { Map, RecordOf } from 'immutable';
+import { Map } from 'immutable';
 
-import Area from './area';
 import Control from './control';
-import { ItmControlComponent } from './control.component';
+import Field from './control';
 import Grid from './grid';
-import { Itm } from './item';
 
 export module ItmForm {
-  interface ModelConfig<I extends Itm = Itm> {
-    defaultSelector?: string;
-    controls?: Area.Configs<Control.Config<I>>;
-  }
-
-  export type Config<I extends Itm = Itm> = Grid.Config<I> & ModelConfig<I>;
-
-  export interface Model<I extends Itm = Itm> extends ModelConfig<I> {
-    defaultSelector: string;
-    areas: Map<string, Map<string, Area.Record<I>>>;
-    controls: Map<string, Control.Record<I>>;
-  }
-
-  export type Record<I extends Itm = Itm> = Grid.Record<I> & RecordOf<Model<I>>;
-
-  const serializer = (cfg: ModelConfig): Model => {
-    const defaultSelector = cfg.defaultSelector || 'control';
-    const controls = Area.serializeAreas(cfg.controls, Control.factory)
-      .map(control => control.cell ? control : control.set('cell', ItmControlComponent));
-    return {areas: Map({[Control.selector]: controls}), defaultSelector, controls};
-  };
-
   export const selector = 'form';
 
-  export const factory: Grid.Factory<Record, Config> = Grid.factory.extend({
+  export const factory: Grid.Factory = Grid.factory.extend({
     selector,
-    serializer,
-    model: {areas: null, defaultSelector: null, controls: null}
+    shared: new Grid.Shared({
+      defaultSelector: Control.selector,
+      areaFactories: Map({field: Field.factory, control: Control.factory})
+    })
   });
 }
 

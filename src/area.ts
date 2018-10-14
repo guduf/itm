@@ -21,8 +21,8 @@ class ItmAreaModel<T = {}> implements ItmArea.Config<T> {
   readonly text?: ItmPipeLike<T, string>;
 
   constructor(cfg: ItmAreaConfig<T>) {
-    if (cfg.key && typeof cfg.key === 'string') this.key = cfg.key;
-    else throw new TypeError('Expected key');
+    if (!cfg.key || !ItmArea.keyRegExp.test(cfg.key)) throw new TypeError('Expected key');
+    this.key = cfg.key;
     this.size = cfg.size && typeof cfg.size === 'number' ? cfg.size : 1;
     this.grow = cfg.grow && typeof cfg.grow === 'number' ? cfg.grow : 1;
     this.cell = cfg.cell !== false && isComponentType(cfg.cell) ? cfg.cell as ComponentType : null;
@@ -36,6 +36,8 @@ class ItmAreaModel<T = {}> implements ItmArea.Config<T> {
   }
 }
 
+export type ItmArea<T = {}> = RecordOf<ItmArea.Model<T>>;
+
 export module ItmArea {
   export const selector = 'area';
 
@@ -43,9 +45,8 @@ export module ItmArea {
 
   export type Model<T = {}> = ItmAreaModel<T>;
 
-  export type Record<T = {}> = RecordOf<Model<T>>;
 
-  export class Shared<R extends ItmArea.Record<T> = ItmArea.Record<T>, T = {}> {
+  export class Shared<R extends ItmArea<T> = ItmArea<T>, T = {}> {
     readonly defaultComp?: ComponentType;
     readonly provide?: (record: R, target: T) => Map<InjectionToken<any>, any>;
 
@@ -53,7 +54,7 @@ export module ItmArea {
   }
 
   // tslint:disable-next-line:max-line-length
-  export type Factory<R extends ItmArea.Record = ItmArea.Record , C extends ItmArea.Config = ItmArea.Config> = RecordFactory<R, C, any, Shared<R>>;
+  export type Factory<R extends ItmArea = ItmArea , C extends ItmArea.Config = ItmArea.Config> = RecordFactory<R, C, any, Shared<R>>;
 
   export const factory: Factory = RecordFactory.build({
     selector,
@@ -65,17 +66,22 @@ export module ItmArea {
   export type Configs<C extends Config = Config> = C[] | Map<string, C>;
 
   // tslint:disable-next-line:max-line-length
-  export function serializeAreas<R extends Record<M>, C extends Config, M extends Object>(
+  export function serializeAreas<R extends ItmArea<M>, C extends Config, M extends Object>(
     cfgs: Configs<C>,
     areaFactory = factory as Factory<R>
   ): Map<string, R> {
+    if (!cfgs) return Map();
     if (Array.isArray(cfgs)) (
       cfgs = cfgs.reduce((cfgsAcc, cfg) => cfgsAcc.set(cfg.key, cfg), Map<string, C>())
     );
     return cfgs.map(cfg => areaFactory.serialize(cfg));
   }
 
-  export const RECORD_TOKEN = new InjectionToken<Record>('ITM_AREA_RECORD');
+  export const defaultKey = '$default';
+  export const keyPattern = `\\$?${RecordFactory.selectorPattern}`;
+  export const keyRegExp = new RegExp(`^${keyPattern}$`);
+
+  export const RECORD_TOKEN = new InjectionToken<ItmArea>('ITM_AREA_RECORD');
 
   // tslint:disable-next-line:max-line-length
   export const FACTORY_MAP_TOKEN = new InjectionToken<Map<string, Factory>>('ITM_FACTORY_MAP_TOKEN');

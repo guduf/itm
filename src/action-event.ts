@@ -3,7 +3,7 @@ import Action from './action';
 import { InjectionToken } from '@angular/core';
 
 /** A generic event with a action definition, a target. */
-export class ItmActionEvent<T = {}, A extends Action.Record = Action.Record> {
+export class ItmActionEvent<T = {}, A extends Action = Action> {
   /** The key of the action. */
   readonly key: string;
 
@@ -66,7 +66,7 @@ export class ItmActionEvent<T = {}, A extends Action.Record = Action.Record> {
 
 export module ItmActionEvent {
   // tslint:disable-next-line:max-line-length
-  export type Emitter<T = {}, A extends Action.Record<T> = Action.Record<T>> = Subject<ItmActionEvent<T, A>>;
+  export type Emitter<T = {}, A extends Action<T> = Action<T>> = Subject<ItmActionEvent<T, A>>;
 
   export const EMITTER_TOKEN = new InjectionToken('ITM_ACTION_EVENT_EMITTER');
 }

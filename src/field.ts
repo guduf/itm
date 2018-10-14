@@ -5,6 +5,8 @@ import Area from './area';
 import { Itm, ItmPipeLike } from './item';
 import { ItmFieldComponent } from './field.component';
 
+export type ItmField<I extends Itm = Itm> = Area<I> & RecordOf<ItmField.Model<I>>;
+
 export module ItmField {
   export interface ModelConfig<I extends Itm = Itm> {
     label?: ItmPipeLike<I, string> | false;
@@ -14,7 +16,7 @@ export module ItmField {
     label: ItmPipeLike<I, string> | false;
   }
 
-  const serializer = (cfg: RecordOf<ModelConfig>, area: Area.Record): Model => {
+  const serializer = (cfg: RecordOf<ModelConfig>, area: Area): Model => {
     const label = (
       cfg.label === false ? null :
       cfg.label && ['string', 'function'].includes(typeof cfg.label) ? cfg.label :
@@ -28,9 +30,7 @@ export module ItmField {
 
   export type Config<I extends Itm = Itm> = Area.Config<I> & ModelConfig<I>;
 
-  export type Record<I extends Itm = Itm> = Area.Record<I> & RecordOf<Model<I>>;
-
-  export const factory: Area.Factory<Record, Config> = Area.factory.extend({
+  export const factory: Area.Factory<ItmField, Config> = Area.factory.extend({
     selector,
     serializer,
     model: {label: null},

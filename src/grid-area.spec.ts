@@ -2,7 +2,6 @@ import { Set } from 'immutable';
 
 import Area from './area';
 import Grid from './grid';
-import GridArea from './grid-area';
 
 describe('ItmGridArea', () => {
   describe('parseAreas()', () => {
@@ -11,8 +10,8 @@ describe('ItmGridArea', () => {
       control: [{key: 'email'}]
     });
 
-    function parseGridAreas(template: string): Set<GridArea.Record> {
-      return GridArea.parseGridAreas(Grid.factory.serialize({template, areas}));
+    function parseGridAreas(template: string) {
+      return Grid.factory.serialize({template, areas});
     }
 
     it('should throw a type error when template is invalid', () => {
@@ -41,7 +40,7 @@ describe('ItmGridArea', () => {
         id  .             name =
         id  control:email name =
       `;
-      const gridAreas = parseGridAreas(template).toArray();
+      const gridAreas = parseGridAreas(template).positions.toSet().toArray();
       const expectedIdPos = {
         area: areas.getIn([Area.selector, 'id']).toJS(),
         selector: Area.selector,

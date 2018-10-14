@@ -11,12 +11,14 @@ import { Map, RecordOf } from 'immutable';
 export function ItmProp<I extends Itm = Itm>(cfg: ItmProp.Config<I> = {}): PropertyDecorator {
   return (proto: any, key: string & keyof I) => {
     if (typeof key !== 'string') return;
-    let props: Map<keyof I, ItmProp.Record> = Reflect.get(proto, ItmProp.MAP_META);
+    let props: Map<keyof I, ItmProp> = Reflect.get(proto, ItmProp.MAP_META);
     if (!props) (props = Map());
     const record = ItmProp.factory.serialize({key}, cfg);
     Reflect.set(proto, ItmProp.MAP_META, props.set(key, record));
   };
 }
+
+export type ItmProp<I extends Itm = Itm> = RecordOf<ItmProp.Model<I>>;
 
 export module ItmProp {
   export interface Config<I extends Itm = Itm> {
@@ -37,13 +39,11 @@ export module ItmProp {
   }
 
   export interface Model<I extends Itm = Itm> extends Config<I> {
-    area: Area.Record<I>;
-    column: Column.Record<I>;
-    field: Field.Record<I>;
-    control: Control.Record<I>;
+    area: Area<I>;
+    column: Column<I>;
+    field: Field<I>;
+    control: Control<I>;
   }
-
-  export type Record<I extends Itm = Itm> = RecordOf<Model<I>>;
 
   const selector = 'prop';
 
@@ -57,7 +57,7 @@ export module ItmProp {
     return {key, area, column, control, field};
   };
 
-  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+  export const factory: RecordFactory<ItmProp, Config> = RecordFactory.build({
     selector: selector,
     serializer,
     // tslint:disable-next-line:max-line-length
@@ -66,7 +66,7 @@ export module ItmProp {
 
   export const MAP_META = Symbol('ITM_PROPS_META');
 
-  export function get<I extends Itm = Itm>(target: any): Map<string & keyof I, Record<I>> {
+  export function get<I extends Itm = Itm>(target: any): Map<string & keyof I, ItmProp<I>> {
     return Reflect.get(target.prototype, MAP_META);
   }
 }

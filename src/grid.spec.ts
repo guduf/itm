@@ -1,8 +1,6 @@
 // tslint:disable:max-line-length
 import Area from './area';
 import Grid from './grid';
-import GridArea from './grid-area';
-import { List, Record } from 'immutable';
 
 describe('ItmGrid', () => {
   it('should create with minimal config', () => {

@@ -27,7 +27,7 @@ export class ItmFieldComponent {
 
   constructor(
     @Inject(Area.RECORD_TOKEN)
-    area: Field.Record,
+    area: Field,
     @Inject(ITM_TARGET)
     item: Itm
   ) {

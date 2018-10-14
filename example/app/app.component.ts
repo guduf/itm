@@ -31,14 +31,13 @@ export class AppComponent {
     canSelect: true
   };
 
-  grid: Grid.Config<User> = {
+  grid: Grid.Config = {
     template: `
       id        . gender
       firstName = lastName  =
       email     =
       ipAddress =
-    `,
-    defaultSelector: 'control'
+    `
   };
 
   target = DATA[0];

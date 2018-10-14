@@ -49,10 +49,10 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
   rowActionsProviders: StaticProvider[];
 
   /** The actions for the row cell */
-  rowActions: Set<Action.Record>;
+  rowActions: Set<Action>;
 
   /** The columns transcluded to the MatTable */
-  columns: Column.Record[];
+  columns: Column[];
 
   /** The keys of the columns to display. */
   displayedColumns: string[];
@@ -256,11 +256,11 @@ export class ItmTableComponent<I extends Itm = Itm> implements OnChanges, OnDest
     );
   }
 
-  getCellClass(column: Column.Record) {
+  getCellClass(column: Column) {
     return `itm-cell itm-slot-${column.size}`;
   }
 
-  getHeaderCellClass(column: Column.Record) {
+  getHeaderCellClass(column: Column) {
     return `itm-header-cell itm-slot-${column.size}`;
   }
 

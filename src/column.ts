@@ -17,19 +17,21 @@ interface ItmColumnConfig<I extends Itm = Itm> {
   header?: ItmPipeLike<I[], string> | ComponentType | false | Area.Config<I[]>;
 }
 
+export type ItmColumn<I extends Itm = Itm> = Area<I> & RecordOf<ItmColumn.Model<I>>;
+
 export module ItmColumn {
   type ModelConfig<I extends Itm = Itm> = ItmColumnConfig<I>;
 
   export interface Model<I extends Itm = Itm> extends ModelConfig<I> {
     sortable: boolean;
-    header: Area.Record<I[]>;
+    header: Area<I[]>;
   }
 
-  const serializer = (cfg: ModelConfig, ancestor: Area.Record): Model => {
+  const serializer = (cfg: ModelConfig, ancestor: Area): Model => {
     if (!Area.factory.isFactoryRecord(ancestor)) throw new TypeError('Expected area record');
-    const header: Area.Record = (
+    const header: Area = (
       cfg.header === false ? null :
-      Area.factory.isFactoryRecord(cfg.header) ? cfg.header as Area.Record :
+      Area.factory.isFactoryRecord(cfg.header) ? cfg.header as Area :
         Area.factory.serialize(ancestor, (
           typeof cfg.header === 'function' ? {cell: cfg.header} :
           typeof cfg.header === 'object' ? cfg.header :
@@ -43,9 +45,7 @@ export module ItmColumn {
 
   export type Config<I extends Itm = Itm> = Area.Config<I> & ModelConfig<I>;
 
-  export type Record<I extends Itm = Itm> = Area.Record<I> & RecordOf<Model<I>>;
-
-  export const factory: Area.Factory<Record, Config> = Area.factory.extend({
+  export const factory: Area.Factory<ItmColumn, Config> = Area.factory.extend({
     selector,
     serializer,
     model: {header: null, sortable: null},

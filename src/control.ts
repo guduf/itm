@@ -7,6 +7,8 @@ import Field from './field';
 import { Itm } from './item';
 import { ItmControlComponent } from './control.component';
 
+export type ItmControl<I extends Itm = Itm> = Field<I> & RecordOf<ItmControl.Model<I>>;
+
 export module ItmControl {
   export type Type = 'string' | 'number';
 
@@ -37,17 +39,15 @@ export module ItmControl {
 
   export type Config<I extends Itm = Itm> = Field.Config<I> & ModelConfig<I>;
 
-  export type Record<I extends Itm = Itm> = Field.Record<I> & RecordOf<Model<I>>;
-
   export const ABSTRACT_CONTROL_TOKEN = new InjectionToken<AbstractControl>('ITM_ABSTRACT_CONTROL');
 
-  export const factory: Area.Factory<Record, Config> = Field.factory.extend({
+  export const factory: Area.Factory<ItmControl, Config> = Field.factory.extend({
     selector,
     serializer,
     model: {type: null, pattern: null, required: null},
     shared: new Area.Shared({
       defaultComp: ItmControlComponent,
-      provide: (record: Record, target: Itm) => (
+      provide: (record: ItmControl, target: Itm) => (
         Map<InjectionToken<any>, any>()
           .set(ABSTRACT_CONTROL_TOKEN, buildFormControl(record, target))
       )
@@ -55,7 +55,7 @@ export module ItmControl {
   });
 
   export function buildFormControl<I extends Itm = Itm>(
-    record: ItmControl.Record<I>,
+    record: ItmControl<I>,
     target: I
   ): AbstractControl {
     return new FormControl(target[record.key]);

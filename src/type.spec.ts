@@ -3,7 +3,7 @@ import Type from './type';
 import { Map } from 'immutable';
 
 class User { name: string; }
-const props = Map<string, Prop.Record>();
+const props = Map<string, Prop>();
 props.set('name', Prop.factory.serialize({key: 'name'}, {}));
 
 describe('ItmTypeDef', () => {

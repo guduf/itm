@@ -1,7 +1,8 @@
 import Area from './area';
-import GridArea from './grid-area';
 import RecordFactory from './record-factory';
-import { Map, RecordOf, Range } from 'immutable';
+import { Map, RecordOf, Range, Record as createRecord, Set } from 'immutable';
+
+export type ItmGrid = RecordOf<ItmGrid.Model>;
 
 export module ItmGrid {
   export type Template = Map<number, Map<number, string>>;
@@ -9,52 +10,76 @@ export module ItmGrid {
   // tslint:disable-next-line:max-line-length
   export type AreasConfig<T = {}> = Area.Config<T>[] | { [selector: string]: Area.Config<T>[] } | Map<string, Map<string, Area.Config<T>>>;
 
-  export interface Config<T = {}> {
+  export interface Position {
+    selector: string;
+    key: string;
+    area: Area;
+    row: number;
+    col: number;
+    width: number;
+    height: number;
+  }
+
+  // tslint:disable-next-line:max-line-length
+  const positionFactory = createRecord<Position>({selector: null, key: null, area: null, row: null, col: null, width: null, height: null});
+
+  export interface Config<T extends Object = {}> {
     areas?: AreasConfig<T>;
     template?: string | string[][] | Template;
-    defaultSelector?: string;
   }
 
-  export interface Model<T = {}> extends Config<T> {
-    areas: Map<string, Map<string, Area.Record<T>>>;
+  export interface Model<T extends Object = {}> extends Config<T> {
+    areas: Map<string, Map<string, Area<T>>>;
     template: Template;
-    defaultSelector?: string;
+    positions: Map<string, RecordOf<Position>>;
   }
 
-  export type Record<T = {}> = RecordOf<Model<T>>;
+  export class Shared {
+    readonly areaFactories?: Map<string, Area.Factory>;
+    readonly defaultSelector?: string;
 
-  const serializer = (cfg: RecordOf<Config>): Model => {
+    constructor(shared: Partial<Shared>) { Object.assign(this, shared); }
+
+    extend(shared: Partial<Shared>): Shared {
+      return new Shared({
+        areaFactories: Map<string, Area.Factory>().merge(this.areaFactories, shared.areaFactories),
+        defaultSelector: shared.defaultSelector || this.defaultSelector
+      });
+    }
+  }
+
+  const serializer = (cfg: RecordOf<Config>, ancestor: null, shared: Shared): Model => {
+    const areas = parseAreas(cfg.areas, shared.areaFactories);
     const template = parseTemplate(cfg.template);
-    const areas = ItmGrid.parseAreas(cfg.areas);
-    if (cfg.defaultSelector && !RecordFactory.selectorRegex.test(cfg.defaultSelector))
-      throw new TypeError('Expected optionnal selector pattern as defaultSelector');
-    const defaultSelector = cfg.defaultSelector || null;
-    return {template, areas, defaultSelector};
+    const positions = ItmGrid.parsePositions(template, areas, shared.defaultSelector);
+    return {areas, template, positions};
   };
 
   const selector = 'grid';
 
   // tslint:disable-next-line:max-line-length
-  export type Factory<R extends ItmGrid.Record = ItmGrid.Record , C extends ItmGrid.Config = ItmGrid.Config> = RecordFactory<R, C, any>;
+  export type Factory<R extends ItmGrid = ItmGrid , C extends ItmGrid.Config = ItmGrid.Config> = RecordFactory<R, C, any, Shared>;
 
   export const factory: Factory = RecordFactory.build({
     selector,
     serializer,
-    model: {areas: null, template: null, defaultSelector: null}
+    model: {areas: null, template: null, positions: null},
+    shared: new Shared({})
   });
 
-  export function parseAreas(cfg: AreasConfig): Map<string, Map<string, Area.Record>> {
+  export function parseAreas(
+    cfg: AreasConfig,
+    factories: Map<string, Area.Factory> = Map()
+  ): Map<string, Map<string, Area>> {
     if (Array.isArray(cfg)) cfg = {[Area.selector]: cfg};
-    const selectorsCfg: Map<string, Map<string, Area.Config>> = (
-      Map.isMap(cfg) ? cfg :
-        Map(cfg).map(areaCfgs => areaCfgs.reduce(
-          (acc, areaCfg) => acc.set(areaCfg.key, areaCfg),
-          Map<string, Area.Config>()
-        ))
-    );
-    return selectorsCfg.map(
-      selectors => selectors.map(areaCfg => Area.factory.serialize(areaCfg))
-    );
+    if (!Map.isMap(cfg)) cfg = Map(cfg).map(areaCfgs => areaCfgs.reduce(
+      (acc, areaCfg) => acc.set(areaCfg.key, areaCfg),
+      Map<string, Area.Config>()
+    ));
+    return cfg.map((selectorCfgs, areaSelector) => {
+      const areaFactory = factories.get(areaSelector, Area.factory);
+      return selectorCfgs.map(areaCfg => areaFactory.serialize(areaCfg));
+    });
   }
 
   // tslint:disable-next-line:max-line-length
@@ -93,8 +118,65 @@ export module ItmGrid {
       );
   }
 
-  export const selectorCallPattern = `(?:${GridArea.selectorPattern})?:${GridArea.keyPattern}`;
-  export const fragmentPattern = `(?:(?:${GridArea.keyPattern})|(?:${selectorCallPattern})|=|\\.)`;
+  export function parsePositions(
+    template: Template,
+    areas: Map<string, Map<string, Area>>,
+    defaultSelector = Area.selector
+  ): Map<string, RecordOf<Position>> {
+    return template
+      .toList()
+      .map((fragments, row) => fragments.toList().map((fragment, col) => ({col, fragment, row})))
+      .flatten()
+      .reduce<Map<string, [[number, number], [number, number]]>>(
+        (positions, {col, fragment, row}, i, fragments) => {
+          const prev = row && col ? fragments.get(i - 1).fragment : null;
+          if (
+            prev &&
+            prev !== fragment &&
+            positions.get(prev)[1][1] >= col
+          ) throw new TypeError(`Invalid row start: '${fragment}'`);
+          if (!fragment) return positions;
+          if (!positions.has(fragment)) return positions.set(fragment, [[row, col], [row, col]]);
+          const [[startRow, startCol], [endRow, endCol]] = positions.get(fragment);
+          // tslint:disable-next-line:max-line-length
+          if (row === startRow && col - 1 > endCol) throw new TypeError(`Invalid column end: '${fragment}'`);
+          // tslint:disable-next-line:max-line-length
+          if (row > startRow && fragment !== prev && col > startCol) throw new TypeError(`Invalid column start: '${fragment}'`);
+          if (row - 1 > endRow) throw new TypeError(`Invalid row end: '${fragment}'`);
+          return positions.set(
+            fragment,
+            [[startRow, startCol], [Math.max(row, endRow), Math.max(col, endCol)]]
+          );
+        },
+        Map()
+    )
+    .map((position, fragment) => {
+      const areaPath = (
+        !fragment.indexOf(':') ? [Area.selector, fragment.slice(1)] :
+        fragment.indexOf(':') > 0 ? fragment.split(':') :
+          [defaultSelector, fragment]
+      );
+      const area = areas.getIn(areaPath);
+      if (!area) throw new ReferenceError(`Missing area for fragment : '${fragment}'`);
+      const [[row, col], [endRow, endCol]] = position;
+      return positionFactory({
+        selector: areaPath[0],
+        key: areaPath[1],
+        area,
+        row: row + 1,
+        col: col + 1,
+        width: endCol - col + 1,
+        height: endRow - row + 1
+      });
+    });
+  }
+
+  export const keyPattern = '[a-z]\\w+(?:\\.[a-z]\\w+)*';
+  export const keyRegExp = new RegExp(`^${keyPattern}$`);
+  export const selectorPattern = `${RecordFactory.selectorPattern}`;
+  export const selectorRegExp = new RegExp(`^${selectorPattern}$`);
+  export const selectorCallPattern = `(?:${selectorPattern})?:${keyPattern}`;
+  export const fragmentPattern = `(?:(?:${keyPattern})|(?:${selectorCallPattern})|=|\\.)`;
   export const fragmentRegExp = new RegExp(`^${fragmentPattern}$`);
   export const templateRowPattern = ` *(${fragmentPattern}(?: +${fragmentPattern})*) *`;
   export const templateRowRegExp = new RegExp(`^${templateRowPattern}$`);

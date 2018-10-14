@@ -22,18 +22,18 @@ interface ItmTableConfig<I extends Itm = Itm> {
   selectionLimit?: number;
 }
 
+export type ItmTable<I extends Itm = Itm> = RecordOf<ItmTable.Model<I>>;
+
 export module ItmTable {
   export type Config<I extends Itm = Itm> = ItmTableConfig<I>;
 
   export interface Model<I extends Itm = Itm> extends Config<I> {
-    rowActions: Set<Action.Record<I>>;
-    columns: Set<Column.Record>;
+    rowActions: Set<Action<I>>;
+    columns: Set<Column>;
     setRowClass: ItmPipe<I, string>;
     canSelect: boolean | ItmPipe<I, boolean>;
     selectionLimit: number;
   }
-
-  export type Record<I extends Itm = Itm> = RecordOf<Model<I>>;
 
   const serializer = (cfg: RecordOf<Config>): Model => {
     const rowActions = Set(cfg.rowActions).map(actionCfg => Action.factory.serialize(actionCfg));
@@ -48,7 +48,7 @@ export module ItmTable {
 
   const selector = 'table';
 
-  export const factory: RecordFactory<Record, Config> = RecordFactory.build({
+  export const factory: RecordFactory<ItmTable, Config> = RecordFactory.build({
     selector,
     serializer,
     model: {

@@ -25,7 +25,7 @@ export class ItmControlComponent {
 
   constructor(
     @Inject(Area.RECORD_TOKEN)
-    readonly control: Control.Record,
+    readonly control: Control,
     @Inject(ITM_TARGET)
     readonly item: Itm
   ) {

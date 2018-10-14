@@ -28,7 +28,7 @@ import { ItmButtonComponent } from './button.component';
 class ItmAreaMockDirective<T = {}> {
   // tslint:disable-next-line:no-input-rename
   @Input('itmArea')
-  area: Area.Record;
+  area: Area;
 
   /** The emitter of action events. */
   @Input()

@@ -71,7 +71,7 @@ const TYPE_RECORD_MAP_PROVIDER: StaticProvider = {
       if (!Type.factory.isFactoryRecord(record)) throw new TypeError('Expected ItmType record');
       return map.set(record.key, record);
     },
-    Map<string, Type.Record>()
+    Map<string, Type>()
   )
 };
 
