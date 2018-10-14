@@ -65,10 +65,11 @@ export class ItmAreaDirective<T = {}, A extends Action = Action<T>> implements O
       .toArray();
 
       const comp = (
-      this.area.cell ||
-      shared.reverse().reduce<ComponentType>((acc, {defaultComp}) => (acc || defaultComp), null) ||
-      this._injector.get(ItmConfig).defaultTextAreaComp
-    );
+        this.area.cell ||
+        // tslint:disable-next-line:max-line-length
+        shared.reverse().reduce<ComponentType>((acc, {defaultComp}) => (acc || defaultComp), null) ||
+        this._injector.get(ItmConfig).defaultTextAreaComp
+      );
 
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
 

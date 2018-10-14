@@ -1,7 +1,7 @@
 import { Map } from 'immutable';
 
 import Control from './control';
-import Field from './control';
+import Field from './field';
 import Grid from './grid';
 
 export module ItmForm {
