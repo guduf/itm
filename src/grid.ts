@@ -13,7 +13,6 @@ export module ItmGrid {
   export interface Position {
     selector: string;
     key: string;
-    area: Area;
     row: number;
     col: number;
     width: number;
@@ -21,7 +20,7 @@ export module ItmGrid {
   }
 
   // tslint:disable-next-line:max-line-length
-  const positionFactory = createRecord<Position>({selector: null, key: null, area: null, row: null, col: null, width: null, height: null});
+  const positionFactory = createRecord<Position>({selector: null, key: null, row: null, col: null, width: null, height: null});
 
   export interface Config<T extends Object = {}> {
     areas?: AreasConfig<T>;
@@ -156,13 +155,10 @@ export module ItmGrid {
         fragment.indexOf(':') > 0 ? fragment.split(':') :
           [defaultSelector, fragment]
       );
-      const area = areas.getIn(areaPath);
-      if (!area) throw new ReferenceError(`Missing area for fragment : '${fragment}'`);
       const [[row, col], [endRow, endCol]] = position;
       return positionFactory({
         selector: areaPath[0],
         key: areaPath[1],
-        area,
         row: row + 1,
         col: col + 1,
         width: endCol - col + 1,

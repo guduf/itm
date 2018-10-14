@@ -22,9 +22,11 @@ import { ItmActionsAreaComponent } from './actions-area.component';
 import { ItmTextAreaComponent } from './text-area.component';
 import { ItmAreaDirective, ITM_AREA_FACTORY_MAP_TOKEN } from './area.directive';
 import { ItmControlComponent } from './control.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const IMPORTS = [
   CommonModule,
+  ReactiveFormsModule,
   ItmMaterialModule
 ];
 

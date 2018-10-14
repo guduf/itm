@@ -148,8 +148,8 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
   ): OrderedMap<string, S> {
     if (!this.isFactoryRecord(record)) throw new TypeError('Expected factory record');
     return ItmRecordFactory.getFactories(factories, record)
-      .map(ancestor => ancestor.shared as S)
-      .filter(shared => shared instanceof shared.constructor);
+      .map(ancestor => (ancestor ? ancestor.shared : null) as S)
+      .filter(shared => shared && shared instanceof this.shared.constructor);
   }
 
   isExtendedFactory(factory: ItmRecordFactory<R, C, any, S>): boolean {
@@ -174,11 +174,7 @@ export module ItmRecordFactory {
     record: R
   ): OrderedMap<string, ItmRecordFactory<R, C, M, S>> {
     return Record.getDescriptiveName(record).split(ItmRecordFactory.selectorSeparator).reduce(
-      (acc, selector) => {
-        // tslint:disable-next-line:max-line-length
-        if (!factories.has(selector)) throw new ReferenceError('Missing ItmRecordFactory with selector: ' + selector);
-        return acc.set(selector, factories.get(selector));
-      },
+      (acc, selector) => acc.set(selector, factories.get(selector, null)),
       OrderedMap<string, ItmRecordFactory<R, C, M, S>>()
     );
   }

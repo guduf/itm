@@ -6,6 +6,7 @@ import Area from './area';
 import Field from './field';
 import { Itm } from './item';
 import { ItmControlComponent } from './control.component';
+import GridControl from './grid-control';
 
 export type ItmControl<I extends Itm = Itm> = Field<I> & RecordOf<ItmControl.Model<I>>;
 
@@ -47,19 +48,9 @@ export module ItmControl {
     model: {type: null, pattern: null, required: null},
     shared: new Area.Shared({
       defaultComp: ItmControlComponent,
-      provide: (record: ItmControl, target: Itm) => (
-        Map<InjectionToken<any>, any>()
-          .set(ABSTRACT_CONTROL_TOKEN, buildFormControl(record, target))
-      )
+      gridAreaFactory: GridControl.factory
     })
   });
-
-  export function buildFormControl<I extends Itm = Itm>(
-    record: ItmControl<I>,
-    target: I
-  ): AbstractControl {
-    return new FormControl(target[record.key]);
-  }
 }
 
 export default ItmControl;

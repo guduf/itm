@@ -1,11 +1,10 @@
 import { Component, HostBinding, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Itm, fromStringPipe, ITM_TARGET } from './item';
-import Control from './control';
-import Field from './field';
+import { fromStringPipe } from './item';
+import GridControl from './grid-control';
 import Area from './area';
-import { RecordOf } from 'immutable';
+import { ITM_GRID_AREA_TOKEN } from './grid-area';
 
 const SELECTOR = 'itm-control';
 
@@ -13,7 +12,10 @@ const SELECTOR = 'itm-control';
   selector: SELECTOR,
   template: `
     <mat-form-field>
-      <input matInput [type]="control.type" [placeholder]="renderedLabel | async"/>
+      <input matInput
+        [type]="control.area.type"
+        [placeholder]="renderedLabel | async"
+        [formControl]="control.formControl"/>
     </mat-form-field>
   `
 })
@@ -26,11 +28,10 @@ export class ItmControlComponent {
   get hostClass(): string { return SELECTOR; }
 
   constructor(
-    @Inject(Area.RECORD_TOKEN)
-    readonly control: Field & RecordOf<Control.Model>,
-    @Inject(ITM_TARGET)
-    readonly item: Itm
+    @Inject(ITM_GRID_AREA_TOKEN)
+    readonly control: GridControl
   ) {
-    this.renderedLabel = control.label === false ? null : fromStringPipe(control.label, item);
+    const {area: {label}, target} = control;
+    this.renderedLabel = label === false ? null : fromStringPipe(label, target.value);
   }
 }

@@ -1,7 +1,10 @@
-import { Set } from 'immutable';
+// tslint:disable:max-line-length
+import { Map } from 'immutable';
 
 import Area from './area';
 import Grid from './grid';
+import GridArea from './grid-area';
+import { BehaviorSubject } from 'rxjs';
 
 describe('ItmGridArea', () => {
   describe('parseAreas()', () => {
@@ -11,7 +14,8 @@ describe('ItmGridArea', () => {
     });
 
     function parseGridAreas(template: string) {
-      return Grid.factory.serialize({template, areas});
+      const grid = Grid.factory.serialize({template, areas});
+      return GridArea.parseGridAreas(Map(), grid, new BehaviorSubject(null));
     }
 
     it('should throw a type error when template is invalid', () => {
@@ -40,9 +44,8 @@ describe('ItmGridArea', () => {
         id  .             name =
         id  control:email name =
       `;
-      const gridAreas = parseGridAreas(template).positions.toSet().toArray();
+      const gridAreas = parseGridAreas(template).toSet().toArray();
       const expectedIdPos = {
-        area: areas.getIn([Area.selector, 'id']).toJS(),
         selector: Area.selector,
         key: 'id',
         row: 1,
@@ -50,9 +53,8 @@ describe('ItmGridArea', () => {
         width: 1,
         height: 2
       };
-      expect(gridAreas[0].toJS()).toEqual(expectedIdPos, 'Expected same grid area with key id');
+      expect(gridAreas[0].position.toJS()).toEqual(expectedIdPos, 'Expected same grid area with key id');
       const expectedNamePos = {
-        area: areas.getIn([Area.selector, 'name']).toJS(),
         selector: Area.selector,
         key: 'name',
         row: 1,
@@ -60,9 +62,8 @@ describe('ItmGridArea', () => {
         width: 2,
         height: 2
       };
-      expect(gridAreas[1].toJS()).toEqual(expectedNamePos, 'Expected same grid area with key name');
+      expect(gridAreas[1].position.toJS()).toEqual(expectedNamePos, 'Expected same grid area with key name');
       const expectedEmailPos = {
-        area: areas.getIn(['control', 'email']).toJS(),
         selector: 'control',
         key: 'email',
         row: 2,
@@ -71,7 +72,7 @@ describe('ItmGridArea', () => {
         height: 1
       };
       // tslint:disable-next-line:max-line-length
-      expect(gridAreas[2].toJS()).toEqual(expectedEmailPos, 'Expected same grid area with key email');
+      expect(gridAreas[2].position.toJS()).toEqual(expectedEmailPos, 'Expected same grid area with key email');
     });
   });
 });

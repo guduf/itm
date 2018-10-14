@@ -3,6 +3,7 @@ import { InjectionToken } from '@angular/core';
 import { Map, RecordOf, Collection } from 'immutable';
 
 import { ItmAreaConfig } from './area-config';
+import GridArea from './grid-area';
 import { ItmPipeLike } from './item';
 import RecordFactory from './record-factory';
 import { ComponentType, isComponentType } from './utils';
@@ -49,6 +50,7 @@ export module ItmArea {
   export class Shared<R extends ItmArea<T> = ItmArea<T>, T = {}> {
     readonly defaultComp?: ComponentType;
     readonly provide?: (record: R, target: T) => Map<InjectionToken<any>, any>;
+    readonly gridAreaFactory?: RecordFactory<GridArea>;
 
     constructor(shared: Shared<R>) { Object.assign(this, shared); }
   }
