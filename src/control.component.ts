@@ -3,7 +3,9 @@ import { Observable } from 'rxjs';
 
 import { Itm, fromStringPipe, ITM_TARGET } from './item';
 import Control from './control';
+import Field from './field';
 import Area from './area';
+import { RecordOf } from 'immutable';
 
 const SELECTOR = 'itm-control';
 
@@ -25,7 +27,7 @@ export class ItmControlComponent {
 
   constructor(
     @Inject(Area.RECORD_TOKEN)
-    readonly control: Control,
+    readonly control: Area & RecordOf<Field.Model & Control.Model>,
     @Inject(ITM_TARGET)
     readonly item: Itm
   ) {

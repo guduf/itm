@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Itm, fromStringPipe, ITM_TARGET } from './item';
 import Field from './field';
 import Area from './area';
+import { RecordOf } from 'immutable';
 
 const SELECTOR = 'itm-field';
 
@@ -27,7 +28,7 @@ export class ItmFieldComponent {
 
   constructor(
     @Inject(Area.RECORD_TOKEN)
-    area: Field,
+    area: Area & RecordOf<Field.Model>,
     @Inject(ITM_TARGET)
     item: Itm
   ) {
