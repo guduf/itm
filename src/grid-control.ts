@@ -1,19 +1,21 @@
-import { AbstractControl, FormControl } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { RecordOf } from 'immutable';
 
 import Control from './control';
+import Form from './form';
 import GridArea from './grid-area';
 import RecordFactory from './record-factory';
 
-export type ItmGridControl = GridArea<Control> & RecordOf<ItmGridControl.Model>;
+export type ItmGridControl = GridArea<Form, Control> & RecordOf<ItmGridControl.Model>;
 
 export module ItmGridControl {
   export interface Model {
     formControl: AbstractControl;
   }
 
-  const serializer = (cfg: null, ancestor: GridArea<Control>): Model => {
-    const formControl = new FormControl(ancestor.target.value[ancestor.area.key]);
+  const serializer = (cfg: null, {area, grid, target}: GridArea<Form, Control>): Model => {
+    const formControl = new FormControl(target.value[area.key]);
+    if (grid.formGroup instanceof FormGroup) grid.formGroup.setControl(area.key, formControl);
     return {formControl};
   };
 
@@ -23,7 +25,7 @@ export module ItmGridControl {
     selector,
     serializer,
     model: {formControl: null},
-    ancestors: [GridArea.factory as GridArea.Factory<Control>]
+    ancestors: [GridArea.factory as any]
   });
 }
 

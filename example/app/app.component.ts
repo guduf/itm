@@ -16,7 +16,7 @@ const tableTemplate  = `
 @Component({
   selector: 'app-root',
   template: `
-    <itm-grid [grid]="'user' | itmTypeGrid:grid" [source]="target"></itm-grid>
+    <itm-grid [grid]="'user' | itmTypeForm:grid" [source]="target"></itm-grid>
   `,
   styleUrls: ['./app.component.scss']
 })
@@ -32,9 +32,9 @@ export class AppComponent {
 
   grid: Grid.Config = {
     template: `
-      field:id        . gender
-      firstName = lastName  =
-      email     =
+      field:id          . gender    =
+      firstName         = lastName  =
+      email             = =         =
       control:ipAddress =
     `
   };

@@ -3,6 +3,7 @@ import { Map } from 'immutable';
 
 import { Itm } from './item';
 import Grid from './grid';
+import Form from './form';
 import Table from './table';
 import Type from './type';
 
@@ -28,6 +29,18 @@ export class ItmTypeGridPipe implements PipeTransform {
   transform(key: string, cfg?: Grid.Config): Grid {
     const typeGrid = this._typeService.get(key).form;
     return cfg ? Grid.factory.serialize(typeGrid, cfg) : typeGrid;
+  }
+}
+
+@Pipe({name: 'itmTypeForm'})
+export class ItmTypeFormPipe implements PipeTransform {
+  constructor(
+    private _typeService: ItmTypeService
+  ) { }
+
+  transform(key: string, cfg?: Grid.Config): Form {
+    const typeForm = this._typeService.get(key).form;
+    return cfg ? Form.factory.serialize(typeForm, cfg) : typeForm;
   }
 }
 

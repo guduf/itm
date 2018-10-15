@@ -9,12 +9,13 @@ import RecordFactory from './record-factory';
 export const ITM_GRID_AREA_TOKEN = new InjectionToken<ItmGridArea>('ITM_GRID_AREA_TOKEN');
 
 // tslint:disable-next-line:max-line-length
-export type ItmGridArea<A extends Area<T> = Area<T>, T extends Object = {}> = RecordOf<ItmGridArea.Model<A>>;
+export type ItmGridArea<G extends Grid = Grid, A extends Area<T> = Area<T>, T extends Object = {}> = RecordOf<ItmGridArea.Model<G, A, T>>;
 
 export module ItmGridArea {
-  export interface Model<A extends Area<T> = Area<T>, T extends Object = {}> {
+  // tslint:disable-next-line:max-line-length
+  export interface Model<G extends Grid = Grid, A extends Area<T> = Area<T>, T extends Object = {}> {
     target: BehaviorSubject<T>;
-    grid: Grid;
+    grid: G;
     area: A;
     position: RecordOf<Grid.Position>;
   }
@@ -29,7 +30,7 @@ export module ItmGridArea {
   export const selector = 'gridArea';
 
   // tslint:disable-next-line:max-line-length
-  export type Factory<A extends Area<T> = Area<T>, T extends Object = T> = RecordFactory<ItmGridArea<A>>;
+  export type Factory<G extends Grid = Grid, A extends Area<T> = Area<T>, T extends Object = T> = RecordFactory<ItmGridArea<G, A, T>>;
 
   export const factory: Factory = RecordFactory.build({
     selector,
@@ -37,13 +38,15 @@ export module ItmGridArea {
     model: {target: null, grid: null, area: null, position: null}
   });
 
-  // tslint:disable-next-line:max-line-length
-  export function parseGridAreas<T extends Object = T>(areaFactories: Map<string, Area.Factory>, grid: Grid, target: BehaviorSubject<T>): Map<string, ItmGridArea<Area<T>>> {
+  export function parseGridAreas<T extends Object = T>(
+    areaFactories: Map<string, Area.Factory>,
+    grid: Grid, target: BehaviorSubject<T>
+  ): Map<string, ItmGridArea<Grid, Area<T>>> {
     return grid.positions.map(position => {
       const area = grid.areas.getIn([position.selector, position.key]);
       // tslint:disable-next-line:max-line-length
       if (!Area.factory.isFactoryRecord(area)) throw new ReferenceError(`Missing area for fragment : '${position.selector}:${position.key}'`);
-      const gridAreaFactory: RecordFactory<ItmGridArea<Area<T>>> = (
+      const gridAreaFactory: RecordFactory<ItmGridArea<Grid, Area<T>>> = (
         (
           Area.factory.getShared(areaFactories, area)
             .reverse()

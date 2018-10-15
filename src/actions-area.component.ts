@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import Action from './action';
-import ActionEvent from './action-event';
+import ActionEvent, { ITM_ACTION_EVENT_EMITTER_TOKEN } from './action-event';
 import { ItmButtonMode } from './button.component';
 import { ITM_TARGET } from './item';
 
@@ -22,7 +22,7 @@ export class ItmActionsAreaComponent<T = {}> {
     readonly actions: Set<Action>,
     @Inject(Action.BUTTON_MODE_TOKEN)
     readonly buttonsMode: Observable<ItmButtonMode>,
-    @Inject(ActionEvent.EMITTER_TOKEN)
+    @Inject(ITM_ACTION_EVENT_EMITTER_TOKEN)
     readonly emitter: ActionEvent.Emitter,
     @Inject(ITM_TARGET)
     readonly target: T

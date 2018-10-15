@@ -67,8 +67,9 @@ export class ItmActionEvent<T = {}, A extends Action = Action> {
 export module ItmActionEvent {
   // tslint:disable-next-line:max-line-length
   export type Emitter<T = {}, A extends Action<T> = Action<T>> = Subject<ItmActionEvent<T, A>>;
-
-  export const EMITTER_TOKEN = new InjectionToken('ITM_ACTION_EVENT_EMITTER');
 }
+
+// tslint:disable-next-line:max-line-length
+export const ITM_ACTION_EVENT_EMITTER_TOKEN = new InjectionToken<ItmActionEvent.Emitter>('ITM_ACTION_EVENT_EMITTER');
 
 export default ItmActionEvent;

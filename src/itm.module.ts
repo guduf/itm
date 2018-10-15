@@ -14,7 +14,7 @@ import { ItmConfig } from './config';
 import { ItmMaterialModule } from './material.module';
 import { ItmTableComponent } from './table.component';
 import { ItmButtonsComponent } from './buttons.component';
-import { ItmTypeService, ItmTableTypePipe, ItmTypeGridPipe } from './type.service';
+import { ItmTypeService, ItmTableTypePipe, ItmTypeGridPipe, ItmTypeFormPipe } from './type.service';
 import Type from './type';
 import { ItmGridComponent } from './grid.component';
 import { ItmFieldComponent } from './field.component';
@@ -48,6 +48,7 @@ const EXPORTED_DECLARATIONS = [
   ItmTypeGridPipe,
   ItmTableComponent,
   ItmTableTypePipe,
+  ItmTypeFormPipe
 ];
 
 export const DEFAULT_CONFIG: ItmConfig = {

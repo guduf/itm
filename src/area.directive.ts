@@ -13,7 +13,7 @@ import {
 import { Map } from 'immutable';
 
 import Action from './action';
-import ActionEvent from './action-event';
+import ActionEvent, { ITM_ACTION_EVENT_EMITTER_TOKEN } from './action-event';
 import Area from './area';
 import { ItmConfig } from './config';
 import { ITM_TARGET } from './item';
@@ -77,7 +77,7 @@ export class ItmAreaDirective<T = {}, A extends Action = Action<T>> implements O
       ...(Array.isArray(this.providers) ? this.providers : []),
       {provide: Area.RECORD_TOKEN, useValue: this.area},
       {provide: ITM_TARGET, useValue: this.target},
-      {provide: ActionEvent.EMITTER_TOKEN, useValue: this.action},
+      {provide: ITM_ACTION_EVENT_EMITTER_TOKEN, useValue: this.action},
       ...factoriesProviders
     ];
     const injector = Injector.create(providers, this._injector);

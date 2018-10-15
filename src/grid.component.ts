@@ -26,7 +26,7 @@ const SELECTOR = 'itm-grid';
     </div>
   `
 })
-export class ItmGridComponent<T = {}> implements OnChanges, OnDestroy {
+export class ItmGridComponent<T extends Object = {}> implements OnChanges, OnDestroy {
   @Input()
   /** The configuration of the grid. */
   grid: Grid.Config = null;

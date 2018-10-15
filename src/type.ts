@@ -36,7 +36,7 @@ export module ItmType {
   export interface Model<I extends Itm = Itm> extends Config<I> {
     key: string;
     grid: Grid;
-    form: Grid;
+    form: Form;
     table: Table<I>;
     target: any;
     props: Map<string & keyof I, Prop>;
