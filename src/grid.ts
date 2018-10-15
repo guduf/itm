@@ -1,6 +1,7 @@
 import Area from './area';
 import RecordFactory from './record-factory';
-import { Map, RecordOf, Range, Record as createRecord, Set } from 'immutable';
+import { Map, RecordOf, Range, Record as createRecord, Set, Seq, List } from 'immutable';
+import { BehaviorSubject } from 'rxjs';
 
 export type ItmGrid = RecordOf<ItmGrid.Model>;
 
@@ -33,9 +34,10 @@ export module ItmGrid {
     positions: Map<string, RecordOf<Position>>;
   }
 
-  export class Shared {
+  export class Shared<R extends ItmGrid = ItmGrid, T extends Object = {}, I = {}> {
     readonly areaFactories?: Map<string, Area.Factory>;
     readonly defaultSelector?: string;
+    readonly onInit?: (record: R, target: BehaviorSubject<T>) => I;
 
     constructor(shared: Partial<Shared>) { Object.assign(this, shared); }
 
@@ -50,14 +52,14 @@ export module ItmGrid {
   const serializer = (cfg: RecordOf<Config>, ancestor: null, shared: Shared): Model => {
     const areas = parseAreas(cfg.areas, shared.areaFactories);
     const template = parseTemplate(cfg.template);
-    const positions = ItmGrid.parsePositions(template, areas, shared.defaultSelector);
+    const positions = ItmGrid.parsePositions(template, shared.defaultSelector);
     return {areas, template, positions};
   };
 
   const selector = 'grid';
 
   // tslint:disable-next-line:max-line-length
-  export type Factory<R extends ItmGrid = ItmGrid , C extends ItmGrid.Config = ItmGrid.Config> = RecordFactory<R, C, any, Shared>;
+  export type Factory<R extends ItmGrid = ItmGrid , C extends ItmGrid.Config = ItmGrid.Config, I = {}> = RecordFactory<R, C, any, Shared<R, I>>;
 
   export const factory: Factory = RecordFactory.build({
     selector,
@@ -119,7 +121,6 @@ export module ItmGrid {
 
   export function parsePositions(
     template: Template,
-    areas: Map<string, Map<string, Area>>,
     defaultSelector = Area.selector
   ): Map<string, RecordOf<Position>> {
     return template
@@ -149,22 +150,25 @@ export module ItmGrid {
         },
         Map()
     )
-    .map((position, fragment) => {
-      const areaPath = (
-        !fragment.indexOf(':') ? [Area.selector, fragment.slice(1)] :
-        fragment.indexOf(':') > 0 ? fragment.split(':') :
-          [defaultSelector, fragment]
-      );
-      const [[row, col], [endRow, endCol]] = position;
-      return positionFactory({
-        selector: areaPath[0],
-        key: areaPath[1],
-        row: row + 1,
-        col: col + 1,
-        width: endCol - col + 1,
-        height: endRow - row + 1
-      });
-    });
+    .reduce(
+      (gridAreas, [[row, col], [endRow, endCol]], fragment) => {
+        const areaPath = List(
+          !fragment.indexOf(':') ? [Area.selector, fragment.slice(1)] :
+          fragment.indexOf(':') > 0 ? fragment.split(':') :
+            [defaultSelector, fragment]
+        );
+        const position = positionFactory({
+          selector: areaPath.first(),
+          key: areaPath.last(),
+          row: row + 1,
+          col: col + 1,
+          width: endCol - col + 1,
+          height: endRow - row + 1
+        });
+        return gridAreas.set(fragment, position);
+      },
+      Map<string, RecordOf<Position>>()
+    );
   }
 
   export const keyPattern = '[a-z]\\w+(?:\\.[a-z]\\w+)*';

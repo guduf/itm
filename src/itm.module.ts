@@ -9,6 +9,8 @@ import Area from './area';
 import Column from './column';
 import Control from './control';
 import Field from './field';
+import Form from './form';
+import Grid from './grid';
 import { ItmButtonComponent } from './button.component';
 import { ItmConfig } from './config';
 import { ItmMaterialModule } from './material.module';
@@ -16,7 +18,7 @@ import { ItmTableComponent } from './table.component';
 import { ItmButtonsComponent } from './buttons.component';
 import { ItmTypeService, ItmTableTypePipe, ItmTypeGridPipe, ItmTypeFormPipe } from './type.service';
 import Type from './type';
-import { ItmGridComponent } from './grid.component';
+import { ItmGridComponent, ITM_GRID_FACTORY_MAP_TOKEN } from './grid.component';
 import { ItmFieldComponent } from './field.component';
 import { ItmActionsAreaComponent } from './actions-area.component';
 import { ItmTextAreaComponent } from './text-area.component';
@@ -88,7 +90,6 @@ const BUILTIN_AREA_FACTORIES: Area.Factory[] = [
 // tslint:disable-next-line:max-line-length
 const AREA_FACTORIES_INIT_TOKEN = new InjectionToken<Area.Factory[]>('ITM_AREA_FACTORIES_INIT_TOKEN');
 
-// tslint:disable-next-line:max-line-length
 const AREA_FACTORY_MAP_PROVIDER = {
   provide: ITM_AREA_FACTORY_MAP_TOKEN,
   deps: [[new Optional(), AREA_FACTORIES_INIT_TOKEN]],
@@ -103,10 +104,33 @@ const AREA_FACTORY_MAP_PROVIDER = {
     )
 };
 
+// tslint:disable-next-line:max-line-length
+const GRID_FACTORIES_INIT_TOKEN = new InjectionToken<Grid.Factory[]>('ITM_GRID_FACTORIES_INIT_TOKEN');
+
+const BUILTIN_GRID_FACTORIES: Grid.Factory[] = [
+  Grid.factory,
+  Form.factory
+];
+
+const GRID_FACTORY_MAP_PROVIDER = {
+  provide: ITM_GRID_FACTORY_MAP_TOKEN,
+  deps: [[new Optional(), GRID_FACTORIES_INIT_TOKEN]],
+  useFactory: (factories: Grid.Factory[] = []) => List(factories)
+    .merge(BUILTIN_GRID_FACTORIES)
+    .reduce(
+      (map, factory) => {
+        if (!Grid.factory.isExtendedFactory(factory)) throw new TypeError('Expected Grid factory');
+        return map.set(factory.selector, factory);
+      },
+      Map<string, Grid.Factory>()
+    )
+};
+
 const PROVIDERS: StaticProvider[] = [
   {provide: ItmConfig, deps: [[new Optional(), ITM_CONFIG]], useFactory: configFactory},
   AREA_FACTORY_MAP_PROVIDER,
-  TYPE_RECORD_MAP_PROVIDER
+  TYPE_RECORD_MAP_PROVIDER,
+  GRID_FACTORY_MAP_PROVIDER
 ];
 
 const SERVICES = [
@@ -127,6 +151,7 @@ export module ItmModule {
   export interface Init {
     types?: any[];
     areaFactories?: Area.Factory[];
+    gridFactories?: Grid.Factory[];
     config?: ItmConfig;
   }
 
@@ -136,6 +161,7 @@ export module ItmModule {
       providers: [
         {provide: ITM_CONFIG, useValue: init.config || {}},
         {provide: AREA_FACTORIES_INIT_TOKEN, useValue: init.areaFactories || []},
+        {provide: GRID_FACTORIES_INIT_TOKEN, useValue: init.gridFactories || []},
         {provide: TYPES_INIT_TOKEN, useValue: init.types || []}
       ]
     };

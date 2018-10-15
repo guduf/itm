@@ -1,5 +1,5 @@
 // tslint:disable-next-line:max-line-length
-import { Component, EventEmitter, OnChanges, Input, SimpleChanges, HostBinding, Output, Inject, OnDestroy, StaticProvider } from '@angular/core';
+import { Component, EventEmitter, OnChanges, Input, SimpleChanges, HostBinding, Output, Inject, OnDestroy, StaticProvider, InjectionToken } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 import ActionEvent from './action-event';
@@ -9,6 +9,10 @@ import GridArea, { ITM_GRID_AREA_TOKEN } from './grid-area';
 import { List, Map } from 'immutable';
 import { ITM_AREA_FACTORY_MAP_TOKEN } from './area.directive';
 import { BehaviorSubject, Subscription, Observable } from 'rxjs';
+
+
+// tslint:disable-next-line:max-line-length
+export const ITM_GRID_FACTORY_MAP_TOKEN = new InjectionToken<Map<string, Area.Factory>>('ITM_GRID_FACTORY_MAP_TOKEN');
 
 /** The selector of ItmGridComponent. */
 const SELECTOR = 'itm-grid';
@@ -69,7 +73,9 @@ export class ItmGridComponent<T extends Object = {}> implements OnChanges, OnDes
   constructor(
     private _sanitizer: DomSanitizer,
     @Inject(ITM_AREA_FACTORY_MAP_TOKEN)
-    private _areaFactories: Map<string, Area.Factory>
+    private _areaFactories: Map<string, Area.Factory>,
+    @Inject(ITM_GRID_FACTORY_MAP_TOKEN)
+    private _gridFactories: Map<string, Grid.Factory>
   ) { }
 
   getAreaRecord(fragment: string): Area<T> {
@@ -106,7 +112,12 @@ export class ItmGridComponent<T extends Object = {}> implements OnChanges, OnDes
     }
     if (gridChanges) {
       this._grid = Grid.factory.serialize(this.grid);
-      this._gridAreas = GridArea.parseGridAreas(this._areaFactories, this.gridRecord, this._target);
+      this._gridAreas = GridArea.parseGridAreas(
+        this._gridFactories,
+        this._areaFactories,
+        this.gridRecord,
+        this._target
+      );
       this.fragments = this._grid.positions.keySeq().toArray();
       this.size = [this._grid.template.first(List()).size, this._grid.template.size];
     }

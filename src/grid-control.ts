@@ -10,13 +10,16 @@ export type ItmGridControl = GridArea<Form, Control> & RecordOf<ItmGridControl.M
 
 export module ItmGridControl {
   export interface Model {
-    formControl: AbstractControl;
+    ngControl: AbstractControl;
   }
 
-  const serializer = (cfg: null, {area, grid, target}: GridArea<Form, Control>): Model => {
-    const formControl = new FormControl(target.value[area.key]);
-    if (grid.formGroup instanceof FormGroup) grid.formGroup.setControl(area.key, formControl);
-    return {formControl};
+  // tslint:disable-next-line:max-line-length
+  const serializer = (cfg: null, {area, init, target}: GridArea<Form, Control, any, Form.Init>): Model => {
+    const ngControl = (
+      init.getNgForm ? init.getNgForm().get(area.key) :
+        new FormControl(target.value[area.key])
+    );
+    return {ngControl};
   };
 
   const selector = 'gridControl';
@@ -24,7 +27,7 @@ export module ItmGridControl {
   export const factory: RecordFactory<ItmGridControl> = RecordFactory.build({
     selector,
     serializer,
-    model: {formControl: null},
+    model: {ngControl: null},
     ancestors: [GridArea.factory as any]
   });
 }

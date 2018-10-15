@@ -26,7 +26,7 @@ export class ItmControlComponent {
 
   get control(): Control { return this._gridControl.area; }
 
-  get formControl(): AbstractControl { return this._gridControl.formControl; }
+  get formControl(): AbstractControl { return this._gridControl.ngControl; }
 
   @HostBinding('class')
   /** The CSS class of the host element. */

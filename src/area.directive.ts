@@ -55,21 +55,12 @@ export class ItmAreaDirective<T = {}, A extends Action = Action<T>> implements O
 
     const shared = Area.factory.getShared(this._areaFactories, this.area);
 
-    const factoriesProviders = shared
-      .reduce<Map<InjectionToken<any>, any>>(
-        (acc, {provide}) => (provide ? acc.merge(provide(this.area, this.target)) : acc),
-        Map()
-      )
-      .map((value, token) => ({provide: token, useValue: value}))
-      .valueSeq()
-      .toArray();
-
-      const comp = (
-        this.area.cell ||
-        // tslint:disable-next-line:max-line-length
-        shared.reverse().reduce<ComponentType>((acc, {defaultComp}) => (acc || defaultComp), null) ||
-        this._injector.get(ItmConfig).defaultTextAreaComp
-      );
+    const comp = (
+      this.area.cell ||
+      // tslint:disable-next-line:max-line-length
+      shared.reverse().reduce<ComponentType>((acc, {defaultComp}) => (acc || defaultComp), null) ||
+      this._injector.get(ItmConfig).defaultTextAreaComp
+    );
 
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
 
@@ -77,8 +68,7 @@ export class ItmAreaDirective<T = {}, A extends Action = Action<T>> implements O
       ...(Array.isArray(this.providers) ? this.providers : []),
       {provide: Area.RECORD_TOKEN, useValue: this.area},
       {provide: ITM_TARGET, useValue: this.target},
-      {provide: ITM_ACTION_EVENT_EMITTER_TOKEN, useValue: this.action},
-      ...factoriesProviders
+      {provide: ITM_ACTION_EVENT_EMITTER_TOKEN, useValue: this.action}
     ];
     const injector = Injector.create(providers, this._injector);
 
