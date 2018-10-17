@@ -1,6 +1,6 @@
 
 import { InjectionToken } from '@angular/core';
-import { Map, RecordOf, Collection } from 'immutable';
+import { Map, RecordOf } from 'immutable';
 
 import { ItmAreaConfig } from './area-config';
 import GridArea from './grid-area';
@@ -83,10 +83,11 @@ export module ItmArea {
   export const keyPattern = `\\$?${RecordFactory.selectorPattern}`;
   export const keyRegExp = new RegExp(`^${keyPattern}$`);
 
-  export const RECORD_TOKEN = new InjectionToken<ItmArea>('ITM_AREA_RECORD');
 
   // tslint:disable-next-line:max-line-length
   export const FACTORY_MAP_TOKEN = new InjectionToken<Map<string, Factory>>('ITM_FACTORY_MAP_TOKEN');
 }
+
+export const ITM_AREA_RECORD_TOKEN = new InjectionToken('ITM_AREA_RECORD_TOKEN');
 
 export default ItmArea;

@@ -1,6 +1,6 @@
 import { Component, HostBinding, Inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import Area from './area';
+import Area, { ITM_AREA_RECORD_TOKEN } from './area';
 import { deferPipe, ITM_TARGET } from './item';
 
 const SELECTOR = 'itm-text-area';
@@ -21,7 +21,7 @@ export class ItmTextAreaComponent<T = {}> {
   rendered: Observable<string>;
 
   constructor(
-    @Inject(Area.RECORD_TOKEN)
+    @Inject(ITM_AREA_RECORD_TOKEN)
     area: Area,
     @Inject(ITM_TARGET)
     target: T

@@ -7,7 +7,7 @@ import RecordFactory from './record-factory';
 /** A generic action configuration. */
 interface ItmActionConfig<T = {}> {
   /** The identifier of the actions. */
-  key: string;
+  key?: string;
   /** Defines the action icon. */
   icon?: false | ItmPipeLike<T, string>;
   /** Defines the the text. */

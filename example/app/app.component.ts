@@ -32,10 +32,11 @@ export class AppComponent {
 
   grid: Grid.Config = {
     template: `
-      field:id          . gender    =
-      firstName         = lastName  =
-      email             = =         =
+      field:id          . gender        =
+      firstName         = lastName      =
+      email             = =             =
       control:ipAddress =
+      .                 . action:submit =
     `
   };
 

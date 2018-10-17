@@ -66,7 +66,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
     const serializer: ItmRecordFactory.Serializer<C, M> = typeof cfg.serializer === 'function' ? cfg.serializer : null;
     const model = ancestors
       .toStack()
-      .map(ancestor => ancestor._model)
+      .map(ancestor => ancestor.model)
       .push(cfg.model)
       .reduce((acc, val) => acc === val ? val : ({...(acc as any || {}), ...(val || {})}));
     return new ItmRecordFactory(selector, ancestors, cfg.shared || {}, model, serializer);
@@ -76,11 +76,11 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
     readonly selector: string,
     readonly ancestors: OrderedMap<string, ItmRecordFactory>,
     readonly shared: S,
-    private readonly _model: M,
+    readonly model: { [P in keyof M]: null },
     private readonly _serializer: ItmRecordFactory.Serializer<C, M>
   ) {
     if (this.ancestors.has(selector)) throw new TypeError('Ancestors has selector');
-    this._cfgFactory = Record(this._model);
+    this._cfgFactory = Record(this.model as M);
   }
 
   isFactoryRecord(maybeRecord: any): boolean {
@@ -117,7 +117,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
             console.error('SERIALIZE ERROR CONTEXT', {selector: this.selector, cfg: rootCfg.toJS()});
             throw err;
           }
-          record = Record(this._model, descriptiveName)(
+          record = Record(this.model as M, descriptiveName)(
             model ? record.mergeDeep(model) : record
           ) as R;
           return {ancestors, record};

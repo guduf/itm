@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule, InjectionToken, ModuleWithProviders, Optional, StaticProvider } from '@angular/core';
 import { Map, List } from 'immutable';
 
+import ActionArea from './action-area';
 import Area from './area';
 import Column from './column';
 import Control from './control';
@@ -25,6 +26,7 @@ import { ItmTextAreaComponent } from './text-area.component';
 import { ItmAreaDirective, ITM_AREA_FACTORY_MAP_TOKEN } from './area.directive';
 import { ItmControlComponent } from './control.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ItmActionAreaComponent } from './action-area.component';
 
 const IMPORTS = [
   CommonModule,
@@ -33,10 +35,11 @@ const IMPORTS = [
 ];
 
 const ENTRY_COMPONENTS = [
+  ItmActionAreaComponent,
   ItmActionsAreaComponent,
   ItmFieldComponent,
   ItmTextAreaComponent,
-  ItmControlComponent
+  ItmControlComponent,
 ];
 
 const DECLARATIONS = [
@@ -81,6 +84,7 @@ const TYPE_RECORD_MAP_PROVIDER: StaticProvider = {
 };
 
 const BUILTIN_AREA_FACTORIES: Area.Factory[] = [
+  ActionArea.factory,
   Area.factory,
   Column.factory,
   Control.factory,

@@ -14,7 +14,7 @@ import { Map } from 'immutable';
 
 import Action from './action';
 import ActionEvent, { ITM_ACTION_EVENT_EMITTER_TOKEN } from './action-event';
-import Area from './area';
+import Area, { ITM_AREA_RECORD_TOKEN } from './area';
 import { ItmConfig } from './config';
 import { ITM_TARGET } from './item';
 import { ComponentType } from './utils';
@@ -66,7 +66,7 @@ export class ItmAreaDirective<T = {}, A extends Action = Action<T>> implements O
 
     const providers = [
       ...(Array.isArray(this.providers) ? this.providers : []),
-      {provide: Area.RECORD_TOKEN, useValue: this.area},
+      {provide: ITM_AREA_RECORD_TOKEN, useValue: this.area},
       {provide: ITM_TARGET, useValue: this.target},
       {provide: ITM_ACTION_EVENT_EMITTER_TOKEN, useValue: this.action}
     ];
