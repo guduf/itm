@@ -1,35 +1,21 @@
-import { Component, HostBinding, Inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import Area, { ITM_AREA_RECORD_TOKEN } from './area';
-import { deferPipe, ITM_TARGET } from './item';
+import { Component, HostBinding } from '@angular/core';
+import { ItmAreaText } from './area';
 
 const SELECTOR = 'itm-text-area';
 
 @Component({
   selector: SELECTOR,
-  template: `{{rendered | async}}`
+  template: `{{text | async}}`
 })
 /**
  * Entry component created by CellDirective
  * when no component class is specified as cell for the ItmColumn. */
-export class ItmTextAreaComponent<T = {}> {
+export class ItmTextAreaComponent {
   @HostBinding('class')
   /** The css class attached to the host. */
   get hostClass() { return SELECTOR; }
 
-  /** The rendered string observable for the value. */
-  rendered: Observable<string>;
-
   constructor(
-    @Inject(ITM_AREA_RECORD_TOKEN)
-    area: Area,
-    @Inject(ITM_TARGET)
-    target: T
-  ) {
-    this.rendered = (
-      typeof area.text === 'function' ? deferPipe(area.text)(target) :
-      typeof area.text === 'string' ? of(area.text) :
-        of(area.key)
-    );
-  }
+    readonly text: ItmAreaText
+  ) { }
 }

@@ -1,27 +1,29 @@
-import { InjectionToken } from '@angular/core';
-import { AbstractControl, FormControl } from '@angular/forms';
+import { InjectionToken, Optional } from '@angular/core';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Map, RecordOf } from 'immutable';
 
 import Area from './area';
 import Field from './field';
-import { Itm } from './item';
-import { ItmControlComponent } from './control.component';
-import GridControl from './grid-control';
+import Target from './target';
 
-export type ItmControl<I extends Itm = Itm> = Field<I> & RecordOf<ItmControl.Model<I>>;
+export abstract class NgForm extends FormGroup { }
+
+export abstract class NgControl extends AbstractControl { }
+
+export type ItmControl<T extends Object = {}> = Field<T> & RecordOf<ItmControl.Model<T>>;
 
 export module ItmControl {
   export type Type = 'string' | 'number';
 
   export const TYPES: Type[] = ['string', 'number'];
 
-  export interface ModelConfig<I extends Itm = Itm> {
+  export interface ModelConfig<T extends Object = {}> {
     type?: Type;
     pattern?: RegExp;
     required?: boolean;
   }
 
-  export interface Model<I extends Itm = Itm> extends ModelConfig<I> {
+  export interface Model<T extends Object = {}> extends ModelConfig<T> {
     type: Type;
     pattern: RegExp;
     required: boolean;
@@ -38,17 +40,24 @@ export module ItmControl {
 
   export const selector = 'control';
 
-  export type Config<I extends Itm = Itm> = Field.Config<I> & ModelConfig<I>;
+  export type Config<T extends Object = {}> = Field.Config<T> & ModelConfig<T>;
 
   export const ABSTRACT_CONTROL_TOKEN = new InjectionToken<AbstractControl>('ITM_ABSTRACT_CONTROL');
+
+  const ngControlProvider: Area.Provider = {
+    deps: [Area, Target, [new Optional(), NgForm]],
+    useFactory: (area: Area, target: Target, ngForm?: NgForm): NgControl => (
+      ngForm ? ngForm.get(area.key) : new FormControl(target.value[area.key])
+    )
+  };
 
   export const factory: Area.Factory<ItmControl, Config> = Field.factory.extend({
     selector,
     serializer,
     model: {type: null, pattern: null, required: null},
     shared: new Area.Shared({
-      defaultComp: ItmControlComponent,
-      gridAreaFactory: GridControl.factory
+      defaultComp: cfg => cfg.defaultControlComp,
+      providers: Map<any, Area.Provider>().set(NgControl, ngControlProvider)
     })
   });
 }

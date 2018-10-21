@@ -1,48 +1,46 @@
+import { Map, RecordOf } from 'immutable';
+
 import Area from './area';
-import Column from './column';
 import Control from './control';
-import { Itm, ItmPipeLike } from './item';
 import { ComponentType } from './utils';
 import Field from './field';
 import RecordFactory from './record-factory';
-import { Map, RecordOf } from 'immutable';
+import Target from './target';
 
 // tslint:disable-next-line:max-line-length
-export function ItmProp<I extends Itm = Itm>(cfg: ItmProp.Config<I> = {}): PropertyDecorator {
-  return (proto: any, key: string & keyof I) => {
+export function ItmProp<T extends Object = {}>(cfg: ItmProp.Config<T> = {}): PropertyDecorator {
+  return (proto: any, key: string) => {
     if (typeof key !== 'string') return;
-    let props: Map<keyof I, ItmProp> = Reflect.get(proto, ItmProp.MAP_META);
+    let props: Map<string, ItmProp> = Reflect.get(proto, ItmProp.MAP_META);
     if (!props) (props = Map());
     const record = ItmProp.factory.serialize({key}, cfg);
     Reflect.set(proto, ItmProp.MAP_META, props.set(key, record));
   };
 }
 
-export type ItmProp<I extends Itm = Itm> = RecordOf<ItmProp.Model<I>>;
+export type ItmProp<T extends Object = {}> = RecordOf<ItmProp.Model<T>>;
 
 export module ItmProp {
-  export interface Config<I extends Itm = Itm> {
-    key?: keyof I & string;
+  export interface Config<T extends Object = {}> {
+    key?: string;
     /**
      * The component displayed in the container.
      * In case of component class, the value is used by the component factory.
      * In case of string, the value is used as the attribute for default cell. */
-    cell?: ItmPipeLike<I, string> | ComponentType | false;
-    header?: ItmPipeLike<I[], string> | ComponentType | false;
-    label?: ItmPipeLike<I, string> | false;
+    comp?: Target.PipeLike<T, string> | ComponentType | false;
+    header?: Target.PipeLike<T[], string> | ComponentType | false;
+    label?: Target.PipeLike<T, string> | false;
 
     area?: Partial<Area.Config>;
-    column?: Partial<Column.Config>;
     field?: Partial<Field.Config>;
     control?: Partial<Control.Config>;
     type?: Partial<Control.Type>;
   }
 
-  export interface Model<I extends Itm = Itm> extends Config<I> {
-    area: Area<I>;
-    column: Column<I>;
-    field: Field<I>;
-    control: Control<I>;
+  export interface Model<T extends Object = {}> extends Config<T> {
+    area: Area<T>;
+    field: Field<T>;
+    control: Control<T>;
   }
 
   const selector = 'prop';
@@ -50,23 +48,22 @@ export module ItmProp {
   const serializer = (cfg: RecordOf<Config>): Model => {
     if (!cfg.key && typeof cfg.key !== 'string') throw new TypeError('Expected key');
     const key = cfg.key;
-    const area = Area.factory.serialize({key, text: item => item[key]}, cfg, cfg.area);
-    const column = Column.factory.serialize(area, {header: cfg.header}, cfg.column);
+    const area = Area.factory.serialize({key, text: item => String(item[key])}, cfg, cfg.area);
     const field = Field.factory.serialize(area, {label: cfg.label}, cfg.field);
     const control = Control.factory.serialize(field, {type: cfg.type}, cfg.control);
-    return {key, area, column, control, field};
+    return {key, area, control, field};
   };
 
   export const factory: RecordFactory<ItmProp, Config> = RecordFactory.build({
     selector: selector,
     serializer,
     // tslint:disable-next-line:max-line-length
-    model: {key: null, cell: null, control: null, header: null, label: null, area: null, column: null, field: null}
+    model: {key: null, comp: null, control: null, header: null, label: null, area: null, field: null}
   });
 
   export const MAP_META = Symbol('ITM_PROPS_META');
 
-  export function get<I extends Itm = Itm>(target: any): Map<string & keyof I, ItmProp<I>> {
+  export function get<T extends Object = {}>(target: any): Map<string, ItmProp<T>> {
     return Reflect.get(target.prototype, MAP_META);
   }
 }

@@ -1,68 +1,81 @@
 
 import { InjectionToken } from '@angular/core';
 import { Map, RecordOf } from 'immutable';
+import { Observable, of, empty } from 'rxjs';
 
 import { ItmAreaConfig } from './area-config';
-import GridArea from './grid-area';
-import { ItmPipeLike } from './item';
+import ItmConfig from './config';
 import RecordFactory from './record-factory';
-import { ComponentType, isComponentType } from './utils';
+import Target from './target';
+import { ComponentType, isComponentType, AbstractRecord } from './utils';
 
-/** The definition of a column used by ItmTableComponent */
-class ItmAreaModel<T = {}> implements ItmArea.Config<T> {
-  /** see [[ItmAreaConfig.key]]. */
+export abstract class ItmAreaText extends Observable<string> { }
+
+// tslint:disable-next-line:max-line-length
+export abstract class ItmArea<T extends Object = {}> extends AbstractRecord<ItmArea.Model> implements RecordOf<ItmArea.Model> {
   readonly key: string;
-  /** see [[ItmAreaConfig.size]]. */
   readonly size: number;
-  /** see [[ItmAreaConfig.grow]]. */
   readonly grow: number;
-  /** see [[ItmAreaConfig.cell]]. */
-  readonly cell?: ComponentType;
-
-  readonly text?: ItmPipeLike<T, string>;
-
-  constructor(cfg: ItmAreaConfig<T>) {
-    if (!cfg.key || !ItmArea.keyRegExp.test(cfg.key)) throw new TypeError('Expected key');
-    this.key = cfg.key;
-    this.size = cfg.size && typeof cfg.size === 'number' ? cfg.size : 1;
-    this.grow = cfg.grow && typeof cfg.grow === 'number' ? cfg.grow : 1;
-    this.cell = cfg.cell !== false && isComponentType(cfg.cell) ? cfg.cell as ComponentType : null;
-    this.text = (
-      cfg.text === false ? null :
-      typeof cfg.text === 'function' ? cfg.text :
-      !this.cell && (typeof cfg.cell === 'string' || typeof cfg.cell === 'function') ?
-        cfg.cell as ItmPipeLike<T, string> :
-        this.key
-    );
-  }
+  readonly cell: ComponentType | null;
+  readonly text: Target.Pipe<T, string> | null;
 }
-
-export type ItmArea<T = {}> = RecordOf<ItmArea.Model<T>>;
 
 export module ItmArea {
   export const selector = 'area';
 
   export type Config<T = {}> = ItmAreaConfig<T>;
 
-  export type Model<T = {}> = ItmAreaModel<T>;
-
-
-  export class Shared<R extends ItmArea<T> = ItmArea<T>, T = {}> {
-    readonly defaultComp?: ComponentType;
-    readonly provide?: (record: R, target: T) => Map<InjectionToken<any>, any>;
-    readonly gridAreaFactory?: RecordFactory<GridArea>;
-
-    constructor(shared: Shared<R>) { Object.assign(this, shared); }
+  export interface Model<T = {}> extends  Config<T> {
+    key: string;
+    size: number;
+    grow: number;
+    cell: ComponentType | null;
+    text: Target.Pipe<T, string> | null;
   }
 
+  export type Provider = (
+    { useValue: any } |
+    { useFactory: Function, deps: any[] } |
+    { useClass: any }
+  );
+
   // tslint:disable-next-line:max-line-length
-  export type Factory<R extends ItmArea = ItmArea , C extends ItmArea.Config = ItmArea.Config> = RecordFactory<R, C, any, Shared<R>>;
+  export class Shared {
+    readonly defaultComp?: (cfg: ItmConfig) => ComponentType;
+    readonly providers?: Map<any, Provider>;
+
+    constructor(shared: Shared) { Object.assign(this, shared); }
+  }
+
+  const serializer = (cfg: RecordOf<Config>): Model => {
+    if (!cfg.key || !keyRegExp.test(cfg.key)) throw new TypeError('Expected key');
+    const key = cfg.key;
+    const size = cfg.size && typeof cfg.size === 'number' ? cfg.size : 1;
+    const grow = cfg.grow && typeof cfg.grow === 'number' ? cfg.grow : 1;
+    const cell = cfg.cell !== false && isComponentType(cfg.cell) ? cfg.cell as ComponentType : null;
+    const text: Target.Pipe<{}, string> = (
+      cfg.text === false ? () => empty() : Target.defer('string', cfg.text)
+    );
+    return {key, size, grow, cell, text};
+  };
+
+  const areaTextProvider: Provider = {
+    deps: [ItmArea, Target],
+    useFactory: (area: ItmArea, target: Target): ItmAreaText => (
+      Target.map(target, area.text || (() => of(area.key)))
+    )
+  };
+
+  // tslint:disable-next-line:max-line-length
+  export type Factory<R extends RecordOf<Model> = ItmArea , C extends ItmArea.Config = ItmArea.Config> = RecordFactory<R, C, any, Shared>;
 
   export const factory: Factory = RecordFactory.build({
     selector,
-    serializer: (cfg: Config) => new ItmAreaModel(cfg),
+    serializer,
     model: {key: null, size: null, grow: null, cell: null, text: null},
-    shared: new Shared({})
+    shared: new Shared({
+      providers: Map<any, Provider>().set(ItmAreaText, areaTextProvider)
+    })
   });
 
   export type Configs<C extends Config = Config> = C[] | Map<string, C>;
@@ -87,7 +100,5 @@ export module ItmArea {
   // tslint:disable-next-line:max-line-length
   export const FACTORY_MAP_TOKEN = new InjectionToken<Map<string, Factory>>('ITM_FACTORY_MAP_TOKEN');
 }
-
-export const ITM_AREA_RECORD_TOKEN = new InjectionToken('ITM_AREA_RECORD_TOKEN');
 
 export default ItmArea;

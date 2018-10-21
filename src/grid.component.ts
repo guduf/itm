@@ -1,18 +1,10 @@
 // tslint:disable-next-line:max-line-length
 import { Component, EventEmitter, OnChanges, Input, SimpleChanges, HostBinding, Output, Inject, OnDestroy, StaticProvider, InjectionToken } from '@angular/core';
-import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
-
-import ActionEvent from './action-event';
-import Area from './area';
-import Grid from './grid';
-import GridArea, { ITM_GRID_AREA_TOKEN } from './grid-area';
 import { List, Map } from 'immutable';
-import { ITM_AREA_FACTORY_MAP_TOKEN } from './area.directive';
 import { BehaviorSubject, Subscription, Observable } from 'rxjs';
 
-
-// tslint:disable-next-line:max-line-length
-export const ITM_GRID_FACTORY_MAP_TOKEN = new InjectionToken<Map<string, Area.Factory>>('ITM_GRID_FACTORY_MAP_TOKEN');
+import ItmConfig from './config';
+import Grid from './grid';
 
 /** The selector of ItmGridComponent. */
 const SELECTOR = 'itm-grid';
@@ -21,12 +13,9 @@ const SELECTOR = 'itm-grid';
   selector: SELECTOR,
   template: `
     <div *ngFor="let fragment of fragments"
-      [class]="getAreaClass(fragment)" [style.gridArea]="getAreaStyle(fragment)">
-      <ng-container
-        [itmArea]="getAreaRecord(fragment)"
-        [providers]="getAreaProviders(fragment)"
-        [action]="action"
-        [target]="target"></ng-container>
+      [class]="getAreaClass(fragment)"
+      [ngStyle]="getAreaStyle(fragment)">
+      <ng-container [itmArea]="getAreaRef(fragment)"></ng-container>
     </div>
   `
 })
@@ -41,7 +30,7 @@ export class ItmGridComponent<T extends Object = {}> implements OnChanges, OnDes
 
   @Output()
   /** The emitter of action events. */
-  action = new EventEmitter<ActionEvent<T>>();
+  action = new EventEmitter();
 
   /** The grid grid area map of the displayed areas. */
   fragments: string[];
@@ -66,36 +55,28 @@ export class ItmGridComponent<T extends Object = {}> implements OnChanges, OnDes
   get target() { return this._target.value; }
 
   private _grid?: Grid;
-  private _gridAreas: Map<string, GridArea>;
+  private _areaRefs: Map<string, Grid.AreaRef>;
   private _target = new BehaviorSubject<T>(undefined);
   private _sourceSubscr: Subscription;
 
   constructor(
-    private _sanitizer: DomSanitizer,
-    @Inject(ITM_AREA_FACTORY_MAP_TOKEN)
-    private _areaFactories: Map<string, Area.Factory>,
-    @Inject(ITM_GRID_FACTORY_MAP_TOKEN)
-    private _gridFactories: Map<string, Grid.Factory>
+    private _config: ItmConfig
   ) { }
 
-  getAreaRecord(fragment: string): Area<T> {
-    return this._gridAreas.get(fragment).area;
+  getAreaRef(fragment: string): Grid.AreaRef {
+    return this._areaRefs.get(fragment);
   }
 
-  getAreaStyle(fragment: string): SafeStyle {
+  getAreaStyle(fragment: string): { [key: string]: string } {
     const {row, col, width, height} = this.gridRecord.positions.get(fragment);
-    return this._sanitizer.bypassSecurityTrustStyle(
-      `${row} / ${col} / ${row + height} / ${col + width}`
-    );
+    return {
+      gridArea: `${row} / ${col} / ${row + height} / ${col + width}`
+    };
   }
 
   getAreaClass(fragment: string): string {
     const {key} = this.gridRecord.positions.get(fragment);
     return `${SELECTOR}-area ${SELECTOR}-key-${key}`;
-  }
-
-  getAreaProviders(fragment: string): StaticProvider[] {
-    return [{provide: ITM_GRID_AREA_TOKEN , useValue: this._gridAreas.get(fragment)}];
   }
 
   ngOnChanges({grid: gridChanges, source: sourceChanges}: SimpleChanges) {
@@ -112,12 +93,7 @@ export class ItmGridComponent<T extends Object = {}> implements OnChanges, OnDes
     }
     if (gridChanges) {
       this._grid = Grid.factory.serialize(this.grid);
-      this._gridAreas = GridArea.parseGridAreas(
-        this._gridFactories,
-        this._areaFactories,
-        this.gridRecord,
-        this._target
-      );
+      this._areaRefs = Grid.parseAreaRefs(this._config, this._grid, this._target);
       this.fragments = this._grid.positions.keySeq().toArray();
       this.size = [this._grid.template.first(List()).size, this._grid.template.size];
     }

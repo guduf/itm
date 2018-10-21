@@ -143,7 +143,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
   }
 
   getShared(
-    factories: Collection<string, ItmRecordFactory>,
+    factories: Collection<string, ItmRecordFactory<R, any, any, S>>,
     record: R
   ): OrderedMap<string, S> {
     if (!this.isFactoryRecord(record)) throw new TypeError('Expected factory record');

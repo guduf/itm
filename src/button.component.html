@@ -1,4 +1,3 @@
-
 <ng-container *ngIf="actionDef" [ngSwitch]="mode">
   <button *ngSwitchCase="'menu'" mat-menu-item (click)="emitEvent($event)">
     <ng-container *ngTemplateOutlet="btnBody"></ng-container>

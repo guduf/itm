@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { ItmModule } from 'src/itm.module';
 import { MatCheckboxModule, MatTableModule } from '@angular/material';
 import { User } from './user';
+import { List } from 'immutable';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,7 @@ import { User } from './user';
     BrowserAnimationsModule,
     MatCheckboxModule,
     MatTableModule,
-    ItmModule.create({types: [User]})
+    ItmModule.create({types: List([User])})
   ],
   providers: [],
   bootstrap: [AppComponent]

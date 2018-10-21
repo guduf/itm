@@ -7,39 +7,35 @@ import Control from './control';
 import Grid from './grid';
 import Field from './field';
 import Form from './form';
-import { Itm } from './item';
 import Prop from './prop';
 import RecordFactory from './record-factory';
-import Table from './table';
 
 const ITM_TYPE_META = Symbol('ITM_TYPE_META');
 
-export function ItmType<I extends Itm = Itm>(cfg: ItmType.Config<I> = {}): ClassDecorator {
+export function ItmType<I extends Object = {}>(cfg: ItmType.Config<I> = {}): ClassDecorator {
   return (target: any) => {
-    const props: Map<keyof I & string, Prop> = Prop.get(target);
+    const props: Map<string, Prop> = Prop.get(target);
     Reflect.set(target, ITM_TYPE_META, ItmType.factory.serialize({target, props}, cfg));
   };
 }
 
-export type ItmType<I extends Itm = Itm> = RecordOf<ItmType.Model<I>>;
+export type ItmType<I extends Object = {}> = RecordOf<ItmType.Model<I>>;
 
 export module ItmType {
-  export interface Config<I extends Itm = Itm> {
+  export interface Config<I extends Object = {}> {
     target?: any;
-    props?: Map<string & keyof I, Prop>;
+    props?: Map<string, Prop>;
     key?: string;
     grid?: Grid.Config<I>;
     form?: Grid.Config<I>;
-    table?: Table.Config<I>;
   }
 
-  export interface Model<I extends Itm = Itm> extends Config<I> {
+  export interface Model<I extends Object = {}> extends Config<I> {
     key: string;
     grid: Grid;
     form: Form;
-    table: Table<I>;
     target: any;
-    props: Map<string & keyof I, Prop>;
+    props: Map<string, Prop>;
   }
 
   const selector = 'type';
@@ -69,22 +65,18 @@ export module ItmType {
     );
     const grid = Grid.factory.serialize({areas, template}, cfg.grid);
     const form = Form.factory.serialize({areas, template}, cfg.form);
-    const columns = props.toSet().map(prop => prop.column);
-    const table = Table.factory.serialize({columns}, cfg.table);
-    return {key, target, props, grid, form, table};
+    return {key, target, props, grid, form};
   };
 
   export const factory: RecordFactory<ItmType, Config> = RecordFactory.build({
     selector,
     serializer,
-    model: {key: null, target: null, props: null, grid: null, form: null, table: null}
+    model: {key: null, target: null, props: null, grid: null, form: null}
   });
 
-  export function get<I extends Itm = Itm>(target: any): ItmType<I> {
+  export function get<I extends Object = {}>(target: any): ItmType<I> {
     return Reflect.get(target, ITM_TYPE_META);
   }
-
-  export const RECORD_MAP_TOKEN = new InjectionToken<Map<string, ItmType>>('ITM_TYPE_MAP_TOKEN');
 }
 
 export default ItmType;

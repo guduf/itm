@@ -15,7 +15,7 @@ describe('ItmTextAreaComponent', () => {
         {provide: Area.RECORD_TOKEN, useValue: Area.factory.serialize({key: 'name'})},
         {provide: ITM_TARGET, useValue: {id: 63, name: 'Scott'}}
       ]
-    }).compileComponents();
+    }).overrideProvider().compileComponents();
   }));
 
   it('should create the component', async(() => {

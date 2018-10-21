@@ -1,9 +1,19 @@
-import Area from './area';
-import RecordFactory from './record-factory';
-import { Map, RecordOf, Range, Record as createRecord, Set, Seq, List } from 'immutable';
+import { StaticProvider } from '@angular/core';
+import { Map, RecordOf, Range, Record as createRecord, List } from 'immutable';
 import { BehaviorSubject } from 'rxjs';
 
-export type ItmGrid = RecordOf<ItmGrid.Model>;
+import Area from './area';
+import ItmConfig from './config';
+import RecordFactory from './record-factory';
+import Target from './target';
+import { AbstractRecord, ComponentType } from './utils';
+
+// tslint:disable-next-line:max-line-length
+export abstract class ItmGrid<T extends Object = {}> extends AbstractRecord<ItmGrid.Model> implements RecordOf<ItmGrid.Model> {
+  areas: Map<string, Map<string, Area<T>>>;
+  template: ItmGrid.Template;
+  positions: Map<string, RecordOf<ItmGrid.Position>>;
+}
 
 export module ItmGrid {
   export type Template = Map<number, Map<number, string>>;
@@ -34,19 +44,12 @@ export module ItmGrid {
     positions: Map<string, RecordOf<Position>>;
   }
 
-  export class Shared<R extends ItmGrid = ItmGrid, T extends Object = {}, I = {}> {
+  export class Shared {
     readonly areaFactories?: Map<string, Area.Factory>;
     readonly defaultSelector?: string;
-    readonly onInit?: (record: R, target: BehaviorSubject<T>) => I;
+    readonly providers?: Map<any, Area.Provider>;
 
     constructor(shared: Partial<Shared>) { Object.assign(this, shared); }
-
-    extend(shared: Partial<Shared>): Shared {
-      return new Shared({
-        areaFactories: Map<string, Area.Factory>().merge(this.areaFactories, shared.areaFactories),
-        defaultSelector: shared.defaultSelector || this.defaultSelector
-      });
-    }
   }
 
   const serializer = (cfg: RecordOf<Config>, ancestor: null, shared: Shared): Model => {
@@ -59,7 +62,7 @@ export module ItmGrid {
   const selector = 'grid';
 
   // tslint:disable-next-line:max-line-length
-  export type Factory<R extends ItmGrid = ItmGrid , C extends ItmGrid.Config = ItmGrid.Config, I = {}> = RecordFactory<R, C, any, Shared<R, I>>;
+  export type Factory<R extends RecordOf<Model> = ItmGrid , C extends ItmGrid.Config = ItmGrid.Config> = RecordFactory<R, C, any, Shared>;
 
   export const factory: Factory = RecordFactory.build({
     selector,
@@ -80,6 +83,49 @@ export module ItmGrid {
     return cfg.map((selectorCfgs, areaSelector) => {
       const areaFactory = factories.get(areaSelector, Area.factory);
       return selectorCfgs.map(areaCfg => areaFactory.serialize(areaCfg));
+    });
+  }
+
+  export interface AreaRef {
+    comp: ComponentType;
+    position: Position;
+    providers: StaticProvider[];
+  }
+
+  export function parseAreaRefs(
+    config: ItmConfig,
+    grid: ItmGrid,
+    target: BehaviorSubject<any>
+  ): Map<string, AreaRef> {
+    const defaultProviders = Map<any, Area.Provider>()
+      .set(ItmGrid, {useValue: grid})
+      .set(Target, {useValue: target});
+    const gridShared = factory.getShared(config.gridFactories, grid).reduce(
+      (acc, {defaultSelector, providers: gridProviders}) => ({
+        defaultSelector: defaultSelector || acc.defaultSelector,
+        providers: acc.providers.merge(gridProviders)
+      }),
+      {defaultSelector: null, providers: defaultProviders} as Partial<Shared>
+    );
+    return parsePositions(grid.template, gridShared.defaultSelector).map(position => {
+      const area: Area = grid.areas.getIn([position.selector, position.key]);
+      // tslint:disable-next-line:max-line-length
+      if (!Area.factory.isFactoryRecord(area)) throw new ReferenceError(`Missing area for fragment : '${position.selector}:${position.key}'`);
+      const areaShared = Area.factory.getShared(config.areaFactories, area).reduce(
+        (acc, {defaultComp, providers: areaProviders}) => ({
+          defaultComp: defaultComp || acc.defaultComp,
+          providers: acc.providers.merge(areaProviders)
+        }),
+        {defaultComp: null, providers: Map().set(Area, {useValue: area})} as Partial<Area.Shared>
+      );
+      const comp = area.cell || areaShared.defaultComp(config);
+      const providers: StaticProvider[] = gridShared.providers
+        .merge(areaShared.providers)
+        .reduce<StaticProvider[]>(
+          (acc, areaProvider, key) => ([...acc, {provide: key, ...areaProvider}]),
+          []
+        );
+      return {comp, position, providers};
     });
   }
 
