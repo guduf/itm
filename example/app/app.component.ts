@@ -16,10 +16,10 @@ export class AppComponent {
 
   grid: Grid.Config = {
     template: `
-      field:id          . gender        =
-      firstName         = lastName      =
-      email             = =             =
-      control:ipAddress = button:submit =
+      field:id          . gender    =
+      firstName         = lastName  =
+      email             = =
+      control:ipAddress = .         button:submit
     `
   };
 }

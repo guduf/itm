@@ -118,7 +118,7 @@ export module ItmGrid {
         }),
         {defaultComp: null, providers: Map().set(Area, {useValue: area})} as Partial<Area.Shared>
       );
-      const comp = area.cell || areaShared.defaultComp(config);
+      const comp = area.comp || areaShared.defaultComp(config);
       const providers: StaticProvider[] = gridShared.providers
         .merge(areaShared.providers)
         .reduce<StaticProvider[]>(

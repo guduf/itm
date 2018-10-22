@@ -59,7 +59,7 @@ export module ItmType {
     const template = props.reduce<string[][]>(
       (templateAcc, {area}) => [
         ...templateAcc,
-        Range(0, area.size).map(() => area.key).toArray()
+        Range(0, 4).map(() => area.key).toArray()
       ],
       []
     );

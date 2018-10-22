@@ -27,7 +27,7 @@ export module ItmProp {
      * The component displayed in the container.
      * In case of component class, the value is used by the component factory.
      * In case of string, the value is used as the attribute for default cell. */
-    comp?: Target.PipeLike<T, string> | ComponentType | false;
+    comp?: ComponentType | false;
     header?: Target.PipeLike<T[], string> | ComponentType | false;
     label?: Target.PipeLike<T, string> | false;
 

@@ -7,15 +7,20 @@ import {
   Directive
 } from '@angular/core';
 
-import Grid from './grid';
+import { ComponentType } from './utils';
+import { StaticProvider } from '@angular/core';
 
-/** The abstract directive to create area component. */
+/** Directive used by ItmGridComponent to build grid area. */
 @Directive({selector: '[itmArea]'})
 // tslint:disable-next-line:max-line-length
 export class ItmAreaDirective implements OnChanges {
+  /**
+   * The reference that contains data needed to create the area component.
+   * The view container is cleaned at each changes and a new component is created.
+   */
   // tslint:disable-next-line:no-input-rename
   @Input('itmArea')
-  areaRef: Grid.AreaRef;
+  areaRef: { comp: ComponentType, providers: StaticProvider[] };
 
   constructor(
     private _injector: Injector,
@@ -25,6 +30,7 @@ export class ItmAreaDirective implements OnChanges {
 
   ngOnChanges() {
     this._viewContainerRef.clear();
+    if (!this.areaRef || typeof this.areaRef !== 'object') return;
     const {comp, providers} = this.areaRef;
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
     const injector = Injector.create(providers, this._injector);

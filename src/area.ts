@@ -3,7 +3,6 @@ import { InjectionToken } from '@angular/core';
 import { Map, RecordOf } from 'immutable';
 import { Observable, of, empty } from 'rxjs';
 
-import { ItmAreaConfig } from './area-config';
 import ItmConfig from './config';
 import RecordFactory from './record-factory';
 import Target from './target';
@@ -14,22 +13,30 @@ export abstract class ItmAreaText extends Observable<string> { }
 // tslint:disable-next-line:max-line-length
 export abstract class ItmArea<T extends Object = {}> extends AbstractRecord<ItmArea.Model> implements RecordOf<ItmArea.Model> {
   readonly key: string;
-  readonly size: number;
-  readonly grow: number;
-  readonly cell: ComponentType | null;
+  readonly comp: ComponentType | null;
   readonly text: Target.Pipe<T, string> | null;
 }
 
 export module ItmArea {
   export const selector = 'area';
 
-  export type Config<T = {}> = ItmAreaConfig<T>;
+  export interface Config<T = {}> {
+    /** The identifier of the area. Must be unique in each selector context.*/
+    key: string;
+
+    /** The text attached to the area. Can be displayed by area components. */
+    text?: Target.PipeLike<T, string> | false;
+
+    /**
+     * The component displayed in the area.
+     * A default component could be determined the area factory and the config.
+     */
+    comp?: ComponentType | false;
+  }
 
   export interface Model<T = {}> extends  Config<T> {
     key: string;
-    size: number;
-    grow: number;
-    cell: ComponentType | null;
+    comp: ComponentType | null;
     text: Target.Pipe<T, string> | null;
   }
 
@@ -50,13 +57,11 @@ export module ItmArea {
   const serializer = (cfg: RecordOf<Config>): Model => {
     if (!cfg.key || !keyRegExp.test(cfg.key)) throw new TypeError('Expected key');
     const key = cfg.key;
-    const size = cfg.size && typeof cfg.size === 'number' ? cfg.size : 1;
-    const grow = cfg.grow && typeof cfg.grow === 'number' ? cfg.grow : 1;
-    const cell = cfg.cell !== false && isComponentType(cfg.cell) ? cfg.cell as ComponentType : null;
+    const comp = cfg.comp !== false && isComponentType(cfg.comp) ? cfg.comp as ComponentType : null;
     const text: Target.Pipe<{}, string> = (
       cfg.text === false ? () => empty() : Target.defer('string', cfg.text)
     );
-    return {key, size, grow, cell, text};
+    return {key, comp, text};
   };
 
   const areaTextProvider: Provider = {
@@ -72,7 +77,7 @@ export module ItmArea {
   export const factory: Factory = RecordFactory.build({
     selector,
     serializer,
-    model: {key: null, size: null, grow: null, cell: null, text: null},
+    model: {key: null, comp: null, text: null},
     shared: new Shared({
       providers: Map<any, Provider>().set(ItmAreaText, areaTextProvider)
     })
