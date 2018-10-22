@@ -28,12 +28,13 @@ export module ItmTarget {
     )) throw new Error('Invalid type');
     if (pipe === null) return null;
     const values = typeof type === 'object' ? Array.from(Object.values(type)) : null;
-    const err = new TypeError(`Expected ${type}`);
+    // tslint:disable-next-line:max-line-length
+    const err = new TypeError(`Expected ${values ? `[${values.map(v => `'${v}'`).join(', ')}]` : typeof type === 'string' ? type : type.name}.`);
     const test = (val: any): any  => {
       if (val === null) return val;
       if (!(
         typeof type === 'string' ? typeof val === type :
-        values ? values.includes(type) :
+        values ? values.includes(val) :
           val instanceof type
       )) {
         console.error('DEFER_ERROR', 'value:', val, 'error:', err);

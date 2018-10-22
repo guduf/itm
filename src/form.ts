@@ -39,7 +39,8 @@ export module ItmForm {
 
   const submitButton = Button.factory.serialize({
     key: 'submit',
-    icon: 'save_alt'
+    icon: 'save_alt',
+    mode: Button.Mode.icon
   });
 
   const serializer = (): Model => {

@@ -1,15 +1,15 @@
-<ng-container *ngIf="actionDef" [ngSwitch]="mode">
-  <button *ngSwitchCase="'menu'" mat-menu-item (click)="emitEvent($event)">
+<ng-container *ngIf="mode | async as mode" [ngSwitch]="mode">
+  <button *ngSwitchCase="modes.menu" mat-menu-item [disabled]="disabled | async" (click)="emit($event)">
     <ng-container *ngTemplateOutlet="btnBody"></ng-container>
   </button>
-  <button *ngSwitchCase="'icon'" mat-icon-button (click)="emitEvent($event)">
+  <button *ngSwitchCase="modes.icon" mat-icon-button [disabled]="disabled | async" (click)="emit($event)">
     <ng-container *ngTemplateOutlet="btnBody"></ng-container>
   </button>
-  <button *ngSwitchDefault mat-button (click)="emitEvent($event)">
+  <button *ngSwitchDefault mat-button [disabled]="disabled | async" (click)="emit($event)">
     <ng-container *ngTemplateOutlet="btnBody"></ng-container>
   </button>
 </ng-container>
 <ng-template #btnBody>
-  <mat-icon *ngIf="isIconButton">{{icon | async}}</mat-icon>
-  <span *ngIf="isTextButton">{{text | async}}</span>
+  <mat-icon *ngIf="icon | async as icon">{{icon}}</mat-icon>
+  <span *ngIf="text | async as text">{{text}}</span>
 </ng-template>

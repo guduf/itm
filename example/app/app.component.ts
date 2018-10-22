@@ -19,7 +19,7 @@ export class AppComponent {
       field:id          . gender        =
       firstName         = lastName      =
       email             = =             =
-      control:ipAddress =
+      control:ipAddress = button:submit =
     `
   };
 }

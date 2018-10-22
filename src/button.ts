@@ -23,15 +23,30 @@ interface ItmButtonConfig<T extends Object = {}> {
   mode?: Target.PipeLike<T, ItmButton.Mode>;
 }
 
+@Injectable()
+export class ItmButtonRef {
+  readonly icon: Observable<string>;
+  readonly disabled: Observable<boolean>;
+  readonly mode: Observable<ItmButton.Mode>;
+
+  constructor(
+    @Inject(Area)
+    button: ItmButton,
+    target: Target
+  ) {
+    this.icon = button.icon ? Target.map(target, button.icon) : empty();
+    this.disabled = button.disabled ? Target.map(target, button.disabled) : empty();
+    this.mode = button.mode ? Target.map(target, button.mode) : of(ItmButton.Mode.basic);
+  }
+}
+
 export type ItmButton<T = {}> = Area<T> & RecordOf<ItmButton.Model<T>>;
 
 export module ItmButton {
   export enum Mode {
     basic = 'BASIC',
     icon = 'ICON',
-    menu = 'MENU',
-    raised = 'RAISED',
-    stroked = 'STROKED'
+    menu = 'MENU'
   }
 
   export type ModelConfig<T = {}> = ItmButtonConfig<T>;
@@ -55,26 +70,14 @@ export module ItmButton {
 
   export type Config<T extends Object = {}> = Area.Config<T> & ModelConfig<T>;
 
-
-  @Injectable()
-  export class Ref {
-    readonly icon: Observable<string>;
-    readonly disabled: Observable<boolean>;
-    readonly mode: Observable<Mode>;
-
-    constructor(@Inject(Area) button: ItmButton, target: Target) {
-      this.icon = button.icon ? Target.map(target, button.icon) : empty();
-      this.disabled = button.disabled ? Target.map(target, button.disabled) : empty();
-      this.mode = button.mode ? Target.map(target, button.mode) : of(Mode.basic);
-    }
-  }
-
   export const factory: Area.Factory<ItmButton, Config> = Area.factory.extend({
     selector,
     serializer,
     model: {key: null, icon: null, disabled: null, mode: null},
     shared: new Area.Shared({
-      providers: Map<any, Area.Provider>().set(Ref, {useClass: Ref})
+      defaultComp: cfg => cfg.defaultButtonComp,
+      providers: Map<any, Area.Provider>()
+        .set(ItmButtonRef, {deps: [Area, Target], useClass: ItmButtonRef})
     })
   });
 }

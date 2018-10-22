@@ -9,6 +9,8 @@ import { ComponentType, isComponentType, AbstractRecord } from './utils';
 /** The global config for the module */
 // tslint:disable-next-line:max-line-length
 export abstract class ItmConfig extends AbstractRecord<ItmConfig.Model> implements RecordOf<ItmConfig.Model> {
+  defaultButtonComp: ComponentType;
+
   /** The component for text area if not specified. Default: ItmTextAreaComponent */
   defaultControlComp: ComponentType;
 
@@ -27,6 +29,7 @@ export abstract class ItmConfig extends AbstractRecord<ItmConfig.Model> implemen
 
 export module ItmConfig {
   export interface ModelConfig {
+    defaultButtonComp?: ComponentType;
     defaultControlComp?: ComponentType;
     defaultFieldComp?: ComponentType;
     defaultTextComp?: ComponentType;
@@ -36,6 +39,7 @@ export module ItmConfig {
   }
 
   export interface Model extends ModelConfig {
+    defaultButtonComp: ComponentType;
     defaultControlComp: ComponentType;
     defaultFieldComp: ComponentType;
     defaultTextComp: ComponentType;
@@ -45,6 +49,9 @@ export module ItmConfig {
   }
 
   const serializer = (cfg: RecordOf<ModelConfig>): Model => {
+    if (!isComponentType(cfg.defaultButtonComp)) throw new TypeError('Expected ComponentType');
+    const defaultButtonComp = cfg.defaultButtonComp;
+
     if (!isComponentType(cfg.defaultControlComp)) throw new TypeError('Expected ComponentType');
     const defaultControlComp = cfg.defaultControlComp;
 
@@ -91,6 +98,7 @@ export module ItmConfig {
     );
 
     return {
+      defaultButtonComp,
       defaultControlComp,
       defaultFieldComp,
       defaultTextComp,
@@ -106,6 +114,7 @@ export module ItmConfig {
     selector,
     serializer,
     model: {
+      defaultButtonComp: null,
       defaultControlComp: null,
       defaultFieldComp: null,
       defaultTextComp: null,

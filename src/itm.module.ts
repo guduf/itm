@@ -6,6 +6,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Map } from 'immutable';
 
 import Area from './area';
+import Button from './button';
 import Control from './control';
 import Field from './field';
 import Form from './form';
@@ -18,6 +19,7 @@ import { ItmFieldComponent } from './field.component';
 import { ItmTextAreaComponent } from './text-area.component';
 import { ItmAreaDirective } from './area.directive';
 import { ItmControlComponent } from './control.component';
+import { ItmButtonComponent } from './button.component';
 
 const IMPORTS = [
   CommonModule,
@@ -26,9 +28,10 @@ const IMPORTS = [
 ];
 
 const ENTRY_COMPONENTS = [
-  ItmFieldComponent,
-  ItmTextAreaComponent,
+  ItmButtonComponent,
   ItmControlComponent,
+  ItmFieldComponent,
+  ItmTextAreaComponent
 ];
 
 const DECLARATIONS = [
@@ -41,11 +44,13 @@ const EXPORTED_DECLARATIONS = [
 ];
 
 export const DEFAULT_CONFIG: ItmConfig.Model = {
+  defaultButtonComp: ItmButtonComponent,
   defaultControlComp: ItmControlComponent,
   defaultFieldComp: ItmFieldComponent,
   defaultTextComp: ItmTextAreaComponent,
   areaFactories: Map<string, Area.Factory>()
     .set(Area.factory.selector, Area.factory)
+    .set(Button.factory.selector, Button.factory)
     .set(Control.factory.selector, Control.factory)
     .set(Field.factory.selector, Field.factory),
   gridFactories: Map<string, Grid.Factory>()
@@ -67,7 +72,7 @@ const CONFIG_PROVIDER = {
 
 @NgModule({
   imports: IMPORTS,
-  exports: [...EXPORTED_DECLARATIONS],
+  exports: EXPORTED_DECLARATIONS,
   declarations: [...DECLARATIONS, ...ENTRY_COMPONENTS, ...EXPORTED_DECLARATIONS],
   entryComponents: ENTRY_COMPONENTS,
   providers: [CONFIG_PROVIDER]
