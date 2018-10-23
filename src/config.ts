@@ -9,22 +9,26 @@ import { ComponentType, isComponentType, AbstractRecord } from './utils';
 /** The global config for the module */
 // tslint:disable-next-line:max-line-length
 export abstract class ItmConfig extends AbstractRecord<ItmConfig.Model> implements RecordOf<ItmConfig.Model> {
-  defaultButtonComp: ComponentType;
+  /** Records that defines item types. */
+  types: Map<string, Type>;
 
-  /** The component for text area if not specified. Default: ItmTextAreaComponent */
-  defaultControlComp: ComponentType;
-
-  /** The component for text area if not specified. Default: ItmTextAreaComponent */
-  defaultFieldComp: ComponentType;
-
-  /** The component for text area if not specified. Default: ItmTextAreaComponent */
-  defaultTextComp: ComponentType;
-
+  /** Record factories to build grids. Allows to extend the generic grid model. */
   gridFactories: Map<string, Grid.Factory>;
 
+  /** Record factories to build areas. Allows to extend the generic area model. */
   areaFactories: Map<string, Area.Factory>;
 
-  types: Map<string, Type>;
+  /** The component displayed in the button area when not specified in its configuration. */
+  defaultButtonComp: ComponentType;
+
+  /** The component displayed in the control area when not specified in its configuration. */
+  defaultControlComp: ComponentType;
+
+  /** The component displayed in the field area when not specified in its configuration. */
+  defaultFieldComp: ComponentType;
+
+  /** The component displayed in the generic area when not specified in its configuration. */
+  defaultTextComp: ComponentType;
 }
 
 export module ItmConfig {

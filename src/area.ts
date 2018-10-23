@@ -10,7 +10,7 @@ import { ComponentType, isComponentType, AbstractRecord } from './utils';
 /** Provide the area text. */
 export abstract class ItmAreaText extends Observable<string> { }
 
-/** This record describes the properties of an area displayed in a grid. */
+/** Record that describes the properties of an generic area displayed in a grid. */
 // tslint:disable-next-line:max-line-length
 export abstract class ItmArea<T extends Object = {}> extends AbstractRecord<ItmArea.Model> implements RecordOf<ItmArea.Model> {
   readonly key: string;

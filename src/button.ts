@@ -1,25 +1,19 @@
 import { Injectable, Inject } from '@angular/core';
 import { Map, RecordOf } from 'immutable';
+import { empty, Observable, of } from 'rxjs';
 
 import Area from './area';
 import Target from './target';
-import { empty, Observable, of } from 'rxjs';
 
-/** A generic action configuration. */
+/** A button area configuration. */
 interface ItmButtonConfig<T extends Object = {}> {
-  /** The identifier of the actions. */
-  key?: string;
-
-  /** Defines the action icon. */
+  /** Defines the action icon. If false, text is never displayed. */
   icon?: false | Target.PipeLike<T, string>;
 
-  /** Defines the the text. */
-  text?: false | Target.PipeLike<T, string>;
-
-  /** Pipe to disable the action */
+  /** Whether the button is disabled */
   disabled?: Target.PipeLike<T, boolean>;
 
-  /** Defines the mode of the button */
+  /** The display mode of the button */
   mode?: Target.PipeLike<T, ItmButton.Mode>;
 }
 
@@ -40,9 +34,11 @@ export class ItmButtonRef {
   }
 }
 
+/** Record that describes specifics property of a button area. */
 export type ItmButton<T = {}> = Area<T> & RecordOf<ItmButton.Model<T>>;
 
 export module ItmButton {
+  /** The availables display mode for a button. */
   export enum Mode {
     basic = 'BASIC',
     icon = 'ICON',
@@ -57,13 +53,11 @@ export module ItmButton {
     mode: Target.Pipe<T, Mode> | null;
   }
 
-  const serializer = (cfg: RecordOf<ModelConfig>): Model => {
-    if (!cfg.key || typeof cfg.key !== 'string') throw new TypeError('Expected key');
-    const key = cfg.key;
-    const icon = cfg.icon === false ? (() => empty()) : Target.defer('string', cfg.icon || key);
+  const serializer = (cfg: RecordOf<ModelConfig>, {key}: Area): Model => {
+    const icon = cfg.icon === false ? (() => empty()) : Target.defer('string', cfg.icon || key);
     const disabled = Target.defer('boolean', cfg.disabled);
     const mode = Target.defer(Mode, cfg.mode);
-    return {key, icon, mode, disabled};
+    return {icon, mode, disabled};
   };
 
   const selector = 'button';
@@ -73,7 +67,7 @@ export module ItmButton {
   export const factory: Area.Factory<ItmButton, Config> = Area.factory.extend({
     selector,
     serializer,
-    model: {key: null, icon: null, disabled: null, mode: null},
+    model: {icon: null, disabled: null, mode: null},
     shared: new Area.Shared({
       defaultComp: cfg => cfg.defaultButtonComp,
       providers: Map<any, Area.Provider>()
