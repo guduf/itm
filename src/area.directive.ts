@@ -4,11 +4,11 @@ import {
   ViewContainerRef,
   Input,
   OnChanges,
-  Directive
+  Directive,
+  StaticProvider
 } from '@angular/core';
 
 import { ComponentType } from './utils';
-import { StaticProvider } from '@angular/core';
 
 /** Directive used by ItmGridComponent to build grid area. */
 @Directive({selector: '[itmArea]'})

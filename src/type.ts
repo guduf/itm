@@ -50,7 +50,7 @@ export module ItmType {
     const areas = props.toSet().reduce(
       (acc, prop) => (
         acc
-          .setIn([Area.selector, prop.key], prop.area)
+          .setIn([Area.factory.selector, prop.key], prop.area)
           .setIn([Field.selector, prop.key], prop.field)
           .setIn([Control.selector, prop.key], prop.control)
       ),

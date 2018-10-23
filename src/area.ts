@@ -1,5 +1,4 @@
 
-import { InjectionToken } from '@angular/core';
 import { Map, RecordOf } from 'immutable';
 import { Observable, of, empty } from 'rxjs';
 
@@ -8,8 +7,10 @@ import RecordFactory from './record-factory';
 import Target from './target';
 import { ComponentType, isComponentType, AbstractRecord } from './utils';
 
+/** Provide the area text. */
 export abstract class ItmAreaText extends Observable<string> { }
 
+/** This record describes the properties of an area displayed in a grid. */
 // tslint:disable-next-line:max-line-length
 export abstract class ItmArea<T extends Object = {}> extends AbstractRecord<ItmArea.Model> implements RecordOf<ItmArea.Model> {
   readonly key: string;
@@ -18,13 +19,11 @@ export abstract class ItmArea<T extends Object = {}> extends AbstractRecord<ItmA
 }
 
 export module ItmArea {
-  export const selector = 'area';
-
   export interface Config<T = {}> {
-    /** The identifier of the area. Must be unique in each selector context.*/
+    /** The identifier of the area. Must be unique in each selector context. */
     key: string;
 
-    /** The text attached to the area. Can be displayed by area components. */
+    /** The text attached to the area. Can be injected by area components as ItmAreaText. */
     text?: Target.PipeLike<T, string> | false;
 
     /**
@@ -49,10 +48,16 @@ export module ItmArea {
   // tslint:disable-next-line:max-line-length
   export class Shared {
     readonly defaultComp?: (cfg: ItmConfig) => ComponentType;
+
     readonly providers?: Map<any, Provider>;
 
     constructor(shared: Shared) { Object.assign(this, shared); }
   }
+
+  // tslint:disable-next-line:max-line-length
+  export type Factory<R extends RecordOf<Model> = ItmArea , C extends ItmArea.Config = ItmArea.Config> = RecordFactory<R, C, any, Shared>;
+
+  const selector = 'area';
 
   const serializer = (cfg: RecordOf<Config>): Model => {
     if (!cfg.key || !keyRegExp.test(cfg.key)) throw new TypeError('Expected key');
@@ -71,9 +76,6 @@ export module ItmArea {
     )
   };
 
-  // tslint:disable-next-line:max-line-length
-  export type Factory<R extends RecordOf<Model> = ItmArea , C extends ItmArea.Config = ItmArea.Config> = RecordFactory<R, C, any, Shared>;
-
   export const factory: Factory = RecordFactory.build({
     selector,
     serializer,
@@ -83,27 +85,9 @@ export module ItmArea {
     })
   });
 
-  export type Configs<C extends Config = Config> = C[] | Map<string, C>;
-
-  // tslint:disable-next-line:max-line-length
-  export function serializeAreas<R extends ItmArea<M>, C extends Config, M extends Object>(
-    cfgs: Configs<C>,
-    areaFactory = factory as Factory<R>
-  ): Map<string, R> {
-    if (!cfgs) return Map();
-    if (Array.isArray(cfgs)) (
-      cfgs = cfgs.reduce((cfgsAcc, cfg) => cfgsAcc.set(cfg.key, cfg), Map<string, C>())
-    );
-    return cfgs.map(cfg => areaFactory.serialize(cfg));
-  }
-
   export const defaultKey = '$default';
   export const keyPattern = `\\$?${RecordFactory.selectorPattern}`;
   export const keyRegExp = new RegExp(`^${keyPattern}$`);
-
-
-  // tslint:disable-next-line:max-line-length
-  export const FACTORY_MAP_TOKEN = new InjectionToken<Map<string, Factory>>('ITM_FACTORY_MAP_TOKEN');
 }
 
 export default ItmArea;

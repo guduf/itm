@@ -7,7 +7,7 @@ import { ComponentType } from './utils';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { By } from '@angular/platform-browser';
 
-fdescribe('ItmAreaDirective', () => {
+describe('ItmAreaDirective', () => {
   @Component({template: `<ng-container [itmArea]="areaRef"></ng-container>`})
   class HotTestComponent {
     areaRef: { comp: ComponentType, providers: StaticProvider[] };

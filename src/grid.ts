@@ -75,7 +75,7 @@ export module ItmGrid {
     cfg: AreasConfig,
     factories: Map<string, Area.Factory> = Map()
   ): Map<string, Map<string, Area>> {
-    if (Array.isArray(cfg)) cfg = {[Area.selector]: cfg};
+    if (Array.isArray(cfg)) cfg = {[Area.factory.selector]: cfg};
     if (!Map.isMap(cfg)) cfg = Map(cfg).map(areaCfgs => areaCfgs.reduce(
       (acc, areaCfg) => acc.set(areaCfg.key, areaCfg),
       Map<string, Area.Config>()
@@ -167,7 +167,7 @@ export module ItmGrid {
 
   export function parsePositions(
     template: Template,
-    defaultSelector = Area.selector
+    defaultSelector = Area.factory.selector
   ): Map<string, RecordOf<Position>> {
     return template
       .toList()
@@ -199,7 +199,7 @@ export module ItmGrid {
     .reduce(
       (gridAreas, [[row, col], [endRow, endCol]], fragment) => {
         const areaPath = List(
-          !fragment.indexOf(':') ? [Area.selector, fragment.slice(1)] :
+          !fragment.indexOf(':') ? [Area.factory.selector, fragment.slice(1)] :
           fragment.indexOf(':') > 0 ? fragment.split(':') :
             [defaultSelector, fragment]
         );

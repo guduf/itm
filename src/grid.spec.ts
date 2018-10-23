@@ -28,7 +28,7 @@ describe('ItmGrid', () => {
       `;
       const def = Grid.factory.serialize({
         template, areas:
-        {[Area.selector]: areasDef, control: [areasDef[2]]}
+        {[Area.factory.selector]: areasDef, control: [areasDef[2]]}
       });
       const expectedTemplate = {
         0: {0: 'id', 1: null, 2: 'name', 3: 'name'},
@@ -40,7 +40,7 @@ describe('ItmGrid', () => {
 
   describe('parsePositions()', () => {
     const areas = Grid.parseAreas({
-      [Area.selector]: [{key: 'name'}, {key: 'id'}],
+      [Area.factory.selector]: [{key: 'name'}, {key: 'id'}],
       control: [{key: 'email'}]
     });
 
@@ -77,7 +77,7 @@ describe('ItmGrid', () => {
       `;
       const gridAreas = parseGridAreas(template).toSet().toArray();
       const expectedIdPos = {
-        selector: Area.selector,
+        selector: Area.factory.selector,
         key: 'id',
         row: 1,
         col: 1,
@@ -86,7 +86,7 @@ describe('ItmGrid', () => {
       };
       expect(gridAreas[0].toJS()).toEqual(expectedIdPos, 'Expected same grid area with key id');
       const expectedNamePos = {
-        selector: Area.selector,
+        selector: Area.factory.selector,
         key: 'name',
         row: 1,
         col: 3,
