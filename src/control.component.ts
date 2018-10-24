@@ -5,6 +5,7 @@ import { ItmFieldLabel } from './field';
 
 const SELECTOR = 'itm-control';
 
+/** Default component for control area if not specified in config. */
 @Component({
   selector: SELECTOR,
   template: `

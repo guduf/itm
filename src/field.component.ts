@@ -1,10 +1,11 @@
 import { Component, HostBinding } from '@angular/core';
+
 import { ItmAreaText } from './area';
 import { ItmFieldLabel } from './field';
 
-
 const SELECTOR = 'itm-field';
 
+/** Default component for field area if not specified in config. */
 @Component({
   selector: SELECTOR,
   template: `

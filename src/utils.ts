@@ -53,3 +53,8 @@ export abstract class AbstractRecord<TProps extends Object = {}> implements Reco
   abstract toSeq(): Seq.Keyed<keyof TProps, TProps[keyof TProps]>;
   abstract [Symbol.iterator](): IterableIterator<[keyof TProps, TProps[keyof TProps]]>;
 }
+
+
+export function isEnumIncludes(target: any, val: any): boolean {
+  return Array.from(Object.values(target)).includes(val);
+}

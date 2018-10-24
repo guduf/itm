@@ -5,6 +5,7 @@ import { Map, RecordOf } from 'immutable';
 import Area from './area';
 import Field from './field';
 import Target from './target';
+import { isEnumIncludes } from './utils';
 
 export abstract class NgForm extends FormGroup { }
 
@@ -13,9 +14,10 @@ export abstract class NgControl extends AbstractControl { }
 export type ItmControl<T extends Object = {}> = Field<T> & RecordOf<ItmControl.Model<T>>;
 
 export module ItmControl {
-  export type Type = 'string' | 'number';
-
-  export const TYPES: Type[] = ['string', 'number'];
+  export enum Type {
+    number = 'number',
+    string = 'string'
+  }
 
   export interface ModelConfig<T extends Object = {}> {
     type?: Type;
@@ -30,9 +32,9 @@ export module ItmControl {
   }
 
   const serializer = (cfg: ModelConfig): Model => {
-    if (cfg.type && !TYPES.includes(cfg.type)) throw new TypeError('Expected control type');
+    if (cfg.type && !isEnumIncludes(Type, cfg.type)) throw new TypeError('Expected control type');
     return {
-      type: cfg.type || 'string',
+      type: cfg.type || Type.string,
       pattern: cfg.pattern instanceof RegExp ? cfg.pattern : null,
       required: typeof cfg.required === 'boolean' ? cfg.required : false
     };
