@@ -1,6 +1,7 @@
 // tslint:disable:max-line-length
 import Area from './area';
 import Grid from './grid';
+import { List } from 'immutable';
 
 describe('ItmGrid', () => {
   describe('factory', () => {
@@ -16,7 +17,9 @@ describe('ItmGrid', () => {
 
     it('should create a single line template', () => {
       const def = Grid.factory.serialize({template: 'id = id name', areas});
-      const expectedTemplate = {0: {0: 'id', 1: 'id', 2: 'id', 3: 'name'}};
+      const expectedTemplate = {
+        0: {0: [null, 'id'], 1: [null, 'id'], 2: [null, 'id'], 3: [null, 'name']}
+      };
       expect(def.template.toJS()).toEqual(expectedTemplate);
     });
 
@@ -31,8 +34,8 @@ describe('ItmGrid', () => {
         {[Area.factory.selector]: areasDef, control: [areasDef[2]]}
       });
       const expectedTemplate = {
-        0: {0: 'id', 1: null, 2: 'name', 3: 'name'},
-        1: {0: 'id', 1: 'control:email', 2: 'name', 3: 'name'}
+        0: {0: [null, 'id'], 1: null, 2: [null, 'name'], 3: [null, 'name']},
+        1: {0: [null, 'id'], 1: ['control', 'email'], 2: [null, 'name'], 3: [null, 'name']}
       };
       expect(def.template.toJS()).toEqual(expectedTemplate, 'Expected same template');
     });
@@ -104,6 +107,12 @@ describe('ItmGrid', () => {
       };
       // tslint:disable-next-line:max-line-length
       expect(gridAreas[2].toJS()).toEqual(expectedEmailPos, 'Expected same grid area with key email');
+    });
+  });
+
+  describe('isAreaFragment()', () => {
+    it('should be true with a valid list', () => {
+      expect(Grid.isAreaFragment(List([null, 'id']))).toBeTruthy();
     });
   });
 });

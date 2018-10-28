@@ -14,11 +14,6 @@ export abstract class NgControl extends AbstractControl { }
 export type ItmControl<T extends Object = {}> = Field<T> & RecordOf<ItmControl.Model<T>>;
 
 export module ItmControl {
-  export enum Type {
-    number = 'number',
-    string = 'string'
-  }
-
   export interface ModelConfig<T extends Object = {}> {
     type?: Type;
     pattern?: RegExp;
@@ -29,6 +24,11 @@ export module ItmControl {
     type: Type;
     pattern: RegExp;
     required: boolean;
+  }
+
+  export enum Type {
+    number = 'number',
+    string = 'string'
   }
 
   const serializer = (cfg: ModelConfig): Model => {

@@ -1,6 +1,7 @@
 import { Map, RecordOf } from 'immutable';
 
 import Area from './area';
+import Column from './column';
 import Control from './control';
 import { ComponentType } from './utils';
 import Field from './field';
@@ -32,14 +33,16 @@ export module ItmProp {
     label?: Target.PipeLike<T, string> | false;
 
     area?: Partial<Area.Config>;
-    field?: Partial<Field.Config>;
+    column?: Partial<Column.Config>;
     control?: Partial<Control.Config>;
-    type?: Partial<Control.Type>;
+    field?: Partial<Field.Config>;
+    type?: Control.Type;
   }
 
   export interface Model<T extends Object = {}> extends Config<T> {
     area: Area<T>;
     field: Field<T>;
+    column: Column<T>;
     control: Control<T>;
   }
 
@@ -48,17 +51,18 @@ export module ItmProp {
   const serializer = (cfg: RecordOf<Config>): Model => {
     if (!cfg.key && typeof cfg.key !== 'string') throw new TypeError('Expected key');
     const key = cfg.key;
-    const area = Area.factory.serialize({key, text: item => String(item[key])}, cfg, cfg.area);
+    const area = Area.factory.serialize({key}, cfg, cfg.area);
     const field = Field.factory.serialize(area, {label: cfg.label}, cfg.field);
+    const column = Column.factory.serialize(field, {header: field.label}, cfg.column);
     const control = Control.factory.serialize(field, {type: cfg.type}, cfg.control);
-    return {key, area, control, field};
+    return {key, area, column, control, field};
   };
 
   export const factory: RecordFactory<ItmProp, Config> = RecordFactory.build({
     selector: selector,
     serializer,
     // tslint:disable-next-line:max-line-length
-    model: {key: null, comp: null, control: null, header: null, label: null, area: null, field: null}
+    model: {key: null, comp: null, column: null, control: null, header: null, label: null, area: null, field: null}
   });
 
   export const MAP_META = Symbol('ITM_PROPS_META');

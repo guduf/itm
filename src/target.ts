@@ -1,5 +1,5 @@
-import { BehaviorSubject, Observable, of, defer as rxDefer, isObservable, empty } from 'rxjs';
-import { distinctUntilChanged, mergeMap, filter, map as rxMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, defer as rxDefer, isObservable } from 'rxjs';
+import { mergeMap, map as rxMap } from 'rxjs/operators';
 
 export abstract class ItmTarget<T extends Object = {}> extends BehaviorSubject<T> { }
 

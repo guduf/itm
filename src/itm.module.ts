@@ -6,20 +6,23 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Map } from 'immutable';
 
 import Area from './area';
+import { ItmAreaDirective } from './area.directive';
 import Button from './button';
+import { ItmButtonComponent } from './button.component';
+import Column from './column';
 import Control from './control';
+import { ItmControlComponent } from './control.component';
+import { ItmConfig } from './config';
 import Field from './field';
+import { ItmFieldComponent } from './field.component';
 import Form from './form';
 import Grid from './grid';
-import { ItmConfig } from './config';
-import { ItmMaterialModule } from './material.module';
-import { ITM_TYPE_PIPES } from './type.pipes';
 import { ItmGridComponent } from './grid.component';
-import { ItmFieldComponent } from './field.component';
+import { ItmMaterialModule } from './material.module';
+import Table from './table';
+import { ItmTableComponent } from './table.component';
 import { ItmTextAreaComponent } from './text-area.component';
-import { ItmAreaDirective } from './area.directive';
-import { ItmControlComponent } from './control.component';
-import { ItmButtonComponent } from './button.component';
+import { ITM_TYPE_PIPES } from './type.pipes';
 
 const IMPORTS = [
   CommonModule,
@@ -40,6 +43,7 @@ const DECLARATIONS = [
 
 const EXPORTED_DECLARATIONS = [
   ItmGridComponent,
+  ItmTableComponent,
   ...ITM_TYPE_PIPES
 ];
 
@@ -51,11 +55,13 @@ export const DEFAULT_CONFIG: ItmConfig.Model = {
   areaFactories: Map<string, Area.Factory>()
     .set(Area.factory.selector, Area.factory)
     .set(Button.factory.selector, Button.factory)
+    .set(Column.factory.selector, Column.factory)
     .set(Control.factory.selector, Control.factory)
     .set(Field.factory.selector, Field.factory),
   gridFactories: Map<string, Grid.Factory>()
     .set(Grid.factory.selector, Grid.factory)
-    .set(Form.factory.selector, Form.factory),
+    .set(Form.factory.selector, Form.factory)
+    .set(Table.factory.selector, Table.factory),
   types: null
 };
 

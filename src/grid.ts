@@ -1,8 +1,9 @@
 import { StaticProvider } from '@angular/core';
 import { Map, RecordOf, Range, Record as createRecord, List } from 'immutable';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import Area from './area';
+import Area, { ItmAreaText } from './area';
 import ItmConfig from './config';
 import RecordFactory from './record-factory';
 import Target from './target';
@@ -12,11 +13,12 @@ import { AbstractRecord, ComponentType } from './utils';
 export abstract class ItmGrid<T extends Object = {}> extends AbstractRecord<ItmGrid.Model> implements RecordOf<ItmGrid.Model> {
   areas: Map<string, Map<string, Area<T>>>;
   template: ItmGrid.Template;
-  positions: Map<string, RecordOf<ItmGrid.Position>>;
+  positions: Map<ItmGrid.Fragment, RecordOf<ItmGrid.Position>>;
 }
 
 export module ItmGrid {
-  export type Template = Map<number, Map<number, string>>;
+  export type Fragment = List<string> | null;
+  export type Template = Map<number, Map<number, Fragment>>;
 
   // tslint:disable-next-line:max-line-length
   export type AreasConfig<T = {}> = Area.Config<T>[] | { [selector: string]: Area.Config<T>[] } | Map<string, Map<string, Area.Config<T>>>;
@@ -35,21 +37,40 @@ export module ItmGrid {
 
   export interface Config<T extends Object = {}> {
     areas?: AreasConfig<T>;
-    template?: string | string[][] | Template;
+    template?: string | (string | Fragment)[][] | Template;
   }
 
   export interface Model<T extends Object = {}> extends Config<T> {
     areas: Map<string, Map<string, Area<T>>>;
     template: Template;
-    positions: Map<string, RecordOf<Position>>;
+    positions: Map<Fragment, RecordOf<Position>>;
   }
 
   export class Shared {
-    readonly areaFactories?: Map<string, Area.Factory>;
-    readonly defaultSelector?: string;
-    readonly providers?: Map<any, Area.Provider>;
+    readonly areaFactories: Map<string, Area.Factory<Area, any>>;
+    readonly defaultSelector: string | null;
+    readonly providers: Map<any, Area.Provider>;
 
-    constructor(shared: Partial<Shared>) { Object.assign(this, shared); }
+    constructor(
+      {areaFactories, defaultSelector, providers}: {
+        areaFactories?: Map<string, Area.Factory<Area, any>> | Area.Factory<Area, any>[];
+        defaultSelector?: string;
+        providers?: Map<any, Area.Provider>;
+      }
+    ) {
+      this.areaFactories = (
+        Map.isMap(areaFactories) ? areaFactories :
+        !Array.isArray(areaFactories) ? Map() :
+          areaFactories.reduce(
+            (acc, fact) => acc.set(fact.selector, fact),
+            Map<string, Area.Factory>()
+          )
+      );
+      this.defaultSelector = (
+        defaultSelector && typeof defaultSelector === 'string' ? defaultSelector : null
+      );
+      this.providers = Map.isMap(providers) ? providers : Map();
+    }
   }
 
   const serializer = (cfg: RecordOf<Config>, ancestor: null, shared: Shared): Model => {
@@ -96,7 +117,7 @@ export module ItmGrid {
     config: ItmConfig,
     grid: ItmGrid,
     target: BehaviorSubject<any>
-  ): Map<string, AreaRef> {
+  ): Map<Fragment, AreaRef> {
     const defaultProviders = Map<any, Area.Provider>()
       .set(ItmGrid, {useValue: grid})
       .set(Target, {useValue: target});
@@ -107,20 +128,30 @@ export module ItmGrid {
       }),
       {defaultSelector: null, providers: defaultProviders} as Partial<Shared>
     );
-    return parsePositions(grid.template, gridShared.defaultSelector).map(position => {
+    return grid.positions.map(position => {
       const area: Area = grid.areas.getIn([position.selector, position.key]);
       // tslint:disable-next-line:max-line-length
       if (!Area.factory.isFactoryRecord(area)) throw new ReferenceError(`Missing area for fragment : '${position.selector}:${position.key}'`);
-      const areaShared = Area.factory.getShared(config.areaFactories, area).reduce(
-        (acc, {defaultComp, providers: areaProviders}) => ({
+      const areaShared = Area.factory.getShared(config.areaFactories, area).reduce<Area.Shared>(
+        (acc, {defaultComp, defaultText, providers: areaProviders}) => ({
           defaultComp: defaultComp || acc.defaultComp,
+          defaultText: defaultText || acc.defaultText,
           providers: acc.providers.merge(areaProviders)
         }),
-        {defaultComp: null, providers: Map().set(Area, {useValue: area})} as Partial<Area.Shared>
+        {
+          defaultComp: () => config.defaultTextComp,
+          defaultText: () => of('banane'),
+          providers: Map<any, Area.Provider>().set(Area, {useValue: area})
+        }
       );
       const comp = area.comp || areaShared.defaultComp(config);
+      const areaText = (
+        area.text ? Target.map(target, area.text) :
+          target.pipe(map(value => areaShared.defaultText({area, target: value})))
+      );
       const providers: StaticProvider[] = gridShared.providers
         .merge(areaShared.providers)
+        .set(ItmAreaText, {useValue: areaText})
         .reduce<StaticProvider[]>(
           (acc, areaProvider, key) => ([...acc, {provide: key, ...areaProvider}]),
           []
@@ -129,8 +160,33 @@ export module ItmGrid {
     });
   }
 
+  export function isAreaFragment(fragment: List<string>): boolean {
+    return (
+      List.isList(fragment) &&
+      fragment.size === 2 &&
+      (fragment.first() === null || selectorRegExp.test(fragment.first())) &&
+      keyRegExp.test(fragment.last())
+    );
+  }
+
+  export function parseFragment(fragment: string | Fragment | null): Fragment {
+    if (fragment === null) return null;
+    if (typeof fragment === 'string')
+      // tslint:disable-next-line:max-line-length
+      if (!fragmentRegExp.test(fragment)) throw new TypeError(`Expected Area fragment pattern. Got '${fragment}'`);
+      else return List(
+        !fragment.indexOf(':') ? [Area.factory.selector, fragment.slice(1)] :
+        fragment.indexOf(':') > 0 ? fragment.split(':') :
+          [null, fragment]
+      );
+    else if (List.isList(fragment))
+      if (!isAreaFragment(fragment)) throw new TypeError('Expected Fragment list');
+      else return fragment;
+    else throw new TypeError('Expected optional Area fragment pattern or Area fragment list');
+  }
+
   // tslint:disable-next-line:max-line-length
-  export function parseTemplate(cfg: string | string[][] | Template): Template {
+  export function parseTemplate(cfg: string | (string | Fragment )[][] | Template): Template {
     if (typeof cfg === 'string') cfg = cfg
       .split(/\s*\n+\s*/)
       .filter(rowTemplate => rowTemplate.length)
@@ -139,27 +195,41 @@ export module ItmGrid {
         if (!match) throw new TypeError(`Expected Template row Regex: ${i}`);
         return match[1].split(/ +/);
       });
-    if (Array.isArray(cfg)) cfg = cfg.reduce<Template>(
-      (cfgAcc, fragments, row) => {
-        const rowTemplate = fragments
-          .reduce((rowAcc, fragment, col) => rowAcc.set(col, fragment), Map<number, string>());
-        return cfgAcc.set(row, rowTemplate);
-      },
+    if (Map.isMap(cfg)) cfg = cfg.reduce<Fragment[][]>(
+      (rows, row) => [...rows, row.reduce((cols, col) => [...cols, col], [])],
+      []
+    );
+    if (!Array.isArray(cfg)) throw new TypeError('Expected Template, Array or string');
+    const rawTemplate = cfg.reduce<Map<number, Map<number, string>>>(
+      (cfgAcc, fragments, row) => cfgAcc.set(row, fragments.reduce<Map<number, string>>(
+        (rowAcc, fragment, col) => {
+          if (fragment === null) return rowAcc.set(col, '.');
+          if (typeof fragment === 'string')
+            if (fragmentRegExp.test(fragment)) return rowAcc.set(col, fragment);
+            else throw new TypeError('Expected Area fragment pattern');
+          // tslint:disable-next-line:max-line-length
+          else if (!isAreaFragment(fragment)) throw new TypeError('Expected Area fragment pattern or area list');
+          return rowAcc.set(
+            col,
+            (fragment.first() ? `${fragment.first()}:` : '') + fragment.last()
+          );
+        },
+        Map()
+      )),
       Map()
     );
-    if (!Map.isMap(cfg)) throw new TypeError('Expected Template, Array or string');
-    const colCount = cfg.reduce((max, row) => Math.max(max, row.size), 0);
-    return Range(0, cfg.size)
+    const colCount = rawTemplate.reduce((max, row) => Math.max(max, row.size), 0);
+    return Range(0, rawTemplate.size)
       .flatMap(row => Range(0, colCount).map(col => ({row, col})))
       .reduce<Template>(
         (templateAcc, {row, col}) => {
           const prev = templateAcc.getIn([row, col - 1]) || null;
-          let fragment = (cfg as Map<number, Map<number, string>>).getIn([row, col]) || null;
+          let fragment = rawTemplate.getIn([row, col]) || null;
           if (fragment)
             // tslint:disable-next-line:max-line-length
             if (!fragmentRegExp.test(fragment)) throw new TypeError('Expected Area fragment pattern');
             else if (fragment.length < 2) fragment = fragment === '=' ? prev : null;
-          return templateAcc.setIn([row, col], fragment);
+          return templateAcc.setIn([row, col], parseFragment(fragment));
         },
         Map()
       );
@@ -167,13 +237,13 @@ export module ItmGrid {
 
   export function parsePositions(
     template: Template,
-    defaultSelector = Area.factory.selector
-  ): Map<string, RecordOf<Position>> {
+    defaultSelector?: string
+  ): Map<Fragment, RecordOf<Position>> {
     return template
       .toList()
       .map((fragments, row) => fragments.toList().map((fragment, col) => ({col, fragment, row})))
       .flatten()
-      .reduce<Map<string, [[number, number], [number, number]]>>(
+      .reduce<Map<Fragment, [[number, number], [number, number]]>>(
         (positions, {col, fragment, row}, i, fragments) => {
           const prev = row && col ? fragments.get(i - 1).fragment : null;
           if (
@@ -198,14 +268,9 @@ export module ItmGrid {
     )
     .reduce(
       (gridAreas, [[row, col], [endRow, endCol]], fragment) => {
-        const areaPath = List(
-          !fragment.indexOf(':') ? [Area.factory.selector, fragment.slice(1)] :
-          fragment.indexOf(':') > 0 ? fragment.split(':') :
-            [defaultSelector, fragment]
-        );
         const position = positionFactory({
-          selector: areaPath.first(),
-          key: areaPath.last(),
+          selector: fragment.first() || defaultSelector || Area.factory.selector,
+          key: fragment.last(),
           row: row + 1,
           col: col + 1,
           width: endCol - col + 1,
@@ -213,7 +278,7 @@ export module ItmGrid {
         });
         return gridAreas.set(fragment, position);
       },
-      Map<string, RecordOf<Position>>()
+      Map<Fragment, RecordOf<Position>>()
     );
   }
 

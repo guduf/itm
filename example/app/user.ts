@@ -12,6 +12,7 @@ export class User {
   firstName: string;
 
   @ItmProp({
+    label: 'Last name',
     control: {
       required: true
     }

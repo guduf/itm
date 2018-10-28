@@ -3,7 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import Config from './config';
 import Grid from './grid';
 import Form from './form';
-import { ComponentType } from './utils';
+import Table from './table';
 
 @Pipe({name: 'itmTypeGrid'})
 export class ItmTypeGridPipe implements PipeTransform {
@@ -31,6 +31,23 @@ export class ItmTypeFormPipe implements PipeTransform {
   }
 }
 
-export const ITM_TYPE_PIPES: ComponentType[] = [ItmTypeGridPipe, ItmTypeFormPipe];
+@Pipe({name: 'itmTypeTable'})
+export class ItmTypeTablePipe implements PipeTransform {
+  constructor(
+    private _config: Config
+  ) { }
+
+  transform(key: string, cfg?: Grid.Config): Table {
+    const type = this._config.types.get(key);
+    if (!type) throw new ReferenceError(`Missing type with key: '${key}'`);
+    return cfg ? Table.factory.serialize(type.table, cfg) : type.table;
+  }
+}
+
+export const ITM_TYPE_PIPES: any[] = [
+  ItmTypeGridPipe,
+  ItmTypeFormPipe,
+  ItmTypeTablePipe
+];
 
 export default ITM_TYPE_PIPES;

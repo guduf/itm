@@ -46,8 +46,10 @@ export module ItmArea {
   );
 
   // tslint:disable-next-line:max-line-length
-  export class Shared {
+  export class Shared<A extends ItmArea<T> = ItmArea<T>, T extends Object = {}> {
     readonly defaultComp?: (cfg: ItmConfig) => ComponentType;
+
+    readonly defaultText?: Target.Pipe<{ area: A, target: T }, string>;
 
     readonly providers?: Map<any, Provider>;
 
@@ -64,25 +66,18 @@ export module ItmArea {
     const key = cfg.key;
     const comp = cfg.comp !== false && isComponentType(cfg.comp) ? cfg.comp as ComponentType : null;
     const text: Target.Pipe<{}, string> = (
-      cfg.text === false ? () => empty() : Target.defer('string', cfg.text)
+      cfg.text === false ? () => empty() :
+      cfg.text ? Target.defer('string', cfg.text) :
+        null
     );
     return {key, comp, text};
-  };
-
-  const areaTextProvider: Provider = {
-    deps: [ItmArea, Target],
-    useFactory: (area: ItmArea, target: Target): ItmAreaText => (
-      Target.map(target, area.text || (() => of(area.key)))
-    )
   };
 
   export const factory: Factory = RecordFactory.build({
     selector,
     serializer,
     model: {key: null, comp: null, text: null},
-    shared: new Shared({
-      providers: Map<any, Provider>().set(ItmAreaText, areaTextProvider)
-    })
+    shared: new Shared({})
   });
 
   export const defaultKey = '$default';

@@ -1,10 +1,10 @@
 // tslint:disable-next-line:max-line-length
 import { Component, EventEmitter, OnChanges, Input, SimpleChanges, HostBinding, Output, Inject, OnDestroy, StaticProvider, InjectionToken } from '@angular/core';
 import { List, Map } from 'immutable';
-import { BehaviorSubject, Subscription, Observable } from 'rxjs';
 
 import ItmConfig from './config';
 import Grid from './grid';
+import { ComponentWithSource } from './utils';
 
 /** The selector of ItmGridComponent. */
 const SELECTOR = 'itm-grid';
@@ -19,21 +19,18 @@ const SELECTOR = 'itm-grid';
     </div>
   `
 })
-export class ItmGridComponent<T extends Object = {}> implements OnChanges, OnDestroy {
+// tslint:disable-next-line:max-line-length
+export class ItmGridComponent<T extends Object = {}> extends ComponentWithSource<T> implements OnChanges, OnDestroy {
   @Input()
   /** The configuration of the grid. */
   grid: Grid.Config = null;
-
-  @Input()
-  /** The target of the grid. */
-  source: T | Observable<T>;
 
   @Output()
   /** The emitter of action events. */
   action = new EventEmitter();
 
   /** The grid grid area map of the displayed areas. */
-  fragments: string[];
+  fragments: Grid.Fragment[];
 
   /** The grid size of grid. The first member is for columns and the second for rows. */
   size: [number, number];
@@ -52,54 +49,38 @@ export class ItmGridComponent<T extends Object = {}> implements OnChanges, OnDes
 
   get gridRecord(): Grid { return this._grid; }
 
-  get target() { return this._target.value; }
-
   private _grid?: Grid;
-  private _areaRefs: Map<string, Grid.AreaRef>;
-  private _target = new BehaviorSubject<T>(undefined);
-  private _sourceSubscr: Subscription;
+  private _areaRefs: Map<Grid.Fragment, Grid.AreaRef>;
 
   constructor(
     private _config: ItmConfig
-  ) { }
+  ) {
+    super();
+  }
 
-  getAreaRef(fragment: string): Grid.AreaRef {
+  getAreaRef(fragment: Grid.Fragment): Grid.AreaRef {
     return this._areaRefs.get(fragment);
   }
 
-  getAreaStyle(fragment: string): { [key: string]: string } {
+  getAreaStyle(fragment: Grid.Fragment): { [key: string]: string } {
     const {row, col, width, height} = this.gridRecord.positions.get(fragment);
     return {
       gridArea: `${row} / ${col} / ${row + height} / ${col + width}`
     };
   }
 
-  getAreaClass(fragment: string): string {
+  getAreaClass(fragment: Grid.Fragment): string {
     const {key} = this.gridRecord.positions.get(fragment);
     return `${SELECTOR}-area ${SELECTOR}-key-${key}`;
   }
 
   ngOnChanges({grid: gridChanges, source: sourceChanges}: SimpleChanges) {
-    if (sourceChanges) {
-      if (this._sourceSubscr) this._sourceSubscr.unsubscribe();
-      if (this.source instanceof Observable) this._sourceSubscr = this.source.subscribe(
-        items => this._target.next(items),
-        err => console.error(err)
-      );
-      else {
-        this._sourceSubscr = null;
-        this._target.next(this.source);
-      }
-    }
+    if (sourceChanges) super.ngOnChanges({source: sourceChanges});
     if (gridChanges) {
       this._grid = Grid.factory.serialize(this.grid);
       this._areaRefs = Grid.parseAreaRefs(this._config, this._grid, this._target);
       this.fragments = this._grid.positions.keySeq().toArray();
       this.size = [this._grid.template.first(List()).size, this._grid.template.size];
     }
-  }
-
-  ngOnDestroy() {
-    if (this._sourceSubscr) this._sourceSubscr.unsubscribe();
   }
 }

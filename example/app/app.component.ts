@@ -8,6 +8,7 @@ import { User } from './user';
   selector: 'app-root',
   template: `
     <itm-grid [grid]="'user' | itmTypeForm:grid" [source]="data[0]"></itm-grid>
+    <itm-table [table]="'user' | itmTypeTable" [source]="data"></itm-table>
   `,
   styleUrls: ['./app.component.scss']
 })

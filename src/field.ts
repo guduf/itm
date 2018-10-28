@@ -42,6 +42,7 @@ export module ItmField {
     model: {label: null},
     shared: new Area.Shared({
       defaultComp: cfg => cfg.defaultFieldComp,
+      defaultText: ({area, target}) => target[area.key],
       providers: Map<any, Area.Provider>()
         .set(ItmFieldLabel, fieldLabelProvider)
     })
