@@ -1,22 +1,10 @@
 @mixin itm-grid($theme, $config) {
   $selector: 'itm-grid';
 
-  $slots: 24;
-  $total-size: 1440px;
-
   .#{$selector} {
     @extend .mat-body-1;
 
     display: grid;
-  }
-
-  @for $i from 1 through $slots {
-    .#{$selector}-rows-#{$i} {
-      grid-template-rows: repeat($i, $total-size / 24);
-    }
-    .#{$selector}-columns-#{$i} {
-      grid-template-columns: repeat($i, $total-size / 24);
-    }
   }
 
   .#{$selector}-area {

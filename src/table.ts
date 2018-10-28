@@ -1,14 +1,19 @@
-import { RecordOf } from 'immutable';
+import { Map, RecordOf } from 'immutable';
 
 import Area from './area';
 import Column from './column';
 import Grid from './grid';
+import Areas from './grid-areas';
+import Template from './grid-template';
+import Menu from './menu';
 
-export type ItmTable<T extends Object = {}>= Grid & RecordOf<ItmTable.Model>;
+export type ItmTable<T extends Object = {}>= Grid & RecordOf<ItmTable.Model<T>>;
 
 export module ItmTable {
-  export interface Model {
-    header: Grid;
+  export interface Model<T extends Object = {}> {
+    header: Grid<T>;
+    areas: Areas<T>;
+    positions: Template.Positions;
   }
 
   const serializer = (cfg: {}, grid: Grid): Model => {
@@ -26,7 +31,17 @@ export module ItmTable {
       fragments.map(fragment => fragment.set(0, null))
     ));
     const header = Grid.factory.serialize({template: headerTemplate, areas: headerAreas});
-    return {header};
+    const positions = Template.insertPosition(
+      grid.positions,
+      [Menu.factory.selector, '$tableMenu'],
+      'right'
+    );
+    const areas = Areas.insert(Map(), Menu.factory, {
+      key: '$tableMenu',
+      size: [[2, 1], 1],
+      buttons: [{key: '$tableDelete', icon: 'delete', text: 'delete'}]
+    });
+    return {header, areas, positions};
   };
 
   const selector = 'table';
@@ -34,7 +49,7 @@ export module ItmTable {
   export const factory: Grid.Factory<ItmTable, {}> = Grid.factory.extend({
     selector,
     serializer,
-    model: {header: null},
+    model: {header: null, areas: null, positions: null},
     shared: new Grid.Shared({
       defaultSelector: Column.factory.selector,
       areaFactories: [Column.factory]

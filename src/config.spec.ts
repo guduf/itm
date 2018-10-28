@@ -15,6 +15,7 @@ describe('ItmConfig', () => {
       defaultButtonComp: TestComponent,
       defaultControlComp: TestComponent,
       defaultFieldComp: TestComponent,
+      defaultMenuComp: TestComponent,
       defaultTextComp: TestComponent,
       areaFactories: List([Area.factory]),
       gridFactories: List([Grid.factory]),

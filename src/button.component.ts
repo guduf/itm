@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, combineLatest } from 'rxjs/operators';
 
-import { ItmAreaText } from './area';
 import Button, { ItmButtonRef } from './button';
 
 const MODES_WITH_ICON = [
@@ -35,7 +34,6 @@ export class ItmButtonComponent {
   readonly text: Observable<string>;
 
   constructor(
-    areaText: ItmAreaText,
     buttonRef: ItmButtonRef
   ) {
     this.disabled = buttonRef.disabled;
@@ -44,7 +42,7 @@ export class ItmButtonComponent {
       combineLatest(this.mode),
       map(([icon, mode]) => MODES_WITH_ICON.includes(mode) ? icon : null)
     );
-    this.text = areaText.pipe(
+    this.text = buttonRef.text.pipe(
       combineLatest(this.mode),
       map(([text, mode]) => MODES_WITH_TEXT.includes(mode) ? text : null),
     );

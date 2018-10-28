@@ -27,6 +27,9 @@ export abstract class ItmConfig extends AbstractRecord<ItmConfig.Model> implemen
   /** The component displayed in the field area when not specified in its configuration. */
   defaultFieldComp: ComponentType;
 
+  /** The component displayed in the menu area when not specified in its configuration. */
+  defaultMenuComp: ComponentType;
+
   /** The component displayed in the generic area when not specified in its configuration. */
   defaultTextComp: ComponentType;
 }
@@ -36,6 +39,7 @@ export module ItmConfig {
     defaultButtonComp?: ComponentType;
     defaultControlComp?: ComponentType;
     defaultFieldComp?: ComponentType;
+    defaultMenuComp?: ComponentType;
     defaultTextComp?: ComponentType;
     areaFactories?: Collection<any, Area.Factory>;
     gridFactories?: Collection<any, Grid.Factory>;
@@ -46,6 +50,7 @@ export module ItmConfig {
     defaultButtonComp: ComponentType;
     defaultControlComp: ComponentType;
     defaultFieldComp: ComponentType;
+    defaultMenuComp: ComponentType;
     defaultTextComp: ComponentType;
     areaFactories: Map<string, Area.Factory>;
     gridFactories: Map<string, Grid.Factory>;
@@ -61,6 +66,9 @@ export module ItmConfig {
 
     if (!isComponentType(cfg.defaultFieldComp)) throw new TypeError('Expected ComponentType');
     const defaultFieldComp = cfg.defaultFieldComp;
+
+    if (!isComponentType(cfg.defaultMenuComp)) throw new TypeError('Expected ComponentType');
+    const defaultMenuComp = cfg.defaultMenuComp;
 
     if (!isComponentType(cfg.defaultTextComp)) throw new TypeError('Expected ComponentType');
     const defaultTextComp = cfg.defaultTextComp;
@@ -105,6 +113,7 @@ export module ItmConfig {
       defaultButtonComp,
       defaultControlComp,
       defaultFieldComp,
+      defaultMenuComp,
       defaultTextComp,
       areaFactories,
       gridFactories,
@@ -121,6 +130,7 @@ export module ItmConfig {
       defaultButtonComp: null,
       defaultControlComp: null,
       defaultFieldComp: null,
+      defaultMenuComp: null,
       defaultTextComp: null,
       gridFactories: null,
       areaFactories: null,

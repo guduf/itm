@@ -1,5 +1,5 @@
 
-import { Map, RecordOf } from 'immutable';
+import { Map, RecordOf, Record } from 'immutable';
 import { Observable, of, empty } from 'rxjs';
 
 import ItmConfig from './config';
@@ -16,6 +16,7 @@ export abstract class ItmArea<T extends Object = {}> extends AbstractRecord<ItmA
   readonly key: string;
   readonly comp: ComponentType | null;
   readonly text: Target.Pipe<T, string> | null;
+  readonly size: RecordOf<ItmArea.Size>;
 }
 
 export module ItmArea {
@@ -26,6 +27,9 @@ export module ItmArea {
     /** The text attached to the area. Can be injected by area components as ItmAreaText. */
     text?: Target.PipeLike<T, string> | false;
 
+    /** The fraction of the available grid space occupied by the area. */
+    size?: [number | [number, number], number | [number, number]] | Partial<Size>;
+
     /**
      * The component displayed in the area.
      * A default component could be determined the area factory and the config.
@@ -33,10 +37,21 @@ export module ItmArea {
     comp?: ComponentType | false;
   }
 
-  export interface Model<T = {}> extends  Config<T> {
+  export interface Size {
+    width: number;
+    flexWidth: number;
+    height: number;
+    flexHeight: number;
+  }
+
+  // tslint:disable-next-line:max-line-length
+  export const sizeFactory = Record<Size>({width: null, flexWidth: null, height: null, flexHeight: null});
+
+  export interface Model<T = {}> extends Config<T> {
     key: string;
     comp: ComponentType | null;
     text: Target.Pipe<T, string> | null;
+    size: RecordOf<Size>;
   }
 
   export type Provider = (
@@ -70,13 +85,36 @@ export module ItmArea {
       cfg.text ? Target.defer('string', cfg.text) :
         null
     );
-    return {key, comp, text};
+    const sizeCfg: Partial<Size> = (
+      !cfg.size || typeof cfg.size !== 'object' ? {} :
+      !Array.isArray(cfg.size) ? cfg.size :
+        ({
+          width: cfg.size[0] ? Array.isArray(cfg.size[0]) ? cfg.size[0][0] : cfg.size[0] : null,
+          flexWidth: Array.isArray(cfg.size[0]) && cfg.size[0][1] ? cfg.size[0][1] : null,
+          height: cfg.size[1] ? Array.isArray(cfg.size[1]) ? cfg.size[1][0] : cfg.size[1] : null,
+          flexHeight: Array.isArray(cfg.size[1]) &&  cfg.size[1][1] ? cfg.size[1][1] : null
+        })
+    );
+    const width = sizeCfg.width >= 1 ? Math.round(sizeCfg.width) : 3;
+    const flexWidth = (
+      sizeCfg.flexWidth !== null && sizeCfg.flexWidth >= 0 ?
+        Math.round(sizeCfg.flexWidth * 10e8) / 10e8 :
+        0
+    );
+    const height = sizeCfg.height >= 1 ? Math.round(sizeCfg.height) : 1;
+    const flexHeight = (
+      sizeCfg.flexHeight !== null && sizeCfg.flexHeight >= 0 ?
+        Math.round(sizeCfg.flexHeight * 10e8) / 10e8 :
+        0
+    );
+    const size = sizeFactory({width, flexWidth, height, flexHeight});
+    return {key, comp, text, size};
   };
 
   export const factory: Factory = RecordFactory.build({
     selector,
     serializer,
-    model: {key: null, comp: null, text: null},
+    model: {key: null, comp: null, text: null, size: null},
     shared: new Shared({})
   });
 

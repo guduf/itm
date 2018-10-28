@@ -14,13 +14,16 @@ export class User {
   })
   id: number;
 
-  @ItmProp()
+  @ItmProp({
+    control: {size: {flexHeight: 0.5}}
+  })
   firstName: string;
 
   @ItmProp({
     label: 'Last name',
     control: {
-      required: true
+      required: true,
+      size: {flexHeight: 1}
     }
   })
   lastName: string;

@@ -1,10 +1,12 @@
 // tslint:disable-next-line:max-line-length
 import { Component, EventEmitter, OnChanges, Input, SimpleChanges, HostBinding, Output, Inject, OnDestroy, StaticProvider, InjectionToken, ChangeDetectionStrategy } from '@angular/core';
-import { List, Map } from 'immutable';
+import { Map, Range } from 'immutable';
 
 import ItmConfig from './config';
 import Grid from './grid';
+import Template from './grid-template';
 import { ComponentWithSource } from './utils';
+import { SafeStyle, DomSanitizer } from '@angular/platform-browser';
 
 /** The selector of ItmGridComponent. */
 const SELECTOR = 'itm-grid';
@@ -35,52 +37,48 @@ export class ItmGridComponent<T extends Object = {}> extends ComponentWithSource
   action = new EventEmitter();
 
   /** The grid grid area map of the displayed areas. */
-  fragments: Grid.Fragment[];
+  fragments: Template.Fragment[];
 
-  @HostBinding('class')
   /** The CSS class of the host element. */
-  get hostClass(): string {
-    return [
-      this.ngClass,
-      SELECTOR,
-      ...([
-        `${SELECTOR}-columns-${this.gridRecord.size.first()}`,
-        `${SELECTOR}-rows-${this.gridRecord.size.last()}`
-      ])
-    ].join(' ');
-  }
+  @HostBinding('class')
+  get hostClass(): string { return [SELECTOR, this.ngClass].join(' '); }
 
   get gridRecord(): Grid { return this._grid; }
 
+  @HostBinding('style.gridTemplateColumns')
+  get gridTemplateColumnsStyle(): SafeStyle { return this._hostStyle.gridTemplateColumns; }
+
+  @HostBinding('style.gridTemplateRows')
+  get gridTemplateRowsStyle(): SafeStyle { return this._hostStyle.gridTemplateRows; }
+
   private _grid?: Grid;
-  private _areaRefs: Map<Grid.Fragment, Grid.AreaRef>;
+
+  private _hostStyle: { gridTemplateColumns: SafeStyle, gridTemplateRows: SafeStyle };
+
+  private _areaRefs: Map<Template.Fragment, Grid.AreaRef>;
 
   constructor(
-    private _config: ItmConfig
+    private _config: ItmConfig,
+    private _sanitizer: DomSanitizer
   ) {
     super();
   }
 
-  getAreaRef(fragment: Grid.Fragment): Grid.AreaRef {
-    return this._areaRefs.get(fragment);
-  }
+  getAreaRef(fragment: Template.Fragment): Grid.AreaRef { return this._areaRefs.get(fragment); }
 
-  getAreaStyle(fragment: Grid.Fragment): { [key: string]: string } {
+  getAreaStyle(fragment: Template.Fragment): { [key: string]: string } {
     const {row, col, width, height} = this.gridRecord.positions.get(fragment);
-    return {
-      gridArea: `${row} / ${col} / ${row + height} / ${col + width}`
-    };
+    return {gridArea: `${row} / ${col} / ${row + height} / ${col + width}`};
   }
 
-  getAreaClass(fragment: Grid.Fragment): string {
-    const cols = this.gridRecord.size.first(NaN);
-    const rows = this.gridRecord.size.last(NaN);
+  getAreaClass(fragment: Template.Fragment): string {
+    const {rows, cols} = Template.getRange(this.gridRecord.positions);
     const {row, col, width, height} = this.gridRecord.positions.get(fragment);
     const areaClass: string[] = [`${SELECTOR}-area`];
     if (col === 1) areaClass.push(`${SELECTOR}-first-col`);
-    if (col + width === cols + 1) areaClass.push(`${SELECTOR}-last-col`);
+    if (col + width === cols) areaClass.push(`${SELECTOR}-last-col`);
     if (row === 1) areaClass.push(`${SELECTOR}-first-row`);
-    if (row + height === rows + 1) areaClass.push(`${SELECTOR}-last-row`);
+    if (row + height === rows) areaClass.push(`${SELECTOR}-last-row`);
     return areaClass.join(' ');
   }
 
@@ -90,6 +88,46 @@ export class ItmGridComponent<T extends Object = {}> extends ComponentWithSource
       this._grid = Grid.factory.serialize(this.grid);
       this._areaRefs = Grid.parseAreaRefs(this._config, this._grid, this._target);
       this.fragments = this._grid.positions.keySeq().toArray();
+      this._setGridStyle();
     }
+  }
+
+  private _setGridStyle(): void {
+    const rhythm = '60px';
+    const range = Template.getRange(this.gridRecord.positions);
+    const initialCols = Range(0, range.cols).map(() => -1).toArray();
+    const initialRows = Range(0, range.rows).map(() => -1).toArray();
+    const {rows, cols} = this.gridRecord.positions.reduce(
+      (acc, pos, frag) => {
+        const {area} = this._areaRefs.get(frag);
+        const flexWidth = area.size.flexWidth / pos.width;
+        const flexHeight = area.size.flexHeight / pos.height;
+        const a = {
+          rows: acc.rows.map((val, i) => {
+            // console.log('rows', pos.row, i + 1, pos.row + pos.height - 1);
+            return (
+            (i + 1 < pos.row || i + 2 > pos.row + pos.height) ? val :
+              val < 0 ? flexHeight : Math.min(val, flexHeight)
+          )}),
+          cols: acc.cols.map((val, i) =>  {
+            // console.log('cols', pos.col, i + 1, pos.col + pos.width - 1);
+            return (
+            (i + 1 < pos.col || i + 2 > pos.col + pos.width) ? val :
+            val < 0 ? flexWidth : Math.min(val, flexWidth)
+          )})
+        };
+        // console.log({area: area.toJS(), flexWidth, flexHeight, rows: a.rows, cols: a.cols});
+        return a;
+      },
+      {rows: initialRows, cols: initialCols}
+    );
+    this._hostStyle = {
+      gridTemplateColumns: this._sanitizer.bypassSecurityTrustStyle(
+        cols.map(col => col > 0 ? `minmax(${rhythm} , ${col}fr)` : rhythm).join(' ')
+      ),
+      gridTemplateRows: this._sanitizer.bypassSecurityTrustStyle(
+        rows.map(row => row > 0 ? `minmax(${rhythm}, ${row}fr)` : rhythm).join(' ')
+      )
+    };
   }
 }

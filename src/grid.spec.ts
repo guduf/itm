@@ -1,6 +1,8 @@
 // tslint:disable:max-line-length
 import Area from './area';
 import Grid from './grid';
+import Areas from './grid-areas';
+import Template from './grid-template';
 import { List } from 'immutable';
 
 describe('ItmGrid', () => {
@@ -42,14 +44,14 @@ describe('ItmGrid', () => {
   });
 
   describe('parsePositions()', () => {
-    const areas = Grid.parseAreas({
+    const areas = Areas.parse({
       [Area.factory.selector]: [{key: 'name'}, {key: 'id'}],
       control: [{key: 'email'}]
     });
 
     function parseGridAreas(template: string) {
       const grid = Grid.factory.serialize({template, areas});
-      return Grid.parsePositions(grid.template);
+      return Template.parsePositions(grid.template);
     }
 
     it('should throw a type error when template is invalid', () => {
@@ -112,7 +114,7 @@ describe('ItmGrid', () => {
 
   describe('isAreaFragment()', () => {
     it('should be true with a valid list', () => {
-      expect(Grid.isAreaFragment(List([null, 'id']))).toBeTruthy();
+      expect(Template.isAreaFragment(List([null, 'id']))).toBeTruthy();
     });
   });
 });
