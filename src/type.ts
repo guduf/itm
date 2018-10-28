@@ -75,7 +75,7 @@ export module ItmType {
     );
     const grid = Grid.factory.serialize({areas, template}, cfg.grid);
     const form = Form.factory.serialize(grid, cfg.form);
-    const table = Table.factory.serialize({areas, template: tableTemplate}, cfg.form);
+    const table = Table.factory.serialize({areas, template: tableTemplate}, cfg.table);
     return {key, target, props, grid, form, table};
   };
 

@@ -14,6 +14,8 @@ export abstract class ItmGrid<T extends Object = {}> extends AbstractRecord<ItmG
   areas: Map<string, Map<string, Area<T>>>;
   template: ItmGrid.Template;
   positions: Map<ItmGrid.Fragment, RecordOf<ItmGrid.Position>>;
+  /** The grid size of grid. The first member is for columns and the second for rows. */
+  size: List<number>;
 }
 
 export module ItmGrid {
@@ -44,6 +46,7 @@ export module ItmGrid {
     areas: Map<string, Map<string, Area<T>>>;
     template: Template;
     positions: Map<Fragment, RecordOf<Position>>;
+    size: List<number>;
   }
 
   export class Shared {
@@ -77,7 +80,8 @@ export module ItmGrid {
     const areas = parseAreas(cfg.areas, shared.areaFactories);
     const template = parseTemplate(cfg.template);
     const positions = ItmGrid.parsePositions(template, shared.defaultSelector);
-    return {areas, template, positions};
+    const size = List([template.first(List()).size, template.size]);
+    return {areas, template, positions, size};
   };
 
   const selector = 'grid';
@@ -88,7 +92,7 @@ export module ItmGrid {
   export const factory: Factory = RecordFactory.build({
     selector,
     serializer,
-    model: {areas: null, template: null, positions: null},
+    model: {areas: null, template: null, positions: null, size: null},
     shared: new Shared({})
   });
 

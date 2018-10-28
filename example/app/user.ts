@@ -1,7 +1,13 @@
 import { ItmProp } from 'src/prop';
 import { ItmType } from 'src/type';
 
-@ItmType()
+@ItmType({
+  table: {
+    template: `
+      id gender firstName = lastName = email = =
+    `
+  }
+})
 export class User {
   @ItmProp({
     label: 'ID'

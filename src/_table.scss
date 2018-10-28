@@ -1,105 +1,37 @@
-@mixin itm-table($config) {
-  .itm-table {
-    @extend .mat-body-1;
+@mixin itm-table($theme, $config) {
+  $selector: 'itm-table';
+
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  $label-color: mat-color($foreground, secondary-text);
+  $underline-color: mat-color($foreground, divider, if($is-dark-theme, 0.7, 0.42));
+
+  .#{$selector} {
+    @extend .mat-elevation-z2;
 
     display: block;
 
-    & > .mat-table {
-      @extend .mat-elevation-z1;
-
+    & > .#{$selector}-header-row,
+    & > .#{$selector}-row {
+      position: relative;
       width: 100%;
-      height: 100%;
-      overflow: hidden;
+
+      &::after {
+        content: '';
+
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+        height: 1px;
+        background-color: $underline-color;
+      }
     }
-  }
 
-  .itm-table-menu {
-    @extend .itm-slot;
-    @extend .itm-slot-2;
-
-    margin-top: -4px;
-    margin-right: -12px;
-
-    header {
-      display: flex;
-      flex-flow: row-reverse;
+    & > .#{$selector}-header-row {
+      color: $label-color;
     }
-  }
-
-  tr.mat-row.itm-row,
-  tr.mat-header-row.itm-header-row {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-  }
-
-  tr.mat-header-row.itm-header-row {
-    @extend .mat-elevation-z1;
-
-    position: relative;
-    z-index: 2;
-    right: 0;
-    left: 0;
-    transition: top 240ms ease-out;
-
-    &::before {
-      content: '';
-
-      position: absolute;
-      right: 0;
-      bottom: 1px;
-      left: 0;
-      height: 100vh;
-      background-color: white;
-    }
-  }
-
-  %itm-cell {
-    @extend .itm-slot;
-
-    display: flex;
-    overflow: hidden;
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
-
-
-  td.mat-cell.itm-selection-cell,
-  th.mat-header-cell.itm-selection-header-cell {
-    @extend %itm-cell;
-    @extend .itm-slot-1;
-
-    padding-right: 9px;
-
-    &:first-of-type {
-      padding-left: 12px;
-    }
-  }
-
-  th.mat-header-cell.itm-selection-header-cell {
-    padding-top: 8px;
-    padding-bottom: 8px;
-  }
-
-  td.mat-cell.itm-action-cell,
-  th.mat-header-cell.itm-action-header-cell {
-    @extend %itm-cell;
-
-    justify-content: flex-end;
-
-    &:last-of-type {
-      padding-right: 12px;
-    }
-  }
-
-  td.mat-cell.itm-cell,
-  th.mat-header-cell.itm-header-cell {
-    @extend %itm-cell;
-
-    flex-grow: 1;
-  }
-
-  th.mat-header-cell.itm-header-cell {
-    position: relative;
   }
 }

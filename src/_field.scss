@@ -1,4 +1,4 @@
-@mixin itm-field($config) {
+@mixin itm-field($theme, $config) {
   $selector: 'itm-field';
 
   .#{$selector} {

@@ -7,7 +7,7 @@ import { User } from './user';
 @Component({
   selector: 'app-root',
   template: `
-    <itm-grid [grid]="'user' | itmTypeForm:grid" [source]="data[0]"></itm-grid>
+    <itm-form [form]="'user' | itmTypeForm:grid" [source]="data[0]"></itm-form>
     <itm-table [table]="'user' | itmTypeTable" [source]="data"></itm-table>
   `,
   styleUrls: ['./app.component.scss']

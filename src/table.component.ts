@@ -1,15 +1,21 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, HostBinding } from '@angular/core';
 
 import Grid from './grid';
 import Table from './table';
 import { ComponentWithSource } from './utils';
 
+const SELECTOR = 'itm-table';
+
 @Component({
-  selector: 'itm-table',
+  selector: SELECTOR,
   template: `
     <ng-container *ngIf="tableRecord as table">
-      <itm-grid [grid]="table.header" [source]="target"></itm-grid>
-      <itm-grid *ngFor="let rowSource of target" [grid]="table" [source]="rowSource"></itm-grid>
+      <itm-grid
+        [grid]="table.header" [source]="target"
+        [ngClass]="headerRowClass"></itm-grid>
+      <itm-grid *ngFor="let rowSource of target"
+        [grid]="table" [source]="rowSource"
+        [ngClass]="rowClass"></itm-grid>
     </ng-container>
   `
 })
@@ -18,6 +24,13 @@ export class ItmTableComponent<T extends Object = {}> extends ComponentWithSourc
   @Input()
   /** The configuration of the table. */
   table: Grid.Config = null;
+
+  readonly headerRowClass = `${SELECTOR}-header-row`;
+
+  readonly rowClass = `${SELECTOR}-row`;
+
+  @HostBinding('class')
+  get hostClass(): string { return SELECTOR; }
 
   get tableRecord(): Table { return this._table; }
 

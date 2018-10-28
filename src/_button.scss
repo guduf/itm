@@ -1,4 +1,4 @@
-@mixin itm-button($config) {
+@mixin itm-button($theme, $config) {
   .itm-button {
     .mat-button-wrapper > span {
       vertical-align: middle;

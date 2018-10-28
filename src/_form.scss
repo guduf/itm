@@ -1,0 +1,9 @@
+@mixin itm-form($theme, $config) {
+  $selector: 'itm-form';
+
+  .#{$selector} {
+    @extend .mat-elevation-z2;
+
+    display: block;
+  }
+}

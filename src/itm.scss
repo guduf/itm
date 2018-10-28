@@ -1,19 +1,21 @@
 @import './button';
 @import './control';
 @import './field';
+@import './form';
 @import './grid';
 @import './slot';
 @import './table';
 
-@mixin itm-core($config: null) {
+@mixin itm($theme, $config: null) {
   @if $config == null {
     $config: mat-typography-config();
   }
 
-  @include itm-slot($config);
-  @include itm-grid($config);
-  @include itm-field($config);
-  @include itm-control($config);
-  @include itm-button($config);
-  @include itm-table($config);
+  @include itm-slot($theme, $config);
+  @include itm-grid($theme, $config);
+  @include itm-field($theme, $config);
+  @include itm-form($theme, $config);
+  @include itm-control($theme, $config);
+  @include itm-button($theme, $config);
+  @include itm-table($theme, $config);
 }

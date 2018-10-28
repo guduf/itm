@@ -1,4 +1,4 @@
-@mixin itm-grid($config) {
+@mixin itm-grid($theme, $config) {
   $selector: 'itm-grid';
 
   $slots: 24;
@@ -6,10 +6,8 @@
 
   .#{$selector} {
     @extend .mat-body-1;
-    @extend .mat-elevation-z1;
 
     display: grid;
-    padding: 6px;
   }
 
   @for $i from 1 through $slots {
@@ -22,6 +20,23 @@
   }
 
   .#{$selector}-area {
+    position: relative;
     padding: 6px;
+
+    &.#{$selector}-first-col {
+      padding-left: 12px;
+    }
+
+    &.#{$selector}-last-col {
+      padding-right: 12px;
+    }
+
+    &.#{$selector}-first-row {
+      padding-top: 12px;
+    }
+
+    &.#{$selector}-last-row {
+      padding-bottom: 12px;
+    }
   }
 }

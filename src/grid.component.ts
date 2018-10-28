@@ -1,5 +1,5 @@
 // tslint:disable-next-line:max-line-length
-import { Component, EventEmitter, OnChanges, Input, SimpleChanges, HostBinding, Output, Inject, OnDestroy, StaticProvider, InjectionToken } from '@angular/core';
+import { Component, EventEmitter, OnChanges, Input, SimpleChanges, HostBinding, Output, Inject, OnDestroy, StaticProvider, InjectionToken, ChangeDetectionStrategy } from '@angular/core';
 import { List, Map } from 'immutable';
 
 import ItmConfig from './config';
@@ -17,13 +17,18 @@ const SELECTOR = 'itm-grid';
       [ngStyle]="getAreaStyle(fragment)">
       <ng-container [itmArea]="getAreaRef(fragment)"></ng-container>
     </div>
-  `
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 // tslint:disable-next-line:max-line-length
 export class ItmGridComponent<T extends Object = {}> extends ComponentWithSource<T> implements OnChanges, OnDestroy {
   @Input()
   /** The configuration of the grid. */
   grid: Grid.Config = null;
+
+  @Input()
+  /** The configuration of the grid. */
+  ngClass: string;
 
   @Output()
   /** The emitter of action events. */
@@ -32,18 +37,16 @@ export class ItmGridComponent<T extends Object = {}> extends ComponentWithSource
   /** The grid grid area map of the displayed areas. */
   fragments: Grid.Fragment[];
 
-  /** The grid size of grid. The first member is for columns and the second for rows. */
-  size: [number, number];
-
   @HostBinding('class')
   /** The CSS class of the host element. */
   get hostClass(): string {
     return [
+      this.ngClass,
       SELECTOR,
-      ...(
-        !this.size ? [] :
-        [`${SELECTOR}-columns-${this.size[0]}`, `${SELECTOR}-rows-${this.size[1]}`]
-      )
+      ...([
+        `${SELECTOR}-columns-${this.gridRecord.size.first()}`,
+        `${SELECTOR}-rows-${this.gridRecord.size.last()}`
+      ])
     ].join(' ');
   }
 
@@ -70,8 +73,15 @@ export class ItmGridComponent<T extends Object = {}> extends ComponentWithSource
   }
 
   getAreaClass(fragment: Grid.Fragment): string {
-    const {key} = this.gridRecord.positions.get(fragment);
-    return `${SELECTOR}-area ${SELECTOR}-key-${key}`;
+    const cols = this.gridRecord.size.first(NaN);
+    const rows = this.gridRecord.size.last(NaN);
+    const {row, col, width, height} = this.gridRecord.positions.get(fragment);
+    const areaClass: string[] = [`${SELECTOR}-area`];
+    if (col === 1) areaClass.push(`${SELECTOR}-first-col`);
+    if (col + width === cols + 1) areaClass.push(`${SELECTOR}-last-col`);
+    if (row === 1) areaClass.push(`${SELECTOR}-first-row`);
+    if (row + height === rows + 1) areaClass.push(`${SELECTOR}-last-row`);
+    return areaClass.join(' ');
   }
 
   ngOnChanges({grid: gridChanges, source: sourceChanges}: SimpleChanges) {
@@ -80,7 +90,6 @@ export class ItmGridComponent<T extends Object = {}> extends ComponentWithSource
       this._grid = Grid.factory.serialize(this.grid);
       this._areaRefs = Grid.parseAreaRefs(this._config, this._grid, this._target);
       this.fragments = this._grid.positions.keySeq().toArray();
-      this.size = [this._grid.template.first(List()).size, this._grid.template.size];
     }
   }
 }

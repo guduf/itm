@@ -1,4 +1,4 @@
-@mixin itm-control($config) {
+@mixin itm-control($theme, $config) {
   $selector: 'itm-control';
 
   .#{$selector} {

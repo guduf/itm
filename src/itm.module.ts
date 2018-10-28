@@ -16,6 +16,7 @@ import { ItmConfig } from './config';
 import Field from './field';
 import { ItmFieldComponent } from './field.component';
 import Form from './form';
+import { ItmFormComponent } from './form.component';
 import Grid from './grid';
 import { ItmGridComponent } from './grid.component';
 import { ItmMaterialModule } from './material.module';
@@ -42,6 +43,7 @@ const DECLARATIONS = [
 ];
 
 const EXPORTED_DECLARATIONS = [
+  ItmFormComponent,
   ItmGridComponent,
   ItmTableComponent,
   ...ITM_TYPE_PIPES
