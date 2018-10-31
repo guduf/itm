@@ -23,7 +23,6 @@ import { ItmMaterialModule } from './material.module';
 import Menu from './menu';
 import Table from './table';
 import { ItmTableComponent } from './table.component';
-import { ItmTextAreaComponent } from './text-area.component';
 import { ITM_TYPE_PIPES } from './type.pipes';
 import { ItmMenuComponent } from './menu.component';
 
@@ -37,8 +36,7 @@ const ENTRY_COMPONENTS = [
   ItmButtonComponent,
   ItmControlComponent,
   ItmFieldComponent,
-  ItmMenuComponent,
-  ItmTextAreaComponent
+  ItmMenuComponent
 ];
 
 const DECLARATIONS = [
@@ -57,7 +55,6 @@ export const DEFAULT_CONFIG: ItmConfig.Model = {
   defaultControlComp: ItmControlComponent,
   defaultFieldComp: ItmFieldComponent,
   defaultMenuComp: ItmMenuComponent,
-  defaultTextComp: ItmTextAreaComponent,
   areaFactories: Map<string, Area.Factory>()
     .set(Area.factory.selector, Area.factory)
     .set(Button.factory.selector, Button.areaFactory)

@@ -113,12 +113,16 @@ export module ItmGrid {
           providers: acc.providers.merge(areaProviders)
         }),
         {
-          defaultComp: () => config.defaultTextComp,
-          defaultText: () => of('banane'),
+          defaultComp: null,
+          defaultText: null,
           providers: Map<any, Area.Provider>().set(Area, {useValue: area})
         }
       );
-      const comp = area.comp || areaShared.defaultComp(config);
+      const comp = (
+        area.comp ||
+        typeof areaShared.defaultComp === 'function' ? areaShared.defaultComp(config) :
+        null
+      );
       const areaText = (
         area.text ? Target.map(target, area.text) :
           target.pipe(map(value => areaShared.defaultText({area, target: value})))

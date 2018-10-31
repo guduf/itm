@@ -29,9 +29,6 @@ export abstract class ItmConfig extends AbstractRecord<ItmConfig.Model> implemen
 
   /** The component displayed in the menu area when not specified in its configuration. */
   defaultMenuComp: ComponentType;
-
-  /** The component displayed in the generic area when not specified in its configuration. */
-  defaultTextComp: ComponentType;
 }
 
 export module ItmConfig {
@@ -40,7 +37,6 @@ export module ItmConfig {
     defaultControlComp?: ComponentType;
     defaultFieldComp?: ComponentType;
     defaultMenuComp?: ComponentType;
-    defaultTextComp?: ComponentType;
     areaFactories?: Collection<any, Area.Factory>;
     gridFactories?: Collection<any, Grid.Factory>;
     types?: List<any> | Map<string, Type>;
@@ -51,7 +47,6 @@ export module ItmConfig {
     defaultControlComp: ComponentType;
     defaultFieldComp: ComponentType;
     defaultMenuComp: ComponentType;
-    defaultTextComp: ComponentType;
     areaFactories: Map<string, Area.Factory>;
     gridFactories: Map<string, Grid.Factory>;
     types: Map<string, Type>;
@@ -69,9 +64,6 @@ export module ItmConfig {
 
     if (!isComponentType(cfg.defaultMenuComp)) throw new TypeError('Expected ComponentType');
     const defaultMenuComp = cfg.defaultMenuComp;
-
-    if (!isComponentType(cfg.defaultTextComp)) throw new TypeError('Expected ComponentType');
-    const defaultTextComp = cfg.defaultTextComp;
 
     if (
       !isCollection(cfg.areaFactories) ||
@@ -114,7 +106,6 @@ export module ItmConfig {
       defaultControlComp,
       defaultFieldComp,
       defaultMenuComp,
-      defaultTextComp,
       areaFactories,
       gridFactories,
       types
@@ -131,7 +122,6 @@ export module ItmConfig {
       defaultControlComp: null,
       defaultFieldComp: null,
       defaultMenuComp: null,
-      defaultTextComp: null,
       gridFactories: null,
       areaFactories: null,
       types: null

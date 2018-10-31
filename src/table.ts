@@ -39,7 +39,8 @@ export module ItmTable {
     const areas = Areas.insert(Map(), Menu.factory, {
       key: '$tableMenu',
       size: [[2, 1], 1],
-      buttons: [{key: '$tableDelete', icon: 'delete', text: 'delete'}]
+      buttons: [{key: '$tableDelete', icon: 'delete', text: 'DELETE'}],
+      direction: Menu.Direction.right
     });
     return {header, areas, positions};
   };

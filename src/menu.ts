@@ -3,24 +3,37 @@ import { Map, RecordOf } from 'immutable';
 import Area from './area';
 import Button from './button';
 import Target from './target';
-import { InjectionToken } from '@angular/core';
 import { ItmButtonRef } from './button';
+import { Observable } from 'rxjs';
 
-// tslint:disable-next-line:max-line-length
-export const ITM_MENU_BUTTON_REFS = new InjectionToken<Map<string, ItmButtonRef>>('ITM_MENU_BUTTON_REFS');
+export class ItmMenuRef {
+  constructor(
+    readonly direction: Observable<ItmMenu.Direction>,
+    readonly buttons: Map<string, ItmButtonRef>
+  ) { }
+}
 
 /** Record that describes specifics property of a button area. */
 export type ItmMenu<T = {}> = Area<T> & RecordOf<ItmMenu.Model<T>>;
 
 export module ItmMenu {
+  export enum Direction {
+    top = 'top',
+    right = 'right',
+    bottom = 'bottom',
+    left = 'left'
+  }
+
   export interface ModelConfig<T extends Object = {}> {
-    buttons: Button.Config<T>[] | Map<string, Button.Config<T>>;
-    mode: Target.PipeLike<T, Button.Mode>;
+    buttons?: Button.Config<T>[] | Map<string, Button.Config<T>>;
+    mode?: Target.PipeLike<T, Button.Mode>;
+    direction?: Target.PipeLike<T, Direction>;
   }
 
   export interface Model<T = {}> extends ModelConfig<T> {
     buttons: Map<string, Button<T>>;
     mode: Target.Pipe<T, Button.Mode>;
+    direction: Target.Pipe<T, Direction>;
   }
 
   const serializer = (cfg: RecordOf<ModelConfig>): Model => {
@@ -37,25 +50,29 @@ export module ItmMenu {
       Map<string, Button>()
     );
     const mode = Target.defer(Button.Mode, cfg.mode);
-    return {buttons, mode};
+    const direction = Target.defer(Direction, cfg.direction);
+    return {buttons, mode, direction};
   };
 
   const selector = 'menu';
 
   export type Config<T extends Object = {}> = Area.Config<T> & ModelConfig<T>;
 
-  export function provideButtonRefs(menu: ItmMenu, target: Target): Map<string, ItmButtonRef> {
-    return menu.buttons.map(button => new ItmButtonRef(button, target));
+  export function provideMenuRef(menu: ItmMenu, target: Target): ItmMenuRef {
+    return new ItmMenuRef(
+      Target.map(target, menu.direction),
+      menu.buttons.map(button => new ItmButtonRef(button, target))
+    );
   }
 
   export const factory: Area.Factory<ItmMenu, Config> = Area.factory.extend({
     selector,
     serializer,
-    model: {buttons: null, mode: null},
+    model: {buttons: null, mode: null, direction: null},
     shared: new Area.Shared({
       defaultComp: cfg => cfg.defaultMenuComp,
       providers: Map<any, Area.Provider>()
-        .set(ITM_MENU_BUTTON_REFS, {deps: [Area, Target], useFactory: provideButtonRefs})
+        .set(ItmMenuRef, {deps: [Area, Target], useFactory: provideMenuRef})
     })
   });
 }

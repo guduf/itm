@@ -1,6 +1,6 @@
 
-import { Map, RecordOf, Record } from 'immutable';
-import { Observable, of, empty } from 'rxjs';
+import { Map, Record, RecordOf } from 'immutable';
+import { Observable, empty } from 'rxjs';
 
 import ItmConfig from './config';
 import RecordFactory from './record-factory';

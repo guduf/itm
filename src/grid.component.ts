@@ -102,22 +102,16 @@ export class ItmGridComponent<T extends Object = {}> extends ComponentWithSource
         const {area} = this._areaRefs.get(frag);
         const flexWidth = area.size.flexWidth / pos.width;
         const flexHeight = area.size.flexHeight / pos.height;
-        const a = {
-          rows: acc.rows.map((val, i) => {
-            // console.log('rows', pos.row, i + 1, pos.row + pos.height - 1);
-            return (
+        return {
+          rows: acc.rows.map((val, i) => (
             (i + 1 < pos.row || i + 2 > pos.row + pos.height) ? val :
               val < 0 ? flexHeight : Math.min(val, flexHeight)
-          )}),
-          cols: acc.cols.map((val, i) =>  {
-            // console.log('cols', pos.col, i + 1, pos.col + pos.width - 1);
-            return (
+          )),
+          cols: acc.cols.map((val, i) => (
             (i + 1 < pos.col || i + 2 > pos.col + pos.width) ? val :
             val < 0 ? flexWidth : Math.min(val, flexWidth)
-          )})
+          ))
         };
-        // console.log({area: area.toJS(), flexWidth, flexHeight, rows: a.rows, cols: a.cols});
-        return a;
       },
       {rows: initialRows, cols: initialCols}
     );
