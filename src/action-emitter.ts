@@ -1,4 +1,4 @@
-import { Subscription, Subject, Observable, of, combineLatest } from 'rxjs';
+import { Subscription, Subject, Observable, of, combineLatest, isObservable } from 'rxjs';
 import { distinctUntilKeyChanged, filter, map } from 'rxjs/operators';
 import { Map } from 'immutable';
 
@@ -7,11 +7,13 @@ import Behavior from './behavior';
 
 // tslint:disable-next-line:max-line-length
 export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T extends Object = {}> {
-  private _subscrs = Map<Action.Unresolved, Subscription>();
+  get action(): Observable<A> { return this._actions; }
 
   private readonly _subject = new Subject<A>();
 
   private readonly _actions: Observable<A>;
+
+    private _subscrs = Map<Action.Unresolved, Subscription>();
 
   constructor(
     private readonly _target: Behavior<T>,
@@ -26,7 +28,15 @@ export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T
           if (!resolver) return true;
           // tslint:disable-next-line:max-line-length
           if (this._subscrs.has(action)) throw new ReferenceError('Duplicate action subscription');
-          this._subscrs = this._subscrs.set(action, resolver(action).subscribe(
+          let primitiveResult: any;
+          try { primitiveResult = resolver(action); }
+          catch (err) {
+            console.error(err);
+            this._subject.next(new Action.Failed(action, err) as any);
+            return;
+          }
+          const resultObs = isObservable(primitiveResult) ? primitiveResult : of(primitiveResult);
+          this._subscrs = this._subscrs.set(action, resultObs.subscribe(
             result => {
               this._subscrs.get(action, {unsubscribe: (() => {})}).unsubscribe();
               this._subject.next(new Action.Resolved(action, result) as any);
@@ -57,8 +67,6 @@ export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T
     ) throw new TypeError('Expected resolved action');
     this._subject.next(action);
   }
-
-  actions(): Observable<A> { return this._actions; }
 
   unsubscribe(): void {
     this._subject.unsubscribe();

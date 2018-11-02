@@ -25,9 +25,9 @@ export module ItmAction {
 
   export class Resolved<T extends Object = {}, R extends Object = {}> extends Generic<T> {
     get resolved(): true { return true; }
-    get failed(): true { return true; }
+    get failed(): false { return false; }
 
-    constructor(readonly action: Unresolved<T>, readonly result: R) {
+    constructor(action: Unresolved<T>, readonly result: R) {
       super(action);
     }
   }

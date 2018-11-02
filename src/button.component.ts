@@ -28,9 +28,6 @@ export class ItmButtonComponent {
   /** The text to display. If null, none text is displayed. */
   readonly text: Observable<string>;
 
-  /** Handles click events to action emitter. */
-  get emit(): (nativeEvent: MouseEvent) => void { return this._buttonRef.emit; }
-
   /** Whether the button is disabled. */
   get disabled(): Observable<boolean> { return this._buttonRef.disabled; }
 
@@ -49,4 +46,7 @@ export class ItmButtonComponent {
       map(([text, mode]) => MODES_WITH_TEXT.includes(mode) ? text : null),
     );
   }
+
+  /** Handles click events to action emitter. */
+  emit(e) { this._buttonRef.emit(e); }
 }

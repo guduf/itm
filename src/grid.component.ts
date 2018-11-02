@@ -123,6 +123,8 @@ export class ItmGridComponent<A extends Action.Generic<T>, T extends Object = {}
         return;
       }
       this.fragments = record.positions.keySeq().toArray();
+      if (this._actionsSubscr) this._actionsSubscr.unsubscribe();
+      this._actionsSubscr = this._ref.emitter.action.subscribe(this.action);
       this._setHostStyle();
     }
   }

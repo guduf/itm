@@ -2,7 +2,6 @@ import {
   Component,
   ComponentFactoryResolver,
   AfterViewInit,
-  Inject,
   Injector,
   OnDestroy,
   ViewChild,
@@ -10,10 +9,9 @@ import {
   HostBinding
 } from '@angular/core';
 
-import Menu, { ItmMenuRef } from './menu';
 import { ItmButtonRef } from './button';
 import ItmConfig from './config';
-import { startWith } from 'rxjs/operators';
+import Menu, { ItmMenuRef } from './menu';
 
 const SELECTOR = 'itm-menu';
 

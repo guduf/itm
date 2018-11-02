@@ -1,7 +1,7 @@
 import { Injector, InjectionToken, StaticProvider } from '@angular/core';
 import { Map } from 'immutable';
 import { Observable, combineLatest, defer } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import Action from './action';
 import ActionEmitter from './action-emitter';

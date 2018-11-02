@@ -1,5 +1,7 @@
 import { FormGroup, AbstractControl, FormControl } from '@angular/forms';
 import { Map } from 'immutable';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 import Action from './action';
 import Area from './area';
@@ -8,8 +10,6 @@ import Control, { NgForm } from './control';
 import Field from './field';
 import Grid from './grid';
 import Target from './target';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 export type ItmForm = Grid;
 
@@ -41,6 +41,7 @@ export module ItmForm {
     deps: [NgForm],
     useFactory: (ngForm: NgForm): Observable<Action.Resolvers> => {
       return ngForm.statusChanges.pipe(
+        startWith(ngForm.status),
         map(() => (
           (Map() as Action.Resolvers).set('submit', ngForm.invalid ? null : () => ngForm.value)
         ))
