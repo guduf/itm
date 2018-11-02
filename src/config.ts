@@ -1,7 +1,5 @@
 import { Map, RecordOf, Collection, isCollection, List } from 'immutable';
 
-import Area from './area';
-import Grid from './grid';
 import RecordFactory from './record-factory';
 import Type from './type';
 import { ComponentType, isComponentType, AbstractRecord } from './utils';
@@ -13,10 +11,10 @@ export abstract class ItmConfig extends AbstractRecord<ItmConfig.Model> implemen
   types: Map<string, Type>;
 
   /** Record factories to build grids. Allows to extend the generic grid model. */
-  gridFactories: Map<string, Grid.Factory>;
+  gridFactories: Map<string, RecordFactory>;
 
   /** Record factories to build areas. Allows to extend the generic area model. */
-  areaFactories: Map<string, Area.Factory>;
+  areaFactories: Map<string, RecordFactory>;
 
   /** The component displayed in the button area when not specified in its configuration. */
   defaultButtonComp: ComponentType;
@@ -37,8 +35,8 @@ export module ItmConfig {
     defaultControlComp?: ComponentType;
     defaultFieldComp?: ComponentType;
     defaultMenuComp?: ComponentType;
-    areaFactories?: Collection<any, Area.Factory>;
-    gridFactories?: Collection<any, Grid.Factory>;
+    areaFactories?: Collection<any, RecordFactory<any>>;
+    gridFactories?: Collection<any, RecordFactory<any>>;
     types?: List<any> | Map<string, Type>;
   }
 
@@ -47,8 +45,8 @@ export module ItmConfig {
     defaultControlComp: ComponentType;
     defaultFieldComp: ComponentType;
     defaultMenuComp: ComponentType;
-    areaFactories: Map<string, Area.Factory>;
-    gridFactories: Map<string, Grid.Factory>;
+    areaFactories: Map<string, RecordFactory<any>>;
+    gridFactories: Map<string, RecordFactory<any>>;
     types: Map<string, Type>;
   }
 
@@ -72,7 +70,7 @@ export module ItmConfig {
         false
       )
     ) throw new TypeError('Expected Map of Area factory');
-    const areaFactories: Map<string, Area.Factory> = (
+    const areaFactories: Map<string, RecordFactory> = (
       cfg.areaFactories.reduce((acc, fact) => acc.set(fact.selector, fact), Map())
     );
 
@@ -83,7 +81,7 @@ export module ItmConfig {
         false
       )
     ) throw new TypeError('Expected Map of Grid factory');
-    const gridFactories: Map<string, Grid.Factory> = (
+    const gridFactories: Map<string, RecordFactory> = (
       cfg.gridFactories.reduce((acc, fact) => acc.set(fact.selector, fact), Map())
     );
 

@@ -1,4 +1,4 @@
-import { Component, InjectionToken, Inject, StaticProvider } from '@angular/core';
+import { Component, InjectionToken, Inject, StaticProvider, Injector } from '@angular/core';
 import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 import { Map } from 'immutable';
 
@@ -10,7 +10,7 @@ import { By } from '@angular/platform-browser';
 describe('ItmAreaDirective', () => {
   @Component({template: `<ng-container [itmArea]="areaRef"></ng-container>`})
   class HotTestComponent {
-    areaRef: { comp: ComponentType, providers: StaticProvider[] };
+    areaRef: { comp: ComponentType, injector: Injector };
   }
 
   const TEST_PROVIDER_TOKEN = new InjectionToken('TEST_PROVIDER_TOKEN');
@@ -45,7 +45,7 @@ describe('ItmAreaDirective', () => {
   function setup(comp: ComponentType = FirstEntryTestComponent, providers: StaticProvider[] = []): ComponentFixture<HotTestComponent> {
     const fixture = TestBed.createComponent(HotTestComponent);
     if (comp) {
-      fixture.componentInstance.areaRef = {comp, providers};
+      fixture.componentInstance.areaRef = {comp, injector: Injector.create(providers)};
       fixture.detectChanges();
     }
     return fixture;
@@ -65,13 +65,15 @@ describe('ItmAreaDirective', () => {
     const fixture = setup();
     fixture.componentInstance.areaRef = null;
     fixture.detectChanges();
-    expect(fixture.debugElement.query(By.directive(FirstEntryTestComponent))).toBeFalsy();
+    // tslint:disable-next-line:max-line-length
+    expect(fixture.debugElement.query(By.directive(FirstEntryTestComponent))).toBeFalsy('expected empty ref');
     fixture.componentInstance.areaRef = {
       comp: SecondEntryTestComponent,
-      providers: [{provide: TEST_PROVIDER_TOKEN, useValue: testProvider}]
+      injector: Injector.create([{provide: TEST_PROVIDER_TOKEN, useValue: testProvider}])
     };
     fixture.detectChanges();
-    expect(fixture.debugElement.query(By.directive(SecondEntryTestComponent))).toBeTruthy();
+    // tslint:disable-next-line:max-line-length
+    expect(fixture.debugElement.query(By.directive(SecondEntryTestComponent))).toBeTruthy('expected component');
   });
 
   it('should not throw a error when component failed to initialize', () => {

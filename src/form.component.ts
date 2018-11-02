@@ -8,7 +8,7 @@ const SELECTOR = 'itm-form';
 
 @Component({
   selector: SELECTOR,
-  template: `<itm-grid [grid]="formRecord" [source]="source"></itm-grid>`
+  template: `<itm-grid [grid]="formRecord" [target]="target"></itm-grid>`
 })
 // tslint:disable-next-line:max-line-length
 export class ItmFormComponent<T extends Object = {}> implements OnChanges {
@@ -18,7 +18,7 @@ export class ItmFormComponent<T extends Object = {}> implements OnChanges {
 
   @Input()
   /** The target of the grid. */
-  source: T | Observable<T>;
+  target: T | Observable<T>;
 
   @HostBinding('class')
   get hostClass(): string { return SELECTOR; }

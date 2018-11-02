@@ -1,5 +1,6 @@
 import { Map, RecordOf } from 'immutable';
 
+import ActionEmitter from './action-emitter';
 import Area from './area';
 import Button from './button';
 import Target from './target';
@@ -58,10 +59,14 @@ export module ItmMenu {
 
   export type Config<T extends Object = {}> = Area.Config<T> & ModelConfig<T>;
 
-  export function provideMenuRef(menu: ItmMenu, target: Target): ItmMenuRef {
+  export function provideMenuRef(
+    menu: ItmMenu,
+    target: Target,
+    emitter: ActionEmitter
+  ): ItmMenuRef {
     return new ItmMenuRef(
       Target.map(target, menu.direction),
-      menu.buttons.map(button => new ItmButtonRef(button, target))
+      menu.buttons.map(button => new ItmButtonRef(button, target, emitter))
     );
   }
 
@@ -72,7 +77,7 @@ export module ItmMenu {
     shared: new Area.Shared({
       defaultComp: cfg => cfg.defaultMenuComp,
       providers: Map<any, Area.Provider>()
-        .set(ItmMenuRef, {deps: [Area, Target], useFactory: provideMenuRef})
+        .set(ItmMenuRef, {deps: [Area, Target, ActionEmitter], useFactory: provideMenuRef})
     })
   });
 }

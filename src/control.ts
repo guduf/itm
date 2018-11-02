@@ -1,4 +1,4 @@
-import { InjectionToken, Optional } from '@angular/core';
+import { Optional } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Map, RecordOf } from 'immutable';
 
@@ -43,8 +43,6 @@ export module ItmControl {
   export const selector = 'control';
 
   export type Config<T extends Object = {}> = Field.Config<T> & ModelConfig<T>;
-
-  export const ABSTRACT_CONTROL_TOKEN = new InjectionToken<AbstractControl>('ITM_ABSTRACT_CONTROL');
 
   const ngControlProvider: Area.Provider = {
     deps: [Area, Target, [new Optional(), NgForm]],

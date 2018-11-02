@@ -1,8 +1,10 @@
 import { Injectable, Inject } from '@angular/core';
 import { Map, RecordOf } from 'immutable';
 import { empty, Observable, of } from 'rxjs';
+import { distinctUntilChanged, map, mergeMap } from 'rxjs/operators';
 
 import ItmArea from './area';
+import ActionEmitter from './action-emitter';
 import RecordFactory from './record-factory';
 import Target from './target';
 
@@ -29,14 +31,23 @@ export class ItmButtonRef {
   readonly disabled: Observable<boolean>;
   readonly mode: Observable<ItmButton.Mode>;
   readonly text: Observable<string>;
+  readonly emit: (nativeEvent?: any) => void;
 
   constructor(
     @Inject(ItmArea)
     button: ItmButton,
-    target: Target
+    target: Target,
+    emitter: ActionEmitter
   ) {
     this.icon = button.icon ? Target.map(target, button.icon) : of(button.key);
-    this.disabled = button.disabled ? Target.map(target, button.disabled) : empty();
+    this.disabled = emitter.resolvers.pipe(
+      mergeMap(resolvers => (
+        resolvers.get(button.key) === null ? of(true) :
+        button.disabled ? Target.map(target, button.disabled) :
+          of(false)
+      ))
+    );
+    this.emit = (nativeEvent?: any) => emitter.emit(button.key, nativeEvent);
     this.mode = button.mode ? Target.map(target, button.mode) : of(ItmButton.Mode.basic);
     this.text = button.text ? Target.map(target, button.text) : of(button.key);
   }
@@ -102,7 +113,7 @@ export module ItmButton {
     shared: new ItmArea.Shared({
       defaultComp: cfg => cfg.defaultButtonComp,
       providers: Map<any, ItmArea.Provider>()
-        .set(ItmButtonRef, {deps: [ItmArea, Target], useClass: ItmButtonRef})
+        .set(ItmButtonRef, {deps: [ItmArea, Target, ActionEmitter], useClass: ItmButtonRef})
     })
   });
 

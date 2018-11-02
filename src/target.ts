@@ -1,7 +1,9 @@
-import { BehaviorSubject, Observable, of, defer as rxDefer, isObservable } from 'rxjs';
+import { Observable, of, defer as rxDefer, isObservable } from 'rxjs';
 import { mergeMap, map as rxMap } from 'rxjs/operators';
 
-export abstract class ItmTarget<T extends Object = {}> extends BehaviorSubject<T> { }
+import Behavior from './behavior';
+
+export abstract class ItmTarget<T extends Object = {}> extends Behavior<T> { }
 
 export module ItmTarget {
   export type PipeLike<T = void, R = {}> = (

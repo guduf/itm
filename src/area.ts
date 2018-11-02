@@ -1,4 +1,9 @@
 
+import {
+  FactorySansProvider,
+  ValueSansProvider,
+  StaticClassSansProvider
+} from '@angular/core/src/di/provider';
 import { Map, Record, RecordOf } from 'immutable';
 import { Observable, empty } from 'rxjs';
 
@@ -54,11 +59,9 @@ export module ItmArea {
     size: RecordOf<Size>;
   }
 
-  export type Provider = (
-    { useValue: any } |
-    { useFactory: Function, deps: any[] } |
-    { useClass: any }
-  );
+  export type Provider = ValueSansProvider | FactorySansProvider | StaticClassSansProvider;
+
+  export type Providers = Map<any, Provider>;
 
   // tslint:disable-next-line:max-line-length
   export class Shared<A extends ItmArea<T> = ItmArea<T>, T extends Object = {}> {

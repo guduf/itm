@@ -1,15 +1,12 @@
-import { StaticProvider } from '@angular/core';
-import { Map, Record as createRecord, RecordOf, List } from 'immutable';
-import { BehaviorSubject, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Map, RecordOf, List } from 'immutable';
+import { Observable } from 'rxjs';
 
-import Area, { ItmAreaText } from './area';
-import ItmConfig from './config';
+import Action from './action';
+import Area from './area';
 import Areas from './grid-areas';
 import Template from './grid-template';
 import RecordFactory from './record-factory';
-import Target from './target';
-import { AbstractRecord, ComponentType } from './utils';
+import { AbstractRecord, mapOrArray } from './utils';
 
 // tslint:disable-next-line:max-line-length
 export abstract class ItmGrid<T extends Object = {}> extends AbstractRecord<ItmGrid.Model> implements RecordOf<ItmGrid.Model> {
@@ -33,30 +30,31 @@ export module ItmGrid {
     size: List<number>;
   }
 
+  interface SharedConfig {
+    areaFactories?: Map<string, Area.Factory<Area, any>> | Area.Factory<Area, any>[];
+    defaultSelector?: string;
+    providers?: Area.Providers;
+    resolversProvider?: ResolversProvider;
+  }
+
+  export interface ResolversProvider {
+    deps?: any[];
+    useFactory: (...args: any[]) => Observable<Action.Resolvers>;
+  }
+
   export class Shared {
     readonly areaFactories: Map<string, Area.Factory<Area, any>>;
     readonly defaultSelector: string | null;
-    readonly providers: Map<any, Area.Provider>;
+    readonly providers: Area.Providers;
+    readonly resolversProvider?: ResolversProvider;
 
-    constructor(
-      {areaFactories, defaultSelector, providers}: {
-        areaFactories?: Map<string, Area.Factory<Area, any>> | Area.Factory<Area, any>[];
-        defaultSelector?: string;
-        providers?: Map<any, Area.Provider>;
-      }
-    ) {
-      this.areaFactories = (
-        Map.isMap(areaFactories) ? areaFactories :
-        !Array.isArray(areaFactories) ? Map() :
-          areaFactories.reduce(
-            (acc, fact) => acc.set(fact.selector, fact),
-            Map<string, Area.Factory>()
-          )
-      );
+    constructor({areaFactories, defaultSelector, providers, resolversProvider}: SharedConfig) {
+      this.areaFactories = mapOrArray(areaFactories, 'selector');
       this.defaultSelector = (
         defaultSelector && typeof defaultSelector === 'string' ? defaultSelector : null
       );
       this.providers = Map.isMap(providers) ? providers : Map();
+      this.resolversProvider = resolversProvider ? resolversProvider : null;
     }
   }
 
@@ -79,64 +77,6 @@ export module ItmGrid {
     model: {areas: null, template: null, positions: null, size: null},
     shared: new Shared({})
   });
-
-  export interface AreaRef {
-    area: Area;
-    comp: ComponentType;
-    position: Template.Position;
-    providers: StaticProvider[];
-  }
-
-  export function parseAreaRefs(
-    config: ItmConfig,
-    grid: ItmGrid,
-    target: BehaviorSubject<any>
-  ): Map<Template.Fragment, AreaRef> {
-    const defaultProviders = Map<any, Area.Provider>()
-      .set(ItmGrid, {useValue: grid})
-      .set(Target, {useValue: target});
-    const gridShared = factory.getShared(config.gridFactories, grid).reduce(
-      (acc, {defaultSelector, providers: gridProviders}) => ({
-        defaultSelector: defaultSelector || acc.defaultSelector,
-        providers: acc.providers.merge(gridProviders)
-      }),
-      {defaultSelector: null, providers: defaultProviders} as Partial<Shared>
-    );
-    return grid.positions.map(position => {
-      const area: Area = grid.areas.getIn([position.selector, position.key]);
-      // tslint:disable-next-line:max-line-length
-      if (!Area.factory.isFactoryRecord(area)) throw new ReferenceError(`Missing area for fragment : '${position.selector}:${position.key}'`);
-      const areaShared = Area.factory.getShared(config.areaFactories, area).reduce<Area.Shared>(
-        (acc, {defaultComp, defaultText, providers: areaProviders}) => ({
-          defaultComp: defaultComp || acc.defaultComp,
-          defaultText: defaultText || acc.defaultText,
-          providers: acc.providers.merge(areaProviders)
-        }),
-        {
-          defaultComp: null,
-          defaultText: null,
-          providers: Map<any, Area.Provider>().set(Area, {useValue: area})
-        }
-      );
-      const comp = (
-        area.comp ||
-        typeof areaShared.defaultComp === 'function' ? areaShared.defaultComp(config) :
-        null
-      );
-      const areaText = (
-        area.text ? Target.map(target, area.text) :
-          target.pipe(map(value => areaShared.defaultText({area, target: value})))
-      );
-      const providers: StaticProvider[] = gridShared.providers
-        .merge(areaShared.providers)
-        .set(ItmAreaText, {useValue: areaText})
-        .reduce<StaticProvider[]>(
-          (acc, areaProvider, key) => ([...acc, {provide: key, ...areaProvider}]),
-          []
-        );
-      return {area, comp, position, providers};
-    });
-  }
 }
 
 export default ItmGrid;

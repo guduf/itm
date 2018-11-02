@@ -1,5 +1,6 @@
 import Button, { ItmButtonRef } from './button';
 import { BehaviorSubject } from 'rxjs';
+import ActionEmitter from './action-emitter';
 
 describe('ItmButton', () => {
   it('should create with a minimal config', () => {
@@ -19,8 +20,10 @@ describe('ItmButton', () => {
 
 describe('ItmButtonRef', () => {
   it('should create with a minimal config', () => {
+    const target = new BehaviorSubject(null);
+    const emitter = new ActionEmitter(target);
     const button = Button.factory.serialize({key: 'save'});
-    expect(new ItmButtonRef(button, new BehaviorSubject(null))).toBeTruthy();
+    expect(new ItmButtonRef(button, target, emitter)).toBeTruthy();
   });
 
   it('should create with a complete config', () => {
@@ -31,6 +34,8 @@ describe('ItmButtonRef', () => {
       mode: Button.Mode.icon
     };
     const button = Button.factory.serialize(config);
-    expect(new ItmButtonRef(button, new BehaviorSubject({id: 63}))).toBeTruthy();
+    const target = new BehaviorSubject(null);
+    const emitter = new ActionEmitter(target);
+    expect(new ItmButtonRef(button, target, emitter)).toBeTruthy();
   });
 });

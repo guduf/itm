@@ -1,6 +1,4 @@
-import { Input, SimpleChanges, OnChanges } from '@angular/core';
-import { Record, Stack, Seq } from 'immutable';
-import { Observable, Subscription, BehaviorSubject } from 'rxjs';
+import { Map, Record, Stack, Seq } from 'immutable';
 
 /** Checks if a class as been decorated with a component template. Only works with NG5+. */
 export function isComponentType(value: any): boolean {
@@ -61,31 +59,17 @@ export function isEnumIncludes(target: any, val: any): boolean {
   return Array.from(Object.values(target)).includes(val);
 }
 
-export abstract class ComponentWithSource<T extends Object = {}> implements OnChanges {
-  @Input()
-  /** The target of the grid. */
-  source: T | Observable<T>;
-
-  protected _target = new BehaviorSubject<T>(undefined);
-  private _sourceSubscr: Subscription;
-
-  get target() { return this._target.value; }
-
-  ngOnChanges({source: sourceChanges}: SimpleChanges) {
-    if (!sourceChanges) return;
-    if (this._sourceSubscr) this._sourceSubscr.unsubscribe();
-    if (this.source instanceof Observable) this._sourceSubscr = this.source.subscribe(
-      items => this._target.next(items),
-      err => console.error(err)
-    );
-    else {
-      this._sourceSubscr = null;
-      this._target.next(this.source);
-    }
-  }
-
-  // tslint:disable-next-line:use-life-cycle-interface
-  ngOnDestroy() {
-    if (this._sourceSubscr) this._sourceSubscr.unsubscribe();
-  }
+export function mapOrArray<M extends Map<any, T>, T>(val: M | T[], prop: keyof T): M {
+  return (
+    Map.isMap(val) ? val :
+    !Array.isArray(val) ? Map() as M :
+      val.reduce<M>(
+        (acc, v) => {
+          const key = v[prop];
+          if (typeof key === 'undefined' || key === null) throw new TypeError('Excepted key');
+          return acc.set(key, v);
+        },
+        Map() as M
+      )
+  );
 }

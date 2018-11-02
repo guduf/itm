@@ -2,7 +2,6 @@ import { Component, Input, OnChanges, SimpleChanges, HostBinding } from '@angula
 
 import Grid from './grid';
 import Table from './table';
-import { ComponentWithSource } from './utils';
 
 const SELECTOR = 'itm-table';
 
@@ -11,19 +10,23 @@ const SELECTOR = 'itm-table';
   template: `
     <ng-container *ngIf="tableRecord as table">
       <itm-grid
-        [grid]="table.header" [source]="target"
+        [grid]="table.header" [target]="target"
         [ngClass]="headerRowClass"></itm-grid>
-      <itm-grid *ngFor="let rowSource of target"
-        [grid]="table" [source]="rowSource"
+      <itm-grid *ngFor="let rowTarget of target"
+        [grid]="table" [target]="rowTarget"
         [ngClass]="rowClass"></itm-grid>
     </ng-container>
   `
 })
 // tslint:disable-next-line:max-line-length
-export class ItmTableComponent<T extends Object = {}> extends ComponentWithSource<T[]> implements OnChanges {
+export class ItmTableComponent<T extends Object = {}> implements OnChanges {
   @Input()
   /** The configuration of the table. */
-  table: Grid.Config = null;
+  table: Grid.Config;
+
+  @Input()
+  /** The target of the table. */
+  target: T[];
 
   readonly headerRowClass = `${SELECTOR}-header-row`;
 
@@ -36,12 +39,7 @@ export class ItmTableComponent<T extends Object = {}> extends ComponentWithSourc
 
   private _table: Table;
 
-  constructor() {
-    super();
-  }
-
-  ngOnChanges({table: tableChanges, source: sourceChanges}: SimpleChanges) {
-    if (sourceChanges) super.ngOnChanges({source: sourceChanges});
+  ngOnChanges({table: tableChanges}: SimpleChanges) {
     if (tableChanges) (this._table = Table.factory.serialize(this.table));
   }
 }

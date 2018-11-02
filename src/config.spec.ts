@@ -11,12 +11,11 @@ describe('ItmConfig', () => {
   class TestComponent { }
 
   it('should create with a complete config', () => {
-    const config = {
+    const config: Config.ModelConfig = {
       defaultButtonComp: TestComponent,
       defaultControlComp: TestComponent,
       defaultFieldComp: TestComponent,
       defaultMenuComp: TestComponent,
-      defaultTextComp: TestComponent,
       areaFactories: List([Area.factory]),
       gridFactories: List([Grid.factory]),
       types: Map({test: Type.factory.serialize({key: 'test'})})
