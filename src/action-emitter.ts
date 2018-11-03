@@ -1,4 +1,4 @@
-import { Subscription, Subject, Observable, of, combineLatest, isObservable } from 'rxjs';
+import { combineLatest, isObservable, Observable, of, Subject, Subscription } from 'rxjs';
 import { distinctUntilKeyChanged, filter, map } from 'rxjs/operators';
 import { Map } from 'immutable';
 
@@ -7,19 +7,19 @@ import Behavior from './behavior';
 
 // tslint:disable-next-line:max-line-length
 export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T extends Object = {}> {
-  get action(): Observable<A> { return this._actions; }
+  get action(): Observable<A> { return this._action; }
 
   private readonly _subject = new Subject<A>();
 
-  private readonly _actions: Observable<A>;
+  private readonly _action: Observable<A>;
 
-    private _subscrs = Map<Action.Unresolved, Subscription>();
+  private _subscrs = Map<Action.Unresolved, Subscription>();
 
   constructor(
-    private readonly _target: Behavior<T>,
+    readonly target: Behavior<T>,
     readonly resolvers: Observable<Action.Resolvers<T>> = of(Map())
   ) {
-    this._actions = (
+    this._action = (
       combineLatest<Action.Unresolved, Action.Resolvers>(this._subject, resolvers).pipe(
         distinctUntilKeyChanged('0'),
         filter(([action, mapper]) => {
@@ -47,7 +47,7 @@ export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T
             }
           ));
         }),
-        map(([action]) => action as A)
+        map(([action]) => action as A),
       )
     );
   }
@@ -55,7 +55,7 @@ export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T
   emit(key: string, nativeEvent?: any): void {
     if (!key || typeof key !== 'string') throw new TypeError('Expected key');
     this._subject.next(
-      new Action.Unresolved({key, nativeEvent, target: this._target.value}) as A
+      new Action.Unresolved({key, nativeEvent, target: this.target.value}) as A
     );
   }
 

@@ -1,6 +1,6 @@
 import { OnChanges, OnDestroy, SimpleChange } from '@angular/core';
-import { Observable, BehaviorSubject, ConnectableObservable } from 'rxjs';
-import { map, distinctUntilChanged, shareReplay } from 'rxjs/operators';
+import { BehaviorSubject, defer, of, Observable } from 'rxjs';
+import { distinctUntilChanged, map, merge } from 'rxjs/operators';
 
 
 export abstract class ItmBehavior<T> extends Observable<T>  {
@@ -18,13 +18,12 @@ export module ItmBehavior {
 
   export function getValue<T>(parent: ItmBehavior<T>, path?: string[]): T {
     if (!path) return parent.getValue();
-    const a = path.reduce(
+    return path.reduce(
       (acc, key) => (
         typeof acc === 'object' && typeof acc['get'] === 'function' ? acc['get'](key) : acc[key]
       ),
       parent.getValue()
     );
-    return a;
   }
 }
 
@@ -36,12 +35,12 @@ export class StaticBehavior<T> extends Observable<T> implements ItmBehavior<T> {
   private readonly _path: any[] | null;
 
   constructor(parent: ItmBehavior<any>, ...path: any[]) {
-    const connectable = parent.pipe(...[
-      map(() => ItmBehavior.getValue(parent, path)),
-      distinctUntilChanged(),
-      shareReplay(1)
-    ]) as ConnectableObservable<T>;
-    super(subscriber => connectable.subscribe(subscriber));
+    const source = parent.pipe(
+      map(() => this.getValue()),
+      merge(defer(() => of(this.getValue()))),
+      distinctUntilChanged()
+    );
+    super(subscriber => source.subscribe(subscriber));
     this._parent = parent;
     this._path = path.length ? path : null;
   }

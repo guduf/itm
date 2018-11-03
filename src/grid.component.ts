@@ -7,22 +7,23 @@ import {
   OnChanges,
   OnDestroy,
   Output,
-  SimpleChanges,
-  ViewContainerRef,
+  SimpleChanges
 } from '@angular/core';
 import { SafeStyle, DomSanitizer } from '@angular/platform-browser';
 import { Map, Range } from 'immutable';
-import { Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 
 import Action from './action';
-import Grid from './grid';
-import GridRef from './grid-ref';
-import Template from './grid-template';
+import ActionEmitter from './action-emitter';
 import { WithBehaviors } from './behavior';
+import ItmConfig from './config';
+import Grid from './grid';
+import GridRef, { ITM_SHARED_RESOLVERS_TOKEN } from './grid-ref';
+import Template from './grid-template';
+import { map } from 'rxjs/operators';
 
 /** The selector of ItmGridComponent. */
 const SELECTOR = 'itm-grid';
-
 
 const GRID_RHYTHM = '60px';
 
@@ -38,7 +39,7 @@ const GRID_RHYTHM = '60px';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 // tslint:disable-next-line:max-line-length
-export class ItmGridComponent<A extends Action.Generic<T>, T extends Object = {}> extends WithBehaviors<{ target: T, resolvers: Action.Resolvers }> implements OnChanges, OnDestroy {
+export class ItmGridComponent<A extends Action.Generic<T> = Action.Generic<T>, T extends Object = {}> extends WithBehaviors<{ target: T, resolvers: Action.Resolvers }> implements OnChanges, OnDestroy {
   @Input()
   /** The configuration of the grid. */
   grid: Grid.Config = null;
@@ -65,7 +66,7 @@ export class ItmGridComponent<A extends Action.Generic<T>, T extends Object = {}
   @HostBinding('class')
   get hostClass(): string { return [SELECTOR, this.ngClass].join(' '); }
 
-  get record(): Grid { return this._ref.grid; }
+  get record(): Grid { return this.ref.record; }
 
   @HostBinding('style.gridTemplateColumns')
   get gridTemplateColumnsStyle(): SafeStyle { return this._hostStyle.gridTemplateColumns; }
@@ -73,24 +74,37 @@ export class ItmGridComponent<A extends Action.Generic<T>, T extends Object = {}
   @HostBinding('style.gridTemplateRows')
   get gridTemplateRowsStyle(): SafeStyle { return this._hostStyle.gridTemplateRows; }
 
+  get ref(): GridRef { return this._ref; }
+
   private _hostStyle: { gridTemplateColumns: SafeStyle, gridTemplateRows: SafeStyle };
 
   private _ref: GridRef;
 
-  private readonly _resolversSub = new Subject<Action.Resolvers<T>>();
-  private _actionsSubscr: Subscription;
+  private readonly _sharedResolversSub = new BehaviorSubject<Action.Resolvers<T>>(Map());
+
+  private _sharedResolversSubscr: Subscription;
+
+  private readonly _resolversObs = (
+    combineLatest(this._sharedResolversSub, this.behaviors.resolvers).pipe(
+      map(([shared, inputs]) => shared.merge(inputs)),
+    )
+  );
+
+  private readonly _actionEmitter = new ActionEmitter(this.behaviors.target, this._resolversObs);
+
+  private _actionSubscr = this._actionEmitter.action.subscribe(this.action);
 
   constructor(
     private _sanitizer: DomSanitizer,
-    private _viewContainerRef: ViewContainerRef
+    private _config: ItmConfig
   ) {
     super({target: undefined, resolvers: Map()});
   }
 
-  getAreaRef(fragment: Template.Fragment): GridRef.AreaRef { return this._ref.areas.get(fragment); }
+  getAreaRef(fragment: Template.Fragment): GridRef.AreaRef { return this.ref.areas.get(fragment); }
 
   getAreaStyle(fragment: Template.Fragment): { [key: string]: string } {
-    const {row, col, width, height} = this._ref.grid.positions.get(fragment);
+    const {row, col, width, height} = this.record.positions.get(fragment);
     return {gridArea: `${row} / ${col} / ${row + height} / ${col + width}`};
   }
 
@@ -108,13 +122,14 @@ export class ItmGridComponent<A extends Action.Generic<T>, T extends Object = {}
   ngOnChanges(changes: SimpleChanges) {
     super.ngOnChanges(changes);
     if (changes.grid) {
+      if (this._sharedResolversSubscr) this._sharedResolversSubscr.unsubscribe();
       const record = Grid.factory.serialize(this.grid);
       try {
         this._ref = GridRef.buildRef(
-          this._viewContainerRef.parentInjector,
+          this._config,
           record,
           this.behaviors.target,
-          this.behaviors.resolvers
+          this._actionEmitter
         );
       } catch (err) {
         console.error('BUILD GRID ERROR', err);
@@ -122,17 +137,21 @@ export class ItmGridComponent<A extends Action.Generic<T>, T extends Object = {}
         console.error('BUILD GRID ERROR CONTEXT', {record: record.toJS()});
         return;
       }
+      const sharedResolvers = (
+        this.ref.injector.get(ITM_SHARED_RESOLVERS_TOKEN) as Observable<Action.Resolvers>
+      );
+      this._sharedResolversSubscr = sharedResolvers.subscribe(this._sharedResolversSub);
       this.fragments = record.positions.keySeq().toArray();
-      if (this._actionsSubscr) this._actionsSubscr.unsubscribe();
-      this._actionsSubscr = this._ref.emitter.action.subscribe(this.action);
       this._setHostStyle();
     }
   }
 
   ngOnDestroy() {
     super.ngOnDestroy();
-    this._resolversSub.unsubscribe();
-    if (this._actionsSubscr) this._actionsSubscr.unsubscribe();
+    this._sharedResolversSub.unsubscribe();
+    this._actionEmitter.unsubscribe();
+    this._actionSubscr.unsubscribe();
+    if (this._sharedResolversSubscr) this._sharedResolversSubscr.unsubscribe();
   }
 
   private _setHostStyle(): void {
@@ -141,9 +160,9 @@ export class ItmGridComponent<A extends Action.Generic<T>, T extends Object = {}
     const initialRows = Range(0, range.rows).map(() => -1).toArray();
     const {rows, cols} = this.record.positions.reduce(
       (acc, pos, frag) => {
-        const {area} = this._ref.areas.get(frag);
-        const flexWidth = area.size.flexWidth / pos.width;
-        const flexHeight = area.size.flexHeight / pos.height;
+        const {record} = this.ref.areas.get(frag);
+        const flexWidth = record.size.flexWidth / pos.width;
+        const flexHeight = record.size.flexHeight / pos.height;
         return {
           rows: acc.rows.map((val, i) => (
             (i + 1 < pos.row || i + 2 > pos.row + pos.height) ? val :

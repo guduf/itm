@@ -1,7 +1,8 @@
 import { Component, HostBinding } from '@angular/core';
 
-import { NgControl } from './control';
+import { ItmControlRef } from './control';
 import { ItmFieldLabel } from './field';
+import { AbstractControl } from '@angular/forms';
 
 const SELECTOR = 'itm-control';
 
@@ -10,7 +11,9 @@ const SELECTOR = 'itm-control';
   selector: SELECTOR,
   template: `
     <mat-form-field>
-      <input matInput [placeholder]="label | async" [formControl]="ngControl"/>
+      <input
+        matInput [required]="required" [placeholder]="label | async"
+        [formControl]="ngControl" />
     </mat-form-field>
   `
 })
@@ -19,8 +22,12 @@ export class ItmControlComponent {
   /** The CSS class of the host element. */
   get hostClass(): string { return SELECTOR; }
 
+  get ngControl(): AbstractControl { return this._controlRef; }
+
+  get required(): boolean { return this._controlRef.record.required; }
+
   constructor(
     readonly label: ItmFieldLabel,
-    readonly ngControl: NgControl
+    private readonly _controlRef: ItmControlRef
   ) { }
 }
