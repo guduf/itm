@@ -8,12 +8,12 @@ export module ItmAction {
   export abstract class Generic<T extends Object = {}> {
     readonly key: string;
     readonly target: T;
-    readonly nativeEvent: any;
+    readonly nativeEvent?: any;
 
     abstract readonly resolved: boolean;
     abstract readonly failed: boolean;
 
-    constructor(action: { key: string, target: T, nativeEvent: any }) {
+    constructor(action: { key: string, target: T, nativeEvent?: any }) {
       Object.assign(this, action);
     }
   }

@@ -7,70 +7,87 @@ import Behavior from './behavior';
 
 // tslint:disable-next-line:max-line-length
 export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T extends Object = {}> {
-  get action(): Observable<A> { return this._action; }
+  /** Emitted action flow. */
+  get action(): Observable<A & Action<T>> { return this._action as Observable<A & Action<T>>; }
 
-  private readonly _subject = new Subject<A>();
+  /** Emitted action subject. */
+  private readonly _actionSub = new Subject<A>();
 
-  private readonly _action: Observable<A>;
+  /** Pending action resolutions. */
+  private _resolveSubscrs = Map<Action.Unresolved, Subscription>();
 
-  private _subscrs = Map<Action.Unresolved, Subscription>();
+  /** see [[ItmActionEmitter.action]]. */
+  private readonly _action: Observable<A> = this._initAction();
 
   constructor(
+    /** Action target behavior. */
     readonly target: Behavior<T>,
+    /** Action resolvers flow. */
     readonly resolvers: Observable<Action.Resolvers<T>> = of(Map())
-  ) {
-    this._action = (
-      combineLatest<Action.Unresolved, Action.Resolvers>(this._subject, resolvers).pipe(
-        distinctUntilKeyChanged('0'),
-        filter(([action, mapper]) => {
-          if (action.resolved) return true;
-          const resolver = mapper.get(action.key);
-          if (!resolver) return true;
-          // tslint:disable-next-line:max-line-length
-          if (this._subscrs.has(action)) throw new ReferenceError('Duplicate action subscription');
-          let primitiveResult: any;
-          try { primitiveResult = resolver(action); }
-          catch (err) {
-            console.error(err);
-            this._subject.next(new Action.Failed(action, err) as any);
-            return;
-          }
-          const resultObs = isObservable(primitiveResult) ? primitiveResult : of(primitiveResult);
-          this._subscrs = this._subscrs.set(action, resultObs.subscribe(
-            result => {
-              this._subscrs.get(action, {unsubscribe: (() => {})}).unsubscribe();
-              this._subject.next(new Action.Resolved(action, result) as any);
-            },
-            err => {
-              this._subscrs.get(action, {unsubscribe: (() => {})}).unsubscribe();
-              this._subject.next(new Action.Failed(action, err) as any);
-            }
-          ));
-        }),
-        map(([action]) => action as A),
-      )
-    );
-  }
+  ) { }
 
+  /**
+   * Builds and emits a unresolved action.
+   * @param key Action key
+   * @param nativeEvent Optionnal action native event - eg: MouseEvent
+   */
   emit(key: string, nativeEvent?: any): void {
     if (!key || typeof key !== 'string') throw new TypeError('Expected key');
-    this._subject.next(
+    this._actionSub.next(
       new Action.Unresolved({key, nativeEvent, target: this.target.value}) as A
     );
   }
 
+  /**
+   * Emits a resolved action.
+   * @param action Resolved action that extends generic action.
+   */
   emitAction(action: A & Action.Resolved<T>): void {
     if (
       !(action instanceof Action.Generic) ||
       !action.resolved &&
       typeof action.result === 'undefined'
     ) throw new TypeError('Expected resolved action');
-    this._subject.next(action);
+    this._actionSub.next(action);
   }
 
+  /** Unsubscribes action subject and resolvers flow. */
   unsubscribe(): void {
-    this._subject.unsubscribe();
-    this._subscrs.forEach(subscr => subscr.unsubscribe());
+    this._actionSub.unsubscribe();
+    this._resolveSubscrs.forEach(subscr => subscr.unsubscribe());
+  }
+
+  /** Inits action flow. */
+  private _initAction(): Observable<A> {
+    return combineLatest<Action.Unresolved, Action.Resolvers>(this._actionSub, this.resolvers).pipe(
+      distinctUntilKeyChanged('0'),
+      filter(([action, mapper]) => {
+        if (action.resolved) return true;
+        const resolver = mapper.get(action.key);
+        if (!resolver) return true;
+        // tslint:disable-next-line:max-line-length
+        if (this._resolveSubscrs.has(action)) throw new ReferenceError('Duplicate action subscription');
+        let primitiveResult: any;
+        try { primitiveResult = resolver(action); }
+        catch (err) {
+          console.error(err);
+          this._actionSub.next(new Action.Failed(action, err) as any);
+          return;
+        }
+        const resultObs = isObservable(primitiveResult) ? primitiveResult : of(primitiveResult);
+        this._resolveSubscrs = this._resolveSubscrs.set(action, resultObs.subscribe(
+          result => {
+            this._resolveSubscrs.get(action, {unsubscribe: (() => {})}).unsubscribe();
+            this._actionSub.next(new Action.Resolved(action, result) as any);
+          },
+          err => {
+            this._resolveSubscrs.get(action, {unsubscribe: (() => {})}).unsubscribe();
+            this._actionSub.next(new Action.Failed(action, err) as any);
+          }
+        ));
+      }),
+      map(([action]) => action as A),
+    );
   }
 }
 
