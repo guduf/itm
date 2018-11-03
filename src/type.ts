@@ -8,7 +8,7 @@ import Field from './field';
 import Form from './form';
 import Prop from './prop';
 import Table from './table';
-import RecordFactory from './record-factory';
+import RecordFactory from './record_factory';
 
 const ITM_TYPE_META = Symbol('ITM_TYPE_META');
 

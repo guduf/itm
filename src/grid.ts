@@ -3,9 +3,9 @@ import { Observable } from 'rxjs';
 
 import Action from './action';
 import Area from './area';
-import Areas from './grid-areas';
-import Template from './grid-template';
-import RecordFactory from './record-factory';
+import Areas from './grid_areas';
+import Template from './grid_template';
+import RecordFactory from './record_factory';
 import { AbstractRecord, mapOrArray } from './utils';
 
 // tslint:disable-next-line:max-line-length

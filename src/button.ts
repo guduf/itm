@@ -4,8 +4,8 @@ import { empty, Observable, of } from 'rxjs';
 import { distinctUntilChanged, map, mergeMap } from 'rxjs/operators';
 
 import ItmArea from './area';
-import ActionEmitter from './action-emitter';
-import RecordFactory from './record-factory';
+import ActionEmitter from './action_emitter';
+import RecordFactory from './record_factory';
 import Target from './target';
 
 /** A button area configuration. */

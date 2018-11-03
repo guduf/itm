@@ -1,7 +1,7 @@
 import { List, Map, Record, RecordOf, Range } from 'immutable';
 
 import Area from './area';
-import RecordFactory from './record-factory';
+import RecordFactory from './record_factory';
 
 export type ItmGridTemplate = Map<number, Map<number, ItmGridTemplate.Fragment>>;
 

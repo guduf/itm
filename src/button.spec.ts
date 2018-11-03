@@ -1,6 +1,6 @@
 import Button, { ItmButtonRef } from './button';
 import { BehaviorSubject } from 'rxjs';
-import ActionEmitter from './action-emitter';
+import ActionEmitter from './action_emitter';
 
 describe('ItmButton', () => {
   it('should create with a minimal config', () => {

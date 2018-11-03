@@ -1,4 +1,4 @@
-import ItmRecordFactory from './record-factory';
+import ItmRecordFactory from './record_factory';
 import { Record, RecordOf } from 'immutable';
 
 const modelTestImplImplSelector = 'testImpl';

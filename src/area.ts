@@ -8,7 +8,7 @@ import { Map, Record, RecordOf } from 'immutable';
 import { Observable, empty } from 'rxjs';
 
 import ItmConfig from './config';
-import RecordFactory from './record-factory';
+import RecordFactory from './record_factory';
 import Target from './target';
 import { ComponentType, isComponentType, AbstractRecord } from './utils';
 

@@ -14,12 +14,12 @@ import { Map, Range } from 'immutable';
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 
 import Action from './action';
-import ActionEmitter from './action-emitter';
+import ActionEmitter from './action_emitter';
 import { WithBehaviors } from './behavior';
 import ItmConfig from './config';
 import Grid from './grid';
-import GridRef, { ITM_SHARED_RESOLVERS_TOKEN } from './grid-ref';
-import Template from './grid-template';
+import GridRef, { ITM_SHARED_RESOLVERS_TOKEN } from './grid_ref';
+import Template from './grid_template';
 import { map } from 'rxjs/operators';
 
 /** The selector of ItmGridComponent. */

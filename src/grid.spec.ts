@@ -1,8 +1,8 @@
 // tslint:disable:max-line-length
 import Area from './area';
 import Grid from './grid';
-import Areas from './grid-areas';
-import Template from './grid-template';
+import Areas from './grid_areas';
+import Template from './grid_template';
 import { List } from 'immutable';
 
 describe('ItmGrid', () => {

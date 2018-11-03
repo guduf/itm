@@ -5,7 +5,7 @@ import { of, BehaviorSubject } from 'rxjs';
 import { ItmAreaText } from './area';
 import Button, { ItmButtonRef } from './button';
 import { ItmButtonComponent } from './button.component';
-import ActionEmitter from './action-emitter';
+import ActionEmitter from './action_emitter';
 
 describe('ItmButtonComponent', () => {
   const button = Button.factory.serialize({key: 'save'});

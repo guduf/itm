@@ -1,6 +1,6 @@
 import { Map, RecordOf, Collection, isCollection, List } from 'immutable';
 
-import RecordFactory from './record-factory';
+import RecordFactory from './record_factory';
 import Type from './type';
 import { ComponentType, isComponentType, AbstractRecord } from './utils';
 

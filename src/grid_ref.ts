@@ -3,11 +3,11 @@ import { Map } from 'immutable';
 import { defer, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import ActionEmitter from './action-emitter';
 import Area, { ItmAreaText } from './area';
+import ActionEmitter from './action_emitter';
 import ItmConfig from './config';
 import Grid, { ItmGrid } from './grid';
-import Template from './grid-template';
+import Template from './grid_template';
 import Target from './target';
 import { ComponentType } from './utils';
 

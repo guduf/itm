@@ -5,7 +5,7 @@ import Column from './column';
 import Control from './control';
 import { ComponentType } from './utils';
 import Field from './field';
-import RecordFactory from './record-factory';
+import RecordFactory from './record_factory';
 import Target from './target';
 
 // tslint:disable-next-line:max-line-length

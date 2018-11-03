@@ -3,8 +3,8 @@ import { Map, RecordOf } from 'immutable';
 import Area from './area';
 import Column from './column';
 import Grid from './grid';
-import Areas from './grid-areas';
-import Template from './grid-template';
+import Areas from './grid_areas';
+import Template from './grid_template';
 import Menu from './menu';
 
 export type ItmTable<T extends Object = {}>= Grid & RecordOf<ItmTable.Model<T>>;

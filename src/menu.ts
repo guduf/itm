@@ -1,11 +1,11 @@
 import { Map, RecordOf } from 'immutable';
+import { Observable } from 'rxjs';
 
-import ActionEmitter from './action-emitter';
+import ActionEmitter from './action_emitter';
 import Area from './area';
 import Button from './button';
 import Target from './target';
 import { ItmButtonRef } from './button';
-import { Observable } from 'rxjs';
 
 export class ItmMenuRef {
   constructor(
