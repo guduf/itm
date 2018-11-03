@@ -10,13 +10,20 @@ import Menu from './menu';
 export type ItmTable<T extends Object = {}>= Grid & RecordOf<ItmTable.Model<T>>;
 
 export module ItmTable {
-  export interface Model<T extends Object = {}> {
-    header: Grid<T>;
+  export interface ModelConfig<T extends Object = {}> {
+    headerMenu?: Menu.Config<T[]>;
+    menu?: Menu.Config<T>;
+  }
+
+  export interface Model<T extends Object = {}> extends ModelConfig {
     areas: Areas<T>;
+    header: Grid<T>;
+    headerMenu: Menu<T[]> | null;
+    menu: Menu<T> | null;
     positions: Template.Positions;
   }
 
-  const serializer = (cfg: {}, grid: Grid): Model => {
+  const serializer = (cfg: RecordOf<ModelConfig>, grid: Grid): Model => {
     const headerAreas: Area[] = grid.positions.reduce(
       (acc, position) => {
         // tslint:disable-next-line:max-line-length
@@ -36,13 +43,18 @@ export module ItmTable {
       [Menu.factory.selector, '$tableMenu'],
       'right'
     );
-    const areas = Areas.insert(Map(), Menu.factory, {
-      key: '$tableMenu',
-      size: [[2, 1], 1],
-      buttons: [{key: '$tableDelete', icon: 'delete', text: 'DELETE'}],
-      direction: Menu.Direction.right
-    });
-    return {header, areas, positions};
+    const menu = (
+      Menu.factory.isFactoryRecord(cfg.menu) ? cfg.menu as Menu :
+      cfg.menu ? Menu.factory.serialize({key: '$rowMenu'}, cfg.menu) :
+        null
+    );
+    const areas = Areas.insert(Map(), Menu.factory, menu);
+    const headerMenu = (
+      Menu.factory.isFactoryRecord(cfg.headerMenu) ? cfg.headerMenu as Menu :
+      cfg.headerMenu ? Menu.factory.serialize({key: '$tableMenu'}, cfg.headerMenu) :
+        null
+    );
+    return {areas, header, headerMenu, menu, positions};
   };
 
   const selector = 'table';
@@ -50,7 +62,7 @@ export module ItmTable {
   export const factory: Grid.Factory<ItmTable, {}> = Grid.factory.extend({
     selector,
     serializer,
-    model: {header: null, areas: null, positions: null},
+    model: {header: null, areas: null, positions: null, headerMenu: null, menu: null},
     shared: new Grid.Shared({
       defaultSelector: Column.factory.selector,
       areaFactories: [Column.factory]

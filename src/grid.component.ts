@@ -39,7 +39,7 @@ const GRID_RHYTHM = '60px';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 // tslint:disable-next-line:max-line-length
-export class ItmGridComponent<A extends Action.Generic<T> = Action.Generic<T>, T extends Object = {}> extends WithBehaviors<{ target: T, resolvers: Action.Resolvers }> implements OnChanges, OnDestroy {
+export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object = {}> extends WithBehaviors<{ target: T, resolvers: Action.Resolvers }> implements OnChanges, OnDestroy {
   @Input()
   /** The configuration of the grid. */
   grid: Grid.Config = null;
