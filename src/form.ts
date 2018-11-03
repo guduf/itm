@@ -38,7 +38,8 @@ export module ItmForm {
       return ngForm.statusChanges.pipe(
         startWith(ngForm.status),
         map(() => (
-          (Map() as Action.Resolvers).set('submit', ngForm.valid ? () => ngForm.value : null)
+          (Map() as Action.Resolvers)
+            .set(submitButton.action, ngForm.valid ? () => ngForm.value : null)
         ))
       );
     }
@@ -46,6 +47,7 @@ export module ItmForm {
 
   const submitButton = Button.areaFactory.serialize({
     key: 'submit',
+    action: '$formSubmit',
     icon: 'save_alt',
     mode: Button.Mode.icon
   });

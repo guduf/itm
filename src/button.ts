@@ -12,6 +12,8 @@ import Target from './target';
 interface ItmButtonConfig<T extends Object = {}> {
   key?: string;
 
+  action?: string;
+
   /** Defines the action icon. If false, text is never displayed. */
   icon?: false | Target.PipeLike<T, string>;
 
@@ -47,7 +49,7 @@ export class ItmButtonRef {
           of(false)
       ))
     );
-    this.emit = (nativeEvent?: any) => emitter.emit(button.key, nativeEvent);
+    this.emit = (nativeEvent?: any) => emitter.emit(button.action, nativeEvent);
     this.mode = button.mode ? Target.map(target, button.mode) : of(ItmButton.Mode.basic);
     this.text = button.text ? Target.map(target, button.text) : of(button.key);
   }
@@ -68,6 +70,7 @@ export module ItmButton {
 
   export interface Model<T = {}> extends Config<T> {
     key: string;
+    action: string;
     icon: Target.Pipe<T, string> | null;
     disabled: Target.Pipe<T, boolean> | null;
     mode: Target.Pipe<T, Mode> | null;
@@ -77,6 +80,7 @@ export module ItmButton {
   const serializer = (cfg: RecordOf<AreaConfig>): Model => {
     if (!cfg.key || !keyRegExp.test(cfg.key)) throw new TypeError('Expected key');
     const key = cfg.key;
+    const action = cfg.action && keyRegExp.test(cfg.action) ? cfg.action : key;
     const icon = (
       cfg.icon === false ? () => empty() :
       cfg.icon ? Target.defer('string', cfg.icon || key) :
@@ -89,12 +93,12 @@ export module ItmButton {
       cfg.text ? Target.defer('string', cfg.text) :
         null
     );
-    return {key, icon, mode, disabled, text};
+    return {key, action, icon, mode, disabled, text};
   };
 
   const selector = 'button';
 
-  const model = {key: null, icon: null, disabled: null, mode: null, text: null};
+  const model = {key: null, action: null, icon: null, disabled: null, mode: null, text: null};
 
   export const factory: RecordFactory<ItmButton, Config> = RecordFactory.build({
     selector,

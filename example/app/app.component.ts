@@ -8,7 +8,7 @@ import { User } from './user';
   selector: 'app-root',
   template: `
     <itm-form [form]="'user' | itmTypeForm:grid" [target]="data[0]"></itm-form>
-    <itm-table [table]="'user' | itmTypeTable" [target]="[data[0]]"></itm-table>
+    <itm-table [table]="'user' | itmTypeTable" [target]="[data[0]]" (action)="handleTableAction($event)"></itm-table>
   `,
   styleUrls: ['./app.component.scss']
 })
@@ -23,4 +23,6 @@ export class AppComponent {
       control:ipAddress = .         button:submit
     `
   };
+
+  handleTableAction(e) { console.log(e); }
 }

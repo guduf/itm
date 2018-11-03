@@ -1,5 +1,14 @@
-import { Component, Input, OnChanges, SimpleChanges, HostBinding } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  HostBinding,
+  Output
+} from '@angular/core';
 
+import Action from './action';
 import Grid from './grid';
 import Table from './table';
 
@@ -11,10 +20,12 @@ const SELECTOR = 'itm-table';
     <ng-container *ngIf="tableRecord as table">
       <itm-grid
         [grid]="table.header" [target]="target"
-        [ngClass]="headerRowClass"></itm-grid>
+        [ngClass]="headerRowClass"
+        (action)="action.emit($event)"></itm-grid>
       <itm-grid *ngFor="let rowTarget of target"
         [grid]="table" [target]="rowTarget"
-        [ngClass]="rowClass"></itm-grid>
+        [ngClass]="rowClass"
+        (action)="action.emit($event)"></itm-grid>
     </ng-container>
   `
 })
@@ -27,6 +38,9 @@ export class ItmTableComponent<T extends Object = {}> implements OnChanges {
   @Input()
   /** The target of the table. */
   target: T[];
+
+  @Output()
+  action = new EventEmitter<Action.Generic<T | T[]>>();
 
   readonly headerRowClass = `${SELECTOR}-header-row`;
 
