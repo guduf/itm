@@ -1,6 +1,6 @@
 import { Component, HostBinding } from '@angular/core';
 
-import { ItmControlRef } from './control';
+import ControlRef from './control_ref';
 import { ItmFieldLabel } from './field';
 import { AbstractControl } from '@angular/forms';
 
@@ -28,6 +28,6 @@ export class ItmControlComponent {
 
   constructor(
     readonly label: ItmFieldLabel,
-    private readonly _controlRef: ItmControlRef
+    private readonly _controlRef: ControlRef
   ) { }
 }

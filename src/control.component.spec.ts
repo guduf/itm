@@ -3,7 +3,7 @@ import { MatFormFieldModule } from '@angular/material';
 import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 import { of } from 'rxjs';
 
-import { ItmControlRef } from './control';
+import ControlRef from './control_ref';
 import { ItmControlComponent } from './control.component';
 import { ItmFieldLabel } from './field';
 
@@ -23,7 +23,7 @@ describe('ItmControlComponent', () => {
       ],
       providers: [
         {provide: ItmFieldLabel, useValue: fieldLabel},
-        {provide: ItmControlRef, useValue: ngControl}
+        {provide: ControlRef, useValue: ngControl}
       ]
     });
     TestBed.compileComponents();

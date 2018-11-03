@@ -1,12 +1,13 @@
-import { List, Map } from 'immutable';
+import { Map } from 'immutable';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 import Action from './action';
 import Area from './area';
 import Button from './button';
-import Control, { ItmFormRef } from './control';
+import Control from './control';
 import Field from './field';
+import FormRef from './form_ref';
 import Grid from './grid';
 import Target from './target';
 
@@ -19,22 +20,9 @@ export module ItmForm {
     areas: Map<string, Map<string, Area<T>>>;
   }
 
-  export function provideFormRef(grid: Grid, target: Target): ItmFormRef {
-    const controls = grid.positions.reduce(
-      (acc, position) => {
-        if (position.selector !== Control.selector) return acc;
-        const control: Control = grid.areas.getIn([Control.selector, position.key]);
-        if (!control) throw new ReferenceError('Expected control');
-        return acc.push(control);
-      },
-      List<Control>()
-    );
-    return new ItmFormRef(controls, target.value);
-  }
-
   const resolversProvider: Grid.ResolversProvider = {
-    deps: [ItmFormRef],
-    useFactory: (ngForm: ItmFormRef): Observable<Action.Resolvers> => {
+    deps: [FormRef],
+    useFactory: (ngForm: FormRef): Observable<Action.Resolvers> => {
       return ngForm.statusChanges.pipe(
         startWith(ngForm.status),
         map(() => (
@@ -67,10 +55,7 @@ export module ItmForm {
     shared: new Grid.Shared({
       defaultSelector: Control.selector,
       areaFactories: Map({field: Field.factory, control: Control.factory}),
-      providers: Map<any, Area.Provider>().set(ItmFormRef, {
-        deps: [Grid, Target],
-        useFactory: provideFormRef
-      }),
+      providers: Map<any, Area.Provider>().set(FormRef, {deps: [Grid, Target], useClass: FormRef}),
       resolversProvider
     })
   });
