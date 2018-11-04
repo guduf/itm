@@ -51,9 +51,9 @@ export abstract class AbstractRecord<TProps extends Object = {}> implements Reco
   abstract wasAltered(): boolean;
   abstract asImmutable(): this;
   abstract toSeq(): Seq.Keyed<keyof TProps, TProps[keyof TProps]>;
-  abstract [Symbol.iterator](): IterableIterator<[keyof TProps, TProps[keyof TProps]]>;
+  // tslint:disable-next-line:max-line-length
+  [Symbol.iterator](): IterableIterator<[keyof TProps, TProps[keyof TProps]]> { return this[Symbol.iterator](); }
 }
-
 
 export function isEnumIncludes(target: any, val: any): boolean {
   return Array.from(Object.values(target)).includes(val);

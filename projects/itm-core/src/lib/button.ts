@@ -7,7 +7,7 @@ import RecordFactory from './record_factory';
 import Target from './target';
 
 /** A button area configuration. */
-interface ItmButtonConfig<T extends Object = {}> {
+export interface ItmButtonConfig<T extends Object = {}> {
   key?: string;
 
   action?: string;

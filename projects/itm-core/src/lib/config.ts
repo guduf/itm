@@ -1,8 +1,11 @@
 import { Map, RecordOf, Collection, List } from 'immutable';
 
+import { InjectionToken } from '@angular/core';
 import RecordFactory from './record_factory';
 import Type from './type';
 import { ComponentType, AbstractRecord } from './utils';
+
+export const ITM_CONFIG = new InjectionToken<ItmConfig>('ITM_CONFIG');
 
 /** The global config for the module */
 // tslint:disable-next-line:max-line-length

@@ -1,15 +1,20 @@
 import { Map, RecordOf } from 'immutable';
 import { Observable } from 'rxjs';
 
-import ActionEmitter from './action_emitter';
 import Area from './area';
-import AreaFactory from './area_factory';
 import Button from './button';
 import Target from './target';
 import { ItmButtonRef } from './button';
 
 /** Record that describes specifics property of a button area. */
 export type ItmMenu<T = {}> = Area<T> & RecordOf<ItmMenu.Model<T>>;
+
+export class ItmMenuRef {
+  constructor(
+    readonly direction: Observable<ItmMenu.Direction>,
+    readonly buttons: Map<string, ItmButtonRef>
+  ) { }
+}
 
 export module ItmMenu {
   export enum Direction {

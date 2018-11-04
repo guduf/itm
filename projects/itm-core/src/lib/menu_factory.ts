@@ -1,21 +1,13 @@
 import { Map } from 'immutable';
-import { Observable } from 'rxjs';
 
 import ActionEmitter from './action_emitter';
 import Area from './area';
 import AreaFactory from './area_factory';
 import Button from './button';
 import ButtonFactory from './button_factory';
-import Menu from './menu';
+import Menu, { ItmMenuRef } from './menu';
 import Target from './target';
 import { ItmButtonRef } from './button';
-
-export class ItmMenuRef {
-  constructor(
-    readonly direction: Observable<Menu.Direction>,
-    readonly buttons: Map<string, ItmButtonRef>
-  ) { }
-}
 
 export function ItmMenuFactory(): AreaFactory<Menu, Menu.Config>;
 export function ItmMenuFactory(...cfgs: Partial<Menu.Config>[]): Menu;

@@ -21,7 +21,7 @@ export function ItmGridFactory(...cfgs: Partial<Grid.Config>[]): Grid | ItmGridF
   return ItmGridFactory._static.serialize(...cfgs);
 }
 export module ItmGridFactory {
-  interface SharedConfig {
+  export interface SharedConfig {
     areaFactories?: Map<string, AreaFactory<Area, any>> | AreaFactory<Area, any>[];
     defaultSelector?: string;
     providers?: Area.Providers;

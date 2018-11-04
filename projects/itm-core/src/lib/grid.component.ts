@@ -3,6 +3,7 @@ import {
   Component,
   EventEmitter,
   HostBinding,
+  Inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -16,8 +17,9 @@ import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import Action from './action';
 import ActionEmitter from './action_emitter';
 import { WithBehaviors } from './behavior';
-import ItmConfig from './config';
+import Config, { ITM_CONFIG } from './config';
 import Grid from './grid';
+import GridFactory from './grid_factory';
 import GridRef, { ITM_SHARED_RESOLVERS_TOKEN } from './grid_ref';
 import Template from './grid_template';
 import { map } from 'rxjs/operators';
@@ -33,7 +35,7 @@ const GRID_RHYTHM = '60px';
     <div *ngFor="let fragment of fragments"
       [class]="getAreaClass(fragment)"
       [ngStyle]="getAreaStyle(fragment)">
-      <ng-container [itmArea]="getAreaRef(fragment)"></ng-container>
+      <!--<ng-container [itmArea]="getAreaRef(fragment)"></ng-container>-->
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -96,7 +98,8 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
 
   constructor(
     private _sanitizer: DomSanitizer,
-    private _config: ItmConfig
+    @Inject(ITM_CONFIG)
+    private _config: Config
   ) {
     super({target: undefined, resolvers: Map()});
   }
