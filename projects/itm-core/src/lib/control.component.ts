@@ -1,33 +1,34 @@
-// import { Component, HostBinding } from '@angular/core';
-// import { AbstractControl } from '@angular/forms';
+import { Component, HostBinding, Inject } from '@angular/core';
+import { AbstractControl } from '@angular/forms';
 
-// import ControlRef from './control_ref';
-// import { ItmFieldLabel } from './field';
+import ControlRef, { ITM_CONTROL_REF } from './control_ref';
+import { ItmFieldLabel } from './field';
 
-// const SELECTOR = 'itm-control';
+const SELECTOR = 'itm-control';
 
-// /** Default component for control area if not specified in config. */
-// @Component({
-//   selector: SELECTOR,
-//   template: `
-//     <mat-form-field>
-//       <input
-//         matInput [required]="required" [placeholder]="label | async"
-//         [formControl]="ngControl" />
-//     </mat-form-field>
-//   `
-// })
-// export class ItmControlComponent {
-//   @HostBinding('class')
-//   /** The CSS class of the host element. */
-//   get hostClass(): string { return SELECTOR; }
+/** Default component for control area if not specified in config. */
+@Component({
+  selector: SELECTOR,
+  template: `
+    <mat-form-field>
+      <input
+        matInput [required]="required" [placeholder]="label | async"
+        [formControl]="ngControl" />
+    </mat-form-field>
+  `
+})
+export class ItmControlComponent {
+  @HostBinding('class')
+  /** The CSS class of the host element. */
+  get hostClass(): string { return SELECTOR; }
 
-//   get ngControl(): AbstractControl { return this._controlRef; }
+  get ngControl(): AbstractControl { return this._controlRef; }
 
-//   get required(): boolean { return this._controlRef.record.required; }
+  get required(): boolean { return this._controlRef.record.required; }
 
-//   constructor(
-//     readonly label: ItmFieldLabel,
-//     private readonly _controlRef: ControlRef
-//   ) { }
-// }
+  constructor(
+    readonly label: ItmFieldLabel,
+    @Inject(ITM_CONTROL_REF)
+    private readonly _controlRef: ControlRef
+  ) { }
+}

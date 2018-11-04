@@ -1,9 +1,12 @@
+import { InjectionToken } from '@angular/core';
 import { FormControl, ValidationErrors, AbstractControl } from '@angular/forms';
 import { isCollection } from 'immutable';
 import { Observable, of } from 'rxjs';
 
 import Control from './control';
 import Target from './target';
+
+export const ITM_CONTROL_REF = new InjectionToken('ITM_CONTROL_REF');
 
 // tslint:disable-next-line:max-line-length
 export class ItmControlRef<T extends Object = {}> extends FormControl {

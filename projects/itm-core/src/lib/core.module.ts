@@ -9,7 +9,7 @@ import { ItmAreaDirective } from './area.directive';
 import ButtonAreaFactory from './button_area_factory';
 import { ItmButtonComponent } from './button.component';
 import ControlFactory from './control_factory';
-// import { ItmControlComponent } from './control.component';
+import { ItmControlComponent } from './control.component';
 import Config, { ITM_CONFIG } from './config';
 import ItmConfigFactory from './config_factory';
 import { ItmFieldComponent } from './field.component';
@@ -35,7 +35,7 @@ const IMPORTS = [
 
 const ENTRY_COMPONENTS = [
   ItmButtonComponent,
-  // ItmControlComponent,
+  ItmControlComponent,
   ItmFieldComponent,
   ItmMenuComponent
 ];

@@ -14,7 +14,7 @@ export * from './lib/button.component';
 export * from './lib/column';
 export * from './lib/config';
 export * from './lib/control_ref';
-// export * from './lib/control.component';
+export * from './lib/control.component';
 export * from './lib/control';
 export * from './lib/field';
 export * from './lib/field.component';
