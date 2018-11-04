@@ -35,7 +35,7 @@ const GRID_RHYTHM = '60px';
     <div *ngFor="let fragment of fragments"
       [class]="getAreaClass(fragment)"
       [ngStyle]="getAreaStyle(fragment)">
-      <!--<ng-container [itmArea]="getAreaRef(fragment)"></ng-container>-->
+      <ng-container [itmArea]="getAreaRef(fragment)"></ng-container>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush

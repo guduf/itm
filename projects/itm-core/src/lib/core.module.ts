@@ -5,7 +5,7 @@ import { NgModule, InjectionToken, ModuleWithProviders, Optional } from '@angula
 import { ReactiveFormsModule } from '@angular/forms';
 import { Map } from 'immutable';
 
-// import { ItmAreaDirective } from './area.directive';
+import { ItmAreaDirective } from './area.directive';
 import ButtonAreaFactory from './button_area_factory';
 // import { ItmButtonComponent } from './button.component';
 import ControlFactory from './control_factory';
@@ -18,7 +18,7 @@ import FormFactory from './form_factory';
 import { ItmGridComponent } from './grid.component';
 import { ItmMaterialModule } from './material.module';
 // import { ItmTableComponent } from './table.component';
-// import { ITM_TYPE_PIPES } from './type.pipes';
+import { ITM_TYPE_PIPES } from './type.pipes';
 // import { ItmMenuComponent } from './menu.component';
 import AreaFactory from './area_factory';
 import ColumnFactory from './column_factory';
@@ -41,14 +41,14 @@ const ENTRY_COMPONENTS = [
 ];
 
 const DECLARATIONS = [
-  // ItmAreaDirective
+  ItmAreaDirective
 ];
 
 const EXPORTED_DECLARATIONS = [
   // ItmFormComponent,
   ItmGridComponent,
   // ItmTableComponent,
-  // ...ITM_TYPE_PIPES
+  ...ITM_TYPE_PIPES
 ];
 
 export const DEFAULT_CONFIG: Config.Model = {
