@@ -7,19 +7,19 @@ import { Map } from 'immutable';
 
 import { ItmAreaDirective } from './area.directive';
 import ButtonAreaFactory from './button_area_factory';
-// import { ItmButtonComponent } from './button.component';
+import { ItmButtonComponent } from './button.component';
 import ControlFactory from './control_factory';
 // import { ItmControlComponent } from './control.component';
 import Config, { ITM_CONFIG } from './config';
 import ItmConfigFactory from './config_factory';
-// import { ItmFieldComponent } from './field.component';
+import { ItmFieldComponent } from './field.component';
 import FormFactory from './form_factory';
-// import { ItmFormComponent } from './form.component';
+import { ItmFormComponent } from './form.component';
 import { ItmGridComponent } from './grid.component';
 import { ItmMaterialModule } from './material.module';
-// import { ItmTableComponent } from './table.component';
+import { ItmTableComponent } from './table.component';
 import { ITM_TYPE_PIPES } from './type.pipes';
-// import { ItmMenuComponent } from './menu.component';
+import { ItmMenuComponent } from './menu.component';
 import AreaFactory from './area_factory';
 import ColumnFactory from './column_factory';
 import FieldFactory from './field_factory';
@@ -34,10 +34,10 @@ const IMPORTS = [
 ];
 
 const ENTRY_COMPONENTS = [
-  // ItmButtonComponent,
+  ItmButtonComponent,
   // ItmControlComponent,
-  // ItmFieldComponent,
-  // ItmMenuComponent
+  ItmFieldComponent,
+  ItmMenuComponent
 ];
 
 const DECLARATIONS = [
@@ -45,17 +45,17 @@ const DECLARATIONS = [
 ];
 
 const EXPORTED_DECLARATIONS = [
-  // ItmFormComponent,
+  ItmFormComponent,
   ItmGridComponent,
-  // ItmTableComponent,
+  ItmTableComponent,
   ...ITM_TYPE_PIPES
 ];
 
 export const DEFAULT_CONFIG: Config.Model = {
-  defaultButtonComp: null, // ItmButtonComponent,
+  defaultButtonComp: ItmButtonComponent,
   defaultControlComp: null, // ItmControlComponent,
-  defaultFieldComp: null, // ItmFieldComponent,
-  defaultMenuComp: null, // ItmMenuComponent,
+  defaultFieldComp: ItmFieldComponent,
+  defaultMenuComp: ItmMenuComponent,
   areaFactories: Map<string, AreaFactory>()
     .set(AreaFactory().selector, AreaFactory())
     .set(ButtonAreaFactory().selector, ButtonAreaFactory())
