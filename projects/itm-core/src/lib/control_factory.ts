@@ -4,7 +4,7 @@ import { Map, isCollection } from 'immutable';
 import Area from './area';
 import AreaFactory from './area_factory';
 import Control from './control';
-import ControlRef from './control_ref';
+import ControlRef, { ITM_CONTROL_REF } from './control_ref';
 import FormRef from './form_ref';
 import FieldFactory from './field_factory';
 import Target from './target';
@@ -47,10 +47,10 @@ export module ItmControlFactory {
     },
     shared: new AreaFactory.Shared({
       defaultComp: cfg => cfg.defaultControlComp,
-      providers: Map<any, Area.Provider>().set(ControlRef, {
-        deps: [Area, Target, [new Optional(), FormRef]],
-        useFactory: ControlRef.provide
-      })
+      providers: Map<any, Area.Provider>().set(
+        ITM_CONTROL_REF,
+        {deps: [Area, Target, [new Optional(), FormRef]], useFactory: ControlRef.provide}
+      )
     })
   });
 }

@@ -1,5 +1,4 @@
-import { ItmProp } from 'src/prop';
-import { ItmType } from 'src/type';
+import { ItmProp, ItmType } from 'itm-core';
 
 @ItmType({
   table: {
@@ -36,13 +35,9 @@ export class User {
   })
   email: string;
 
-  @ItmProp({
-    // required: true
-  })
+  @ItmProp({})
   gender: 'male'|'female';
 
-  @ItmProp({
-    // pattern: /^\d{2,3}(\.\d{2,3}){2}$/
-  })
+  @ItmProp({})
   ipAddress;
 }

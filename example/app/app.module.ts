@@ -1,13 +1,11 @@
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-import { NgModule } from '@angular/core';
+import { List } from 'immutable';
+import { ItmModule } from 'itm-core';
 
 import { AppComponent } from './app.component';
-import { ItmModule } from 'src/itm.module';
-import { MatCheckboxModule, MatTableModule } from '@angular/material';
 import { User } from './user';
-import { List } from 'immutable';
 
 @NgModule({
   declarations: [
@@ -16,8 +14,6 @@ import { List } from 'immutable';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    MatCheckboxModule,
-    MatTableModule,
     ItmModule.create({types: List([User])})
   ],
   providers: [],

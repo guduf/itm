@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css?family=Work+Sans');
 @import '~@angular/material/theming';
-@import '../src/itm';
+@import '../projects/itm-core/src/core.scss';
 // Plus imports for other components in your app.
 
 $general-typography: mat-typography-config(

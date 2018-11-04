@@ -4,6 +4,7 @@ import { isCollection } from 'immutable';
 import { Observable, of } from 'rxjs';
 
 import Control from './control';
+import FormRef from './form_ref';
 import Target from './target';
 
 export const ITM_CONTROL_REF = new InjectionToken('ITM_CONTROL_REF');
@@ -23,9 +24,9 @@ export module ItmControlRef {
     [key: string]: boolean | string;
   }
 
-  export function provide(control: Control, target: Target): ItmControlRef {
+  export function provide(control: Control, target: Target, formRef?: FormRef): ItmControlRef {
     return (
-      new ItmControlRef(control, target.value[control.key])
+      formRef ? formRef.get(control.key) : new ItmControlRef(control, target.value[control.key])
     );
   }
 

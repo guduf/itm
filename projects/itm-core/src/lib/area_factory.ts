@@ -6,7 +6,7 @@ import Area from './area';
 import ItmConfig from './config';
 import RecordFactory from './record_factory';
 import Target from './target';
-import { ComponentType, isComponentType } from './utils';
+import { ComponentType } from './utils';
 
 // tslint:disable-next-line:max-line-length
 export type ItmAreaFactory<R extends RecordOf<Area.Model> = Area , C extends Area.Config = Area.Config> = RecordFactory<R, C, any, ItmAreaFactory.Shared>;
@@ -34,7 +34,9 @@ export module ItmAreaFactory {
   export function normalize(cfg: Area.Config): Area.Model {
     if (!cfg.key || !Area.keyRegExp.test(cfg.key)) throw new TypeError('Expected key');
     const key = cfg.key;
-    const comp = cfg.comp !== false && isComponentType(cfg.comp) ? cfg.comp as ComponentType : null;
+    const comp = (
+      cfg.comp !== false && typeof cfg.comp === 'function' ? cfg.comp as ComponentType : null
+    );
     const text: Target.Pipe<{}, string> = (
       cfg.text === false ? () => empty() :
       cfg.text ? Target.defer('string', cfg.text) :

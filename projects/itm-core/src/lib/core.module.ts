@@ -53,7 +53,7 @@ const EXPORTED_DECLARATIONS = [
 
 export const DEFAULT_CONFIG: Config.Model = {
   defaultButtonComp: ItmButtonComponent,
-  defaultControlComp: null, // ItmControlComponent,
+  defaultControlComp: ItmControlComponent,
   defaultFieldComp: ItmFieldComponent,
   defaultMenuComp: ItmMenuComponent,
   areaFactories: Map<string, AreaFactory>()

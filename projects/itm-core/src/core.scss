@@ -1,11 +1,11 @@
-@import './button';
-@import './control';
-@import './field';
-@import './form';
-@import './grid';
-@import './menu';
-@import './slot';
-@import './table';
+@import './style/button';
+@import './style/control';
+@import './style/field';
+@import './style/form';
+@import './style/grid';
+@import './style/menu';
+@import './style/slot';
+@import './style/table';
 
 @mixin itm($theme, $config: null) {
   @if $config == null {

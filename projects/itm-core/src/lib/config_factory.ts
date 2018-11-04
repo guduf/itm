@@ -5,7 +5,6 @@ import RecordFactory from './record_factory';
 import Type from './type';
 import TypeDecorator from './type_decorator';
 import TypeFactory from './type_factory';
-import { isComponentType } from './utils';
 
 export function ItmConfigFactory(): RecordFactory<Config, Config.ModelConfig>;
 export function ItmConfigFactory(...cfgs: Partial<Config.ModelConfig>[]): Config;
@@ -17,16 +16,16 @@ export function ItmConfigFactory(...cfgs: Partial<Config.ModelConfig>[]): Config
 
 export module ItmConfigFactory {
   export function normalize(cfg: Config.ModelConfig): Config.Model {
-    if (!isComponentType(cfg.defaultButtonComp)) throw new TypeError('Expected ComponentType');
+    if (typeof cfg.defaultButtonComp !== 'function') throw new TypeError('Expected ComponentType');
     const defaultButtonComp = cfg.defaultButtonComp;
 
-    if (!isComponentType(cfg.defaultControlComp)) throw new TypeError('Expected ComponentType');
+    if (typeof cfg.defaultControlComp !== 'function') throw new TypeError('Expected ComponentType');
     const defaultControlComp = cfg.defaultControlComp;
 
-    if (!isComponentType(cfg.defaultFieldComp)) throw new TypeError('Expected ComponentType');
+    if (typeof cfg.defaultFieldComp !== 'function') throw new TypeError('Expected ComponentType');
     const defaultFieldComp = cfg.defaultFieldComp;
 
-    if (!isComponentType(cfg.defaultMenuComp)) throw new TypeError('Expected ComponentType');
+    if (typeof cfg.defaultMenuComp !== 'function') throw new TypeError('Expected ComponentType');
     const defaultMenuComp = cfg.defaultMenuComp;
 
     if (

@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 
 import Area from './area';
 import Column from './column';
@@ -35,16 +35,16 @@ export module ItmTableFactory {
       fragments.map(fragment => fragment.set(0, null))
     ));
     const header = GridFactory({template: headerTemplate, areas: headerAreas});
-    const positions = Template.insertPosition(
-      grid.positions,
-      [Menu.selector, '$tableMenu'],
-      'right'
-    );
     let areas = Map() as Areas;
     const menu = (
       MenuFactory().isFactoryRecord(cfg.menu) ? cfg.menu as Menu :
       cfg.menu ? MenuFactory({key: '$rowMenu'}, cfg.menu) :
         null
+    );
+    const positions  = (
+      menu ?
+        Template.insertPosition(grid.positions, [Menu.selector, '$rowMenu'], 'right') :
+        Map() as Template.Positions
     );
     if (menu) areas = Areas.insert(areas, MenuFactory(), menu);
     const headerMenu = (

@@ -34,4 +34,5 @@ export * from './lib/record_factory';
 export * from './lib/table.component';
 export * from './lib/target';
 export { ItmTypeGridPipe, ItmTypeFormPipe, ItmTypeTablePipe } from './lib/type.pipes';
-export * from './lib/type';
+export { ItmType as ItmTypeRecord } from './lib/type';
+export { ItmTypeDecorator as ItmType } from './lib/type_decorator';
