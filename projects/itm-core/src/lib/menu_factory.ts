@@ -31,8 +31,8 @@ export module ItmMenuFactory {
       },
       Map<string, Button>()
     );
-    const mode = Target.defer(Button.Mode, cfg.mode);
-    const direction = Target.defer(Menu.Direction, cfg.direction);
+    const mode = cfg.mode ? Target.defer(Button.Mode, cfg.mode) : null;
+    const direction = cfg.direction ? Target.defer(Menu.Direction, cfg.direction) : null;
     return {buttons, mode, direction};
   }
 
