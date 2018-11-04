@@ -16,6 +16,14 @@
     "lib": [
       "es2017",
       "dom"
-    ]
+    ],
+    "paths": {
+      "itm-core": [
+        "dist/itm-core"
+      ],
+      "itm-core/*": [
+        "dist/itm-core/*"
+      ]
+    }
   }
 }

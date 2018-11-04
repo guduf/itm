@@ -71,13 +71,14 @@ export const DEFAULT_CONFIG: ItmConfig.Model = {
 
 const CONFIG_INIT_TOKEN = new InjectionToken('ITM_CONFIG_INIT');
 
+export function provideConfig(config: ItmConfig.ModelConfig = null): ItmConfig {
+  return ItmConfig.factory.serialize(DEFAULT_CONFIG, config);
+}
+
 const CONFIG_PROVIDER = {
   provide: ItmConfig,
   deps: [[new Optional(), CONFIG_INIT_TOKEN]],
-  useFactory: (config: ItmConfig.ModelConfig = null): ItmConfig => ItmConfig.factory.serialize(
-    DEFAULT_CONFIG,
-    config
-  )
+  useFactory: provideConfig
 };
 
 @NgModule({

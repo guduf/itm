@@ -27,7 +27,6 @@ interface ItmButtonConfig<T extends Object = {}> {
   mode?: Target.PipeLike<T, ItmButton.Mode>;
 }
 
-@Injectable()
 export class ItmButtonRef {
   readonly icon: Observable<string>;
   readonly disabled: Observable<boolean>;
@@ -36,7 +35,6 @@ export class ItmButtonRef {
   readonly emit: (nativeEvent?: any) => void;
 
   constructor(
-    @Inject(ItmArea)
     button: ItmButton,
     target: Target,
     emitter: ActionEmitter

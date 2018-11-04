@@ -3,14 +3,11 @@ import { isCollection } from 'immutable';
 import { Observable, of } from 'rxjs';
 
 import Control from './control';
-import FormRef from './form_ref';
 import Target from './target';
 
 // tslint:disable-next-line:max-line-length
 export class ItmControlRef<T extends Object = {}> extends FormControl {
   readonly record: Control;
-
-  parent: FormRef<T>;
 
   constructor(record: Control, init: T) {
     super(init[record.key], null, (c: this) => ItmControlRef.validateSchema(c, record));
@@ -23,9 +20,9 @@ export module ItmControlRef {
     [key: string]: boolean | string;
   }
 
-  export function provide(control: Control, target: Target, formRef?: FormRef): ItmControlRef {
+  export function provide(control: Control, target: Target): ItmControlRef {
     return (
-      formRef ? formRef.get(control.key) : new ItmControlRef(control, target.value[control.key])
+      new ItmControlRef(control, target.value[control.key])
     );
   }
 
