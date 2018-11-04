@@ -142,7 +142,8 @@
           "options": {
             "main": "projects/itm-core/src/test.ts",
             "tsConfig": "projects/itm-core/tsconfig.spec.json",
-            "karmaConfig": "projects/itm-core/karma.conf.js"
+            "karmaConfig": "projects/itm-core/karma.conf.js",
+            "sourceMap": true
           }
         },
         "lint": {

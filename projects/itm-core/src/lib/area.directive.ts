@@ -41,11 +41,14 @@ export class ItmAreaDirective implements OnChanges {
 
   ngOnChanges() {
     this._viewContainerRef.clear();
+    if (this._textSubscr) this._textSubscr.unsubscribe();
+    if (this._textNode) {
+      this._renderer.removeChild(this._parentNode, this._textNode);
+      this._textNode = null;
+    }
     if (!this.areaRef || typeof this.areaRef !== 'object') return;
     if (!this.areaRef.comp) try { return this._renderText(this.areaRef.injector.get(ItmAreaText)); }
     catch (err) { console.error(err); return; }
-    this._textNode = null;
-    this._textSubscr = null;
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory(
       this.areaRef.comp
     );
@@ -53,16 +56,7 @@ export class ItmAreaDirective implements OnChanges {
     catch (err) { console.error(err); }
   }
 
-  private _resetText(): void {
-    if (this._textSubscr) this._textSubscr.unsubscribe();
-    if (this._textNode) {
-      this._renderer.removeChild(this._parentNode, this._textNode);
-      this._textNode = null;
-    }
-  }
-
   private _renderText(areaText: Observable<string>): void {
-    this._resetText();
     if (!isObservable(areaText)) return null;
     this._textSubscr = areaText
       .pipe(

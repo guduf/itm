@@ -10,7 +10,7 @@ export * from './lib/area.directive';
 export * from './lib/area';
 export * from './lib/behavior';
 export * from './lib/button';
-export * from './lib/button.component';
+export * from './lib/button_area.component';
 export * from './lib/column';
 export * from './lib/config';
 export * from './lib/control_ref';

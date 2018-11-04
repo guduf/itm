@@ -5,6 +5,8 @@ import { By } from '@angular/platform-browser';
 
 import { ItmAreaDirective } from './area.directive';
 import { ComponentType } from './utils';
+import { ItmAreaText } from './area';
+import { BehaviorSubject } from 'rxjs';
 
 describe('ItmAreaDirective', () => {
   @Component({template: `<ng-container [itmArea]="areaRef"></ng-container>`})
@@ -43,10 +45,8 @@ describe('ItmAreaDirective', () => {
   // tslint:disable-next-line:max-line-length
   function setup(comp: ComponentType = FirstEntryTestComponent, providers: StaticProvider[] = []): ComponentFixture<HotTestComponent> {
     const fixture = TestBed.createComponent(HotTestComponent);
-    if (comp) {
-      fixture.componentInstance.areaRef = {comp, injector: Injector.create(providers)};
-      fixture.detectChanges();
-    }
+    fixture.componentInstance.areaRef = {comp, injector: Injector.create(providers)};
+    fixture.detectChanges();
     return fixture;
   }
 
@@ -77,5 +77,14 @@ describe('ItmAreaDirective', () => {
 
   it('should not throw a error when component failed to initialize', () => {
     expect(setup(SecondEntryTestComponent)).toBeTruthy();
+  });
+
+  it('should render a text then destroy it', () => {
+    const expectedText = 'Foo';
+    const subject = new BehaviorSubject(expectedText);
+    const fixture = setup(null, [{provide: ItmAreaText, useValue: subject}]);
+    expect(fixture.debugElement.childNodes[1].nativeNode.textContent).toBe(expectedText);
+    subject.next(null);
+    expect(fixture.debugElement.childNodes.length).toBe(1);
   });
 });

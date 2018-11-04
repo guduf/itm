@@ -7,7 +7,7 @@ import { Map } from 'immutable';
 
 import { ItmAreaDirective } from './area.directive';
 import ButtonAreaFactory from './button_area_factory';
-import { ItmButtonComponent } from './button.component';
+import { ItmButtonAreaComponent } from './button_area.component';
 import ControlFactory from './control_factory';
 import { ItmControlComponent } from './control.component';
 import Config, { ITM_CONFIG } from './config';
@@ -34,7 +34,7 @@ const IMPORTS = [
 ];
 
 const ENTRY_COMPONENTS = [
-  ItmButtonComponent,
+  ItmButtonAreaComponent,
   ItmControlComponent,
   ItmFieldComponent,
   ItmMenuComponent
@@ -52,7 +52,7 @@ const EXPORTED_DECLARATIONS = [
 ];
 
 export const DEFAULT_CONFIG: Config.Model = {
-  defaultButtonComp: ItmButtonComponent,
+  defaultButtonComp: ItmButtonAreaComponent,
   defaultControlComp: ItmControlComponent,
   defaultFieldComp: ItmFieldComponent,
   defaultMenuComp: ItmMenuComponent,

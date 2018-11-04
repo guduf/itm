@@ -14,10 +14,10 @@ const MODES_WITH_TEXT = [
 ];
 
 @Component({
-  selector: 'itm-button',
-  templateUrl: 'button.component.html'
+  selector: 'itm-button-area',
+  templateUrl: 'button_area.component.html'
 })
-export class ItmButtonComponent {
+export class ItmButtonAreaComponent {
 
   /** The icon to display. If null, none icon is displayed. */
   readonly icon: Observable<string>;
