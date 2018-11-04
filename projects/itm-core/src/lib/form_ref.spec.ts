@@ -1,12 +1,12 @@
 import { BehaviorSubject } from 'rxjs';
 
-import Control from './control';
+import ControlFactory from './control_factory';
 import FormRef from './form_ref';
-import Grid from './grid';
+import GridFactory from './grid_factory';
 
 describe('ItmFormRef', () => {
-  const control = Control.factory.serialize({key: 'name'});
-  const grid = Grid.factory.serialize({template: 'control:name', areas: {control: [control]}});
+  const control = ControlFactory({key: 'name'});
+  const grid = GridFactory({template: 'control:name', areas: {control: [control]}});
 
   it('should create with minimal arguments', () => {
     const expectedKey = 'name';

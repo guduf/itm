@@ -38,7 +38,7 @@ export module ItmGridTemplate {
       // tslint:disable-next-line:max-line-length
       if (!fragmentRegExp.test(fragment)) throw new TypeError(`Expected Area fragment pattern. Got '${fragment}'`);
       else return List(
-        !fragment.indexOf(':') ? [Area.factory.selector, fragment.slice(1)] :
+        !fragment.indexOf(':') ? [Area.selector, fragment.slice(1)] :
         fragment.indexOf(':') > 0 ? fragment.split(':') :
           [null, fragment]
       );
@@ -114,7 +114,7 @@ export module ItmGridTemplate {
     direction?: 'top' | 'right'  | 'left' | 'bottom',
     dimensions?: number | [number, number]
   ): Positions {
-    const [selector, key] = typeof path === 'string' ? [Area.factory.selector, path] : path;
+    const [selector, key] = typeof path === 'string' ? [Area.selector, path] : path;
     const fragment = List([selector, key]);
     if (positions.has(fragment)) throw new ReferenceError('Positions has fragment');
     const {rows, cols} = getRange(positions);
@@ -191,7 +191,7 @@ export module ItmGridTemplate {
     .reduce(
       (gridAreas, [[row, col], [endRow, endCol]], fragment) => {
         const position = positionFactory({
-          selector: fragment.first() || defaultSelector || Area.factory.selector,
+          selector: fragment.first() || defaultSelector || Area.selector,
           key: fragment.last(),
           row: row + 1,
           col: col + 1,

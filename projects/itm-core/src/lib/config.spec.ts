@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
 import { List, Map } from 'immutable';
 
-import Area from './area';
-import Grid from './grid';
-import Type from './type';
+import AreaFactory from './area_factory';
+import GridFactory from './grid_factory';
+import TypeFactory from './type_factory';
 import Config from './config';
+import ConfigFactory from './config_factory';
 
 describe('ItmConfig', () => {
   @Component({template: ''})
   class TestComponent { }
 
-  const type = Type.factory.serialize({key: 'test'});
+  const type = TypeFactory({key: 'test'});
 
   it('should create with a complete config', () => {
     const config: Config.ModelConfig = {
@@ -18,10 +19,10 @@ describe('ItmConfig', () => {
       defaultControlComp: TestComponent,
       defaultFieldComp: TestComponent,
       defaultMenuComp: TestComponent,
-      areaFactories: List([Area.factory]),
-      gridFactories: List([Grid.factory]),
+      areaFactories: List([AreaFactory()]),
+      gridFactories: List([GridFactory()]),
       types: Map({test: type})
     };
-    expect(Config.factory.serialize(config)).toBeTruthy();
+    expect(ConfigFactory(config)).toBeTruthy();
   });
 });

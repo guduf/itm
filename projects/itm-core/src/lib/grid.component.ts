@@ -123,7 +123,7 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
     super.ngOnChanges(changes);
     if (changes.grid) {
       if (this._sharedResolversSubscr) this._sharedResolversSubscr.unsubscribe();
-      const record = Grid.factory.serialize(this.grid);
+      const record = GridFactory(this.grid);
       try {
         this._ref = GridRef.buildRef(
           this._config,

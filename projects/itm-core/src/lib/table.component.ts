@@ -11,6 +11,7 @@ import {
 import Action from './action';
 import Grid from './grid';
 import Table from './table';
+import TableFactory from './table_factory';
 
 const SELECTOR = 'itm-table';
 
@@ -54,6 +55,6 @@ export class ItmTableComponent<T extends Object = {}> implements OnChanges {
   private _table: Table;
 
   ngOnChanges({table: tableChanges}: SimpleChanges) {
-    if (tableChanges) (this._table = Table.factory.serialize(this.table));
+    if (tableChanges) (this._table = TableFactory(this.table));
   }
 }

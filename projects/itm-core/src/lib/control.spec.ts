@@ -1,17 +1,11 @@
-import Control from './control';
+import AreaFactory from './area_factory';
+import ControlFactory from './control_factory';
 
-describe('ItmControl', () => {
-  it('should create with a minimal config', () => {
-    expect(Control.factory.serialize({key: 'save'})).toBeTruthy();
-  });
-
-  it('should create with a complete config', () => {
-    const config = {
-      key: 'test',
-      type: Control.Type.number,
-      pattern: /foobar/,
-      required: true
-    };
-    expect(Control.factory.serialize(config)).toBeTruthy();
+describe('ItmControlFactory', () => {
+  it('should return a record factory or a record', () => {
+    const recordFactory = ControlFactory();
+    expect(AreaFactory().isExtendedFactory(recordFactory)).toBeTruthy('Expected record factory.');
+    const record = ControlFactory({key: 'foo'});
+    expect(recordFactory.isFactoryRecord(record)).toBeTruthy('Expected record.');
   });
 });

@@ -5,26 +5,27 @@ import { NgModule, InjectionToken, ModuleWithProviders, Optional } from '@angula
 import { ReactiveFormsModule } from '@angular/forms';
 import { Map } from 'immutable';
 
-import Area from './area';
 import { ItmAreaDirective } from './area.directive';
-import Button from './button';
+import ButtonAreaFactory from './button_area_factory';
 import { ItmButtonComponent } from './button.component';
-import Column from './column';
-import Control from './control';
+import ControlFactory from './control_factory';
 import { ItmControlComponent } from './control.component';
 import { ItmConfig } from './config';
-import Field from './field';
+import ItmConfigFactory from './config_factory';
 import { ItmFieldComponent } from './field.component';
-import Form from './form';
+import FormFactory from './form_factory';
 import { ItmFormComponent } from './form.component';
-import Grid from './grid';
 import { ItmGridComponent } from './grid.component';
 import { ItmMaterialModule } from './material.module';
-import Menu from './menu';
-import Table from './table';
 import { ItmTableComponent } from './table.component';
 import { ITM_TYPE_PIPES } from './type.pipes';
 import { ItmMenuComponent } from './menu.component';
+import AreaFactory from './area_factory';
+import ColumnFactory from './column_factory';
+import FieldFactory from './field_factory';
+import MenuFactory from './menu_factory';
+import GridFactory from './grid_factory';
+import TableFactory from './table_factory';
 
 const IMPORTS = [
   CommonModule,
@@ -55,24 +56,24 @@ export const DEFAULT_CONFIG: ItmConfig.Model = {
   defaultControlComp: ItmControlComponent,
   defaultFieldComp: ItmFieldComponent,
   defaultMenuComp: ItmMenuComponent,
-  areaFactories: Map<string, Area.Factory>()
-    .set(Area.factory.selector, Area.factory)
-    .set(Button.factory.selector, Button.areaFactory)
-    .set(Column.factory.selector, Column.factory)
-    .set(Control.factory.selector, Control.factory)
-    .set(Field.factory.selector, Field.factory)
-    .set(Menu.factory.selector, Menu.factory),
-  gridFactories: Map<string, Grid.Factory>()
-    .set(Grid.factory.selector, Grid.factory)
-    .set(Form.factory.selector, Form.factory)
-    .set(Table.factory.selector, Table.factory),
+  areaFactories: Map<string, AreaFactory>()
+    .set(AreaFactory().selector, AreaFactory())
+    .set(ButtonAreaFactory().selector, ButtonAreaFactory())
+    .set(ColumnFactory().selector, ColumnFactory())
+    .set(ControlFactory().selector, ControlFactory())
+    .set(FieldFactory().selector, FieldFactory())
+    .set(MenuFactory().selector, MenuFactory()),
+  gridFactories: Map<string, GridFactory>()
+    .set(GridFactory().selector, GridFactory())
+    .set(FormFactory().selector, FormFactory())
+    .set(TableFactory().selector, TableFactory()),
   types: null
 };
 
 const CONFIG_INIT_TOKEN = new InjectionToken('ITM_CONFIG_INIT');
 
 export function provideConfig(config: ItmConfig.ModelConfig = null): ItmConfig {
-  return ItmConfig.factory.serialize(DEFAULT_CONFIG, config);
+  return ItmConfigFactory(DEFAULT_CONFIG, config);
 }
 
 const CONFIG_PROVIDER = {
@@ -94,8 +95,8 @@ export class ItmModule { }
 export module ItmModule {
   export interface Init {
     types?: any[];
-    areaFactories?: Area.Factory[];
-    gridFactories?: Grid.Factory[];
+    areaFactories?: AreaFactory[];
+    gridFactories?: GridFactory[];
     config?: ItmConfig;
   }
 

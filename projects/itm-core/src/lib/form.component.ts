@@ -10,8 +10,9 @@ import {
 import { Observable } from 'rxjs';
 
 import Grid from './grid';
-import { ItmGridComponent } from './grid.component';
 import Form from './form';
+import FormFactory from './form_factory';
+import { ItmGridComponent } from './grid.component';
 import FormRef from './form_ref';
 
 const SELECTOR = 'itm-form';
@@ -47,7 +48,7 @@ export class ItmFormComponent<T extends Object = {}> implements AfterViewInit, O
   }
 
   ngOnChanges({form: formChanges}: SimpleChanges) {
-    if (formChanges) (this._form = Form.factory.serialize(this.form));
+    if (formChanges) (this._form = FormFactory(this.form));
   }
 
   ngAfterViewInit() {

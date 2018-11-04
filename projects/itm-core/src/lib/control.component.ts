@@ -1,8 +1,8 @@
 import { Component, HostBinding } from '@angular/core';
+import { AbstractControl } from '@angular/forms';
 
 import ControlRef from './control_ref';
 import { ItmFieldLabel } from './field';
-import { AbstractControl } from '@angular/forms';
 
 const SELECTOR = 'itm-control';
 

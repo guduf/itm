@@ -18,7 +18,7 @@ interface ChildModelTestImpl extends ChildModelTestConfig { childKey: string; }
 
 const childModelTestImplImplSelector = 'childTestImpl';
 
-const childModelSerializer = (
+const normalize = (
   {key, suffix}: RecordOf<ModelTestImpl & ChildModelTestConfig>
 ): ChildModelTestImpl => {
   if (!suffix || typeof suffix !== 'string') throw new TypeError('Expected string');
@@ -28,12 +28,12 @@ const childModelSerializer = (
 describe('ItmRecordFactory', () => {
   function setup<T extends C = C, C extends Object = {}>(
     // tslint:disable-next-line:max-line-length
-    {ancestors, selector, serializer, model}: any = {},
+    {ancestors, selector, normalize, model}: any = {},
   ): ItmRecordFactory<RecordOf<T>, C> {
     if (typeof selector === 'undefined') selector = modelTestImplImplSelector;
-    if (typeof serializer === 'undefined') serializer = cfg => new ModelTestImpl(cfg as any) as any;
+    if (typeof normalize === 'undefined') normalize = cfg => new ModelTestImpl(cfg as any) as any;
     if (typeof model === 'undefined') model = {key: null} as any;
-    return ItmRecordFactory.build({selector, serializer, model, ancestors}) as any;
+    return ItmRecordFactory.build({selector, normalize, model, ancestors}) as any;
   }
 
   it('should create with minimal config', () => {
@@ -58,7 +58,7 @@ describe('ItmRecordFactory', () => {
     const factory = setup<ChildModelTestImpl, ChildModelTestConfig>(
       {
         selector: childModelTestImplImplSelector,
-        serializer: childModelSerializer,
+        normalize,
         model: {key: null, childKey: null, suffix: null},
         ancestors: [ancestor]
       }
@@ -75,7 +75,7 @@ describe('ItmRecordFactory', () => {
     expect(() => setup({selector: '$é'})).toThrowError(/Expected selector pattern/i);
   });
 
-  it('should throw a error when model is not specified while serializer is', () => {
-    expect(() => setup({model: null})).toThrowError(/Expected model when serializer is specified/i);
+  it('should throw a error when model is not specified while normalize is', () => {
+    expect(() => setup({model: null})).toThrowError(/Expected model when normalize is specified/i);
   });
 });

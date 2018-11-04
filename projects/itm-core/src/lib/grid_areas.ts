@@ -1,6 +1,7 @@
 import { Map } from 'immutable';
 
 import Area from './area';
+import AreaFactory from './area_factory';
 
 export type ItmGridAreas<T extends Object = {}> = Map<string, Map<string, Area<T>>>;
 
@@ -10,22 +11,22 @@ export module ItmGridAreas {
 
   export function parse(
     cfg: Config,
-    factories: Map<string, Area.Factory> = Map()
+    factories: Map<string, AreaFactory> = Map()
   ): ItmGridAreas {
-    if (Array.isArray(cfg)) cfg = {[Area.factory.selector]: cfg};
+    if (Array.isArray(cfg)) cfg = {[Area.selector]: cfg};
     if (!Map.isMap(cfg)) cfg = Map(cfg).map(areaCfgs => areaCfgs.reduce(
       (acc, areaCfg) => acc.set(areaCfg.key, areaCfg),
       Map<string, Area.Config>()
     ));
     return cfg.map((selectorCfgs, areaSelector) => {
-      const areaFactory = factories.get(areaSelector, Area.factory);
+      const areaFactory = factories.get(areaSelector, AreaFactory());
       return selectorCfgs.map(areaCfg => areaFactory.serialize(areaCfg));
     });
   }
 
   export function insert<C extends Area.Config<T> = Area.Config<T>, T extends Object = {}>(
     areas: ItmGridAreas,
-    factory: Area.Factory<Area, C>,
+    factory: AreaFactory<Area, C>,
     ...cfgs: (Partial<C> | Partial<C>[])[]
   ): ItmGridAreas<T> {
     return cfgs.reduce(

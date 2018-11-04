@@ -6,7 +6,7 @@ import Target from './target';
 export type ItmColumn<T extends Object = {}> = Area<T> & RecordOf<ItmColumn.Model<T>>;
 
 export module ItmColumn {
-  interface ModelConfig<T extends Object = {}> {
+  export interface ModelConfig<T extends Object = {}> {
     /** Whether column is sortable. */
     sortable?: boolean;
 
@@ -23,31 +23,9 @@ export module ItmColumn {
     header: Area<T[]>;
   }
 
-  const serializer = (cfg: ModelConfig, ancestor: Area): Model => {
-    if (!Area.factory.isFactoryRecord(ancestor)) throw new TypeError('Expected area record');
-    const header: Area = (
-      Area.factory.isFactoryRecord(cfg.header) ? cfg.header as Area :
-        Area.factory.serialize(ancestor, (
-          typeof cfg.header === 'function' ? {text: cfg.header} :
-          cfg.header && typeof cfg.header === 'object' ? cfg.header :
-            {text: ancestor.key}
-        ))
-    );
-    return {header, sortable: cfg.sortable === true};
-  };
-
-  const selector = 'column';
-
   export type Config<T extends Object = {}> = Area.Config<T> & ModelConfig<T>;
 
-  export const factory: Area.Factory<ItmColumn, Config> = Area.factory.extend({
-    selector,
-    serializer,
-    model: {header: null, sortable: null},
-    shared: new Area.Shared({
-      defaultText: ({area, target}) => target[area.key]
-    })
-  });
+  export const selector = 'column';
 }
 
 export default ItmColumn;

@@ -1,6 +1,7 @@
 // tslint:disable:max-line-length
 import Area from './area';
-import Grid from './grid';
+import AreaFactory from './area_factory';
+import GridFactory from './grid_factory';
 import Areas from './grid_areas';
 import Template from './grid_template';
 import { List } from 'immutable';
@@ -8,17 +9,17 @@ import { List } from 'immutable';
 describe('ItmGrid', () => {
   describe('factory', () => {
     it('should create with minimal config', () => {
-      expect(Grid.factory.serialize({template: 'name', areas: [{key: 'name'}]})).toBeTruthy();
+      expect(GridFactory({template: 'name', areas: [{key: 'name'}]})).toBeTruthy();
     });
 
     it('should create with simple template', () => {
-      expect(Grid.factory.serialize({template: 'id', areas: [{key: 'id'}]})).toBeTruthy();
+      expect(GridFactory({template: 'id', areas: [{key: 'id'}]})).toBeTruthy();
     });
 
     const areas: Area.Config[] = [{key: 'id'}, {key: 'name'}, {key: 'email'}];
 
     it('should create a single line template', () => {
-      const def = Grid.factory.serialize({template: 'id = id name', areas});
+      const def = GridFactory({template: 'id = id name', areas});
       const expectedTemplate = {
         0: {0: [null, 'id'], 1: [null, 'id'], 2: [null, 'id'], 3: [null, 'name']}
       };
@@ -26,14 +27,14 @@ describe('ItmGrid', () => {
     });
 
     it('should create a multi line template', () => {
-      const areasDef = areas.map(cfg => Area.factory.serialize(cfg));
+      const areasDef = areas.map(cfg => AreaFactory(cfg));
       const template = `
         id  .             name =
         id  control:email name =
       `;
-      const def = Grid.factory.serialize({
+      const def = GridFactory({
         template, areas:
-        {[Area.factory.selector]: areasDef, control: [areasDef[2]]}
+        {[Area.selector]: areasDef, control: [areasDef[2]]}
       });
       const expectedTemplate = {
         0: {0: [null, 'id'], 1: null, 2: [null, 'name'], 3: [null, 'name']},
@@ -45,12 +46,12 @@ describe('ItmGrid', () => {
 
   describe('parsePositions()', () => {
     const areas = Areas.parse({
-      [Area.factory.selector]: [{key: 'name'}, {key: 'id'}],
+      [Area.selector]: [{key: 'name'}, {key: 'id'}],
       control: [{key: 'email'}]
     });
 
     function parseGridAreas(template: string) {
-      const grid = Grid.factory.serialize({template, areas});
+      const grid = GridFactory({template, areas});
       return Template.parsePositions(grid.template);
     }
 
@@ -82,7 +83,7 @@ describe('ItmGrid', () => {
       `;
       const gridAreas = parseGridAreas(template).toSet().toArray();
       const expectedIdPos = {
-        selector: Area.factory.selector,
+        selector: Area.selector,
         key: 'id',
         row: 1,
         col: 1,
@@ -91,7 +92,7 @@ describe('ItmGrid', () => {
       };
       expect(gridAreas[0].toJS()).toEqual(expectedIdPos, 'Expected same grid area with key id');
       const expectedNamePos = {
-        selector: Area.factory.selector,
+        selector: Area.selector,
         key: 'name',
         row: 1,
         col: 3,

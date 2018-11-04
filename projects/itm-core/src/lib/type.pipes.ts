@@ -3,7 +3,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 import Config from './config';
 import Grid from './grid';
 import Form from './form';
+import FormFactory from './form_factory';
 import Table from './table';
+import TableFactory from './table_factory';
 
 @Pipe({name: 'itmTypeGrid'})
 export class ItmTypeGridPipe implements PipeTransform {
@@ -14,7 +16,7 @@ export class ItmTypeGridPipe implements PipeTransform {
   transform(key: string, cfg?: Grid.Config): Grid {
     const type = this._config.types.get(key);
     if (!type) throw new ReferenceError(`Missing type with key: '${key}'`);
-    return cfg ? Form.factory.serialize(type.grid, cfg) : type.grid;
+    return cfg ? FormFactory(type.grid, cfg) : type.grid;
   }
 }
 
@@ -27,7 +29,7 @@ export class ItmTypeFormPipe implements PipeTransform {
   transform(key: string, cfg?: Grid.Config): Form {
     const type = this._config.types.get(key);
     if (!type) throw new ReferenceError(`Missing type with key: '${key}'`);
-    return cfg ? Form.factory.serialize(type.form, cfg) : type.form;
+    return cfg ? FormFactory(type.form, cfg) : type.form;
   }
 }
 
@@ -40,7 +42,7 @@ export class ItmTypeTablePipe implements PipeTransform {
   transform(key: string, cfg?: Grid.Config): Table {
     const type = this._config.types.get(key);
     if (!type) throw new ReferenceError(`Missing type with key: '${key}'`);
-    return cfg ? Table.factory.serialize(type.table, cfg) : type.table;
+    return cfg ? TableFactory(type.table, cfg) : type.table;
   }
 }
 

@@ -1,9 +1,7 @@
-import { Injectable, Inject } from '@angular/core';
-import { Map, RecordOf } from 'immutable';
-import { empty, Observable, of } from 'rxjs';
-import { distinctUntilChanged, map, mergeMap } from 'rxjs/operators';
+import { RecordOf } from 'immutable';
+import { Observable, of } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 
-import ItmArea from './area';
 import ActionEmitter from './action_emitter';
 import RecordFactory from './record_factory';
 import Target from './target';
@@ -75,50 +73,7 @@ export module ItmButton {
     text: Target.Pipe<T, string> | false;
   }
 
-  const serializer = (cfg: RecordOf<AreaConfig>): Model => {
-    if (!cfg.key || !keyRegExp.test(cfg.key)) throw new TypeError('Expected key');
-    const key = cfg.key;
-    const action = cfg.action && keyRegExp.test(cfg.action) ? cfg.action : key;
-    const icon = (
-      cfg.icon === false ? () => empty() :
-      cfg.icon ? Target.defer('string', cfg.icon || key) :
-        null
-    );
-    const disabled = Target.defer('boolean', cfg.disabled);
-    const mode = Target.defer(Mode, cfg.mode);
-    const text: Target.Pipe<{}, string> = (
-      cfg.text === false ? () => empty() :
-      cfg.text ? Target.defer('string', cfg.text) :
-        null
-    );
-    return {key, action, icon, mode, disabled, text};
-  };
-
-  const selector = 'button';
-
-  const model = {key: null, action: null, icon: null, disabled: null, mode: null, text: null};
-
-  export const factory: RecordFactory<ItmButton, Config> = RecordFactory.build({
-    selector,
-    serializer,
-    model
-  });
-
-  export type AreaConfig<T extends Object = {}> = ItmArea.Config<T> & Config<T>;
-
-  export type Area<T = {}> = ItmArea<T> & RecordOf<Model<T>>;
-
-  export const areaFactory: ItmArea.Factory<Area, AreaConfig> = ItmArea.factory.extend({
-    selector,
-    serializer,
-    model,
-    shared: new ItmArea.Shared({
-      defaultComp: cfg => cfg.defaultButtonComp,
-      providers: Map<any, ItmArea.Provider>()
-        .set(ItmButtonRef, {deps: [ItmArea, Target, ActionEmitter], useClass: ItmButtonRef})
-    })
-  });
-
+  export const selector = 'button';
   export const keyPattern = `\\$?${RecordFactory.selectorPattern}`;
   export const keyRegExp = new RegExp(`^${keyPattern}$`);
 }

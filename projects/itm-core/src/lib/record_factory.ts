@@ -8,7 +8,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
     cfg: {
       selector: string,
       shared?: S,
-      serializer?: ItmRecordFactory.Serializer<C, M, null, S>,
+      normalize?: ItmRecordFactory.Serializer<C, M, null, S>,
       model?: { [P in keyof M]: null },
       ancestors?: never
     }
@@ -19,7 +19,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
     cfg: {
       selector: string,
       shared?: S,
-      serializer?: ItmRecordFactory.Serializer<C, M, AR, S>,
+      normalize?: ItmRecordFactory.Serializer<C, M, AR, S>,
       model?: { [P in keyof M]: null },
       ancestors: [ItmRecordFactory<AR, AC>]
     }
@@ -30,7 +30,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
     cfg: {
       selector: string,
       shared?: S,
-      serializer?: never,
+      normalize?: never,
       model?: never,
       ancestors: [ItmRecordFactory<R1, C1>, ItmRecordFactory<R2, C2>]
     }
@@ -40,7 +40,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
     cfg: {
       selector: string;
       shared?: any;
-      serializer?: ItmRecordFactory.Serializer<C, M, RecordOf<any>, any>;
+      normalize?: ItmRecordFactory.Serializer<C, M, RecordOf<any>, any>;
       model?: { [P in keyof M]: null };
       ancestors?: ItmRecordFactory[];
     }
@@ -49,7 +49,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
     if (!ItmRecordFactory.selectorRegex.test(cfg.selector)) throw new TypeError('Expected selector pattern');
     const selector = cfg.selector;
     // tslint:disable-next-line:max-line-length
-    if (cfg.serializer && !cfg.model) throw new TypeError('Expected model when serializer is specified');
+    if (cfg.normalize && !cfg.model) throw new TypeError('Expected model when normalize is specified');
     const ancestors = Collection(cfg.ancestors).reduce(
       (acc, ancestor) => {
         // tslint:disable-next-line:max-line-length
@@ -63,13 +63,13 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
       OrderedMap<string, ItmRecordFactory>()
     );
     // tslint:disable-next-line:max-line-length
-    const serializer: ItmRecordFactory.Serializer<C, M> = typeof cfg.serializer === 'function' ? cfg.serializer : null;
+    const normalize: ItmRecordFactory.Serializer<C, M> = typeof cfg.normalize === 'function' ? cfg.normalize : null;
     const model = ancestors
       .toStack()
       .map(ancestor => ancestor.model)
       .push(cfg.model)
       .reduce((acc, val) => acc === val ? val : ({...(acc as any || {}), ...(val || {})}));
-    return new ItmRecordFactory(selector, ancestors, cfg.shared || {}, model, serializer);
+    return new ItmRecordFactory(selector, ancestors, cfg.shared || {}, model, normalize);
   }
 
   private constructor(
@@ -77,7 +77,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
     readonly ancestors: OrderedMap<string, ItmRecordFactory>,
     readonly shared: S,
     readonly model: { [P in keyof M]: null },
-    private readonly _serializer: ItmRecordFactory.Serializer<C, M>
+    private readonly _normalizer: ItmRecordFactory.Serializer<C, M>
   ) {
     if (this.ancestors.has(selector)) throw new TypeError('Ancestors has selector');
     this._cfgFactory = Record(this.model as M);
@@ -108,9 +108,9 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
           const descriptiveName = ancestors
             .map(({selector}) => selector)
             .join(ItmRecordFactory.selectorSeparator);
-          const serializer = factory._serializer;
+          const normalizer = factory._normalizer;
           let model: R;
-          if (serializer) try { model = serializer(rootCfg, record, this.shared) as R; }
+          if (normalizer) try { model = normalizer(rootCfg, record, this.shared) as R; }
           catch (err) {
             console.error('SERIALIZE ERROR', err);
             // tslint:disable-next-line:max-line-length
@@ -130,7 +130,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
   extend<CR extends R & RecordOf<CM>, CC extends Object, CM extends CC>(
     cfg: {
       selector: string,
-      serializer?: ItmRecordFactory.Serializer<CC, CM, R>;
+      normalize?: ItmRecordFactory.Serializer<CC, CM, R>;
       model?: { [P in keyof CM]: null },
       shared?: S
     }
