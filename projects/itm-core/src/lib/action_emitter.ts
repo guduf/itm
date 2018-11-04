@@ -11,10 +11,10 @@ export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T
   get action(): Observable<A & Action<T>> { return this._action as Observable<A & Action<T>>; }
 
   /** Emitted action subject. */
-  private readonly _actionSub = new Subject<A>();
+  private readonly _actionSub = new Subject<Action.Generic<T>>();
 
   /** Pending action resolutions. */
-  private _resolveSubscrs = Map<Action.Unresolved, Subscription>();
+  private _resolveSubscrs = Map<Action.Unresolved<T>, Subscription>();
 
   /** see [[ItmActionEmitter.action]]. */
   private readonly _action: Observable<A> = this._initAction();
@@ -34,7 +34,7 @@ export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T
   emit(key: string, nativeEvent?: any): void {
     if (!key || typeof key !== 'string') throw new TypeError('Expected key');
     this._actionSub.next(
-      new Action.Unresolved({key, nativeEvent, target: this.target.value}) as A
+      new Action.Unresolved({key, nativeEvent, target: this.target.value})
     );
   }
 
@@ -48,7 +48,7 @@ export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T
       !action.resolved &&
       typeof action.result === 'undefined'
     ) throw new TypeError('Expected resolved action');
-    this._actionSub.next(action);
+    this._actionSub.next(action as Action.Resolved<T>);
   }
 
   /** Unsubscribes action subject and resolvers flow. */
@@ -59,9 +59,9 @@ export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T
 
   /** Inits action flow. */
   private _initAction(): Observable<A> {
-    return combineLatest<Action.Unresolved, Action.Resolvers>(this._actionSub, this.resolvers).pipe(
+    return combineLatest(this._actionSub, this.resolvers).pipe(
       distinctUntilKeyChanged('0'),
-      filter(([action, mapper]) => {
+      filter(([action, mapper]: [Action.Unresolved<T>, Action.Resolvers<T>]) => {
         if (action.resolved) return true;
         const resolver = mapper.get(action.key);
         if (!resolver) return true;

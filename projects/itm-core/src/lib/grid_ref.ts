@@ -1,7 +1,7 @@
 import { Injector, InjectionToken, StaticProvider } from '@angular/core';
 import { Map } from 'immutable';
 import { defer, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { mergeMap } from 'rxjs/operators';
 
 import Area, { ItmAreaText } from './area';
 import AreaFactory from './area_factory';
@@ -90,9 +90,10 @@ export module ItmGridRef {
         null
       );
       const areaText = defer(() => (
-        record.text ? Target.map(inj.target, record.text) : inj.target.pipe(
-          map(value => areaShared.defaultText({area: record, target: value}))
-        )
+        record.text ? Target.map(inj.target, record.text) :
+          inj.target.pipe(
+            mergeMap(value => areaShared.defaultText({area: record, target: value}))
+          )
       ));
       const providers: StaticProvider[] = areaShared.providers.reduce(
         (acc, prvdr, provide) => ([...acc, {provide, ...prvdr}]),

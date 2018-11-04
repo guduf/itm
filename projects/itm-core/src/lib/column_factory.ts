@@ -1,3 +1,5 @@
+import { of } from 'rxjs';
+
 import Area from './area';
 import AreaFactory from './area_factory';
 import Column from './column';
@@ -12,7 +14,7 @@ export function ItmColumnFactory(...cfgs: Partial<Column.Config>[]): Column | Ar
 
 export module ItmColumnFactory {
   const shared = new AreaFactory.Shared({
-    defaultText: ({area, target}) => target[area.key]
+    defaultText: ({area, target}) => of(target[area.key])
   });
 
 

@@ -27,7 +27,7 @@ export module ItmFieldFactory {
 
   const shared = new AreaFactory.Shared({
     defaultComp: cfg => cfg.defaultFieldComp,
-    defaultText: ({area, target}) => target ? target[area.key] : null,
+    defaultText: ({area, target}) => of(target ? target[area.key] : null),
     providers: Map<any, Area.Provider>()
       .set(ItmFieldLabel, fieldLabelProvider)
   });
