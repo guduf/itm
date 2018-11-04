@@ -45,7 +45,6 @@ export module ItmMenu {
     );
     const buttons = buttonCfgs.reduce(
       (acc, buttonCfg) => {
-        console.log(buttonCfg);
         const button = Button.factory.serialize(buttonCfg);
         return acc.set(button.key, button);
       },

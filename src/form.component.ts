@@ -10,9 +10,9 @@ import {
 import { Observable } from 'rxjs';
 
 import Grid from './grid';
-import Form from './form';
 import { ItmGridComponent } from './grid.component';
-import { ItmFormRef } from './control';
+import Form from './form';
+import FormRef from './form_ref';
 
 const SELECTOR = 'itm-form';
 
@@ -51,7 +51,7 @@ export class ItmFormComponent<T extends Object = {}> implements AfterViewInit, O
   }
 
   ngAfterViewInit() {
-    const formRef: ItmFormRef = this.gridComp.ref.injector.get(ItmFormRef);
+    const formRef: FormRef = this.gridComp.ref.injector.get(FormRef);
     console.log(formRef, Object.keys(formRef.controls).map(key => formRef.get(key).errors));
   }
 }

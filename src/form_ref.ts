@@ -1,9 +1,7 @@
 import { FormGroup } from '@angular/forms';
-import { Collection, List } from 'immutable';
 
 import Control from './control';
 import Grid from './grid';
-import ControlRef from './control_ref';
 import Target from './target';
 
 export class ItmFormRef<T extends Object = {}> extends FormGroup {
@@ -27,5 +25,7 @@ export class ItmFormRef<T extends Object = {}> extends FormGroup {
     return super.get(path) as ControlRef;
   }
 }
+
+import ControlRef from './control_ref';
 
 export default ItmFormRef;

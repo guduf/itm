@@ -23,7 +23,7 @@ export module ItmTable {
     positions: Template.Positions;
   }
 
-  const serializer = (cfg: RecordOf<ModelConfig>, grid: Grid): Model => {
+  export function serialize(cfg: RecordOf<ModelConfig>, grid: Grid): Model {
     const headerAreas: Area[] = grid.positions.reduce(
       (acc, position) => {
         // tslint:disable-next-line:max-line-length
@@ -43,25 +43,27 @@ export module ItmTable {
       [Menu.factory.selector, '$tableMenu'],
       'right'
     );
+    let areas = Map() as Areas;
     const menu = (
       Menu.factory.isFactoryRecord(cfg.menu) ? cfg.menu as Menu :
       cfg.menu ? Menu.factory.serialize({key: '$rowMenu'}, cfg.menu) :
         null
     );
-    const areas = Areas.insert(Map(), Menu.factory, menu);
+    if (menu) areas = Areas.insert(areas, Menu.factory, menu);
     const headerMenu = (
       Menu.factory.isFactoryRecord(cfg.headerMenu) ? cfg.headerMenu as Menu :
       cfg.headerMenu ? Menu.factory.serialize({key: '$tableMenu'}, cfg.headerMenu) :
         null
     );
+    if (headerMenu) areas = Areas.insert(areas, Menu.factory, headerMenu);
     return {areas, header, headerMenu, menu, positions};
-  };
+  }
 
   const selector = 'table';
 
   export const factory: Grid.Factory<ItmTable, {}> = Grid.factory.extend({
     selector,
-    serializer,
+    serializer: serialize,
     model: {header: null, areas: null, positions: null, headerMenu: null, menu: null},
     shared: new Grid.Shared({
       defaultSelector: Column.factory.selector,

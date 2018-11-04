@@ -10,6 +10,8 @@ describe('ItmConfig', () => {
   @Component({template: ''})
   class TestComponent { }
 
+  const type = Type.factory.serialize({key: 'test'});
+
   it('should create with a complete config', () => {
     const config: Config.ModelConfig = {
       defaultButtonComp: TestComponent,
@@ -18,7 +20,7 @@ describe('ItmConfig', () => {
       defaultMenuComp: TestComponent,
       areaFactories: List([Area.factory]),
       gridFactories: List([Grid.factory]),
-      types: Map({test: Type.factory.serialize({key: 'test'})})
+      types: Map({test: type})
     };
     expect(Config.factory.serialize(config)).toBeTruthy();
   });
