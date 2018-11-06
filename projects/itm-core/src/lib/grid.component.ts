@@ -8,7 +8,8 @@ import {
   OnChanges,
   OnDestroy,
   Output,
-  SimpleChanges
+  SimpleChanges,
+  forwardRef
 } from '@angular/core';
 import { SafeStyle, DomSanitizer } from '@angular/platform-browser';
 import { Map, Range } from 'immutable';
@@ -17,7 +18,7 @@ import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import Action from './action';
 import ActionEmitter from './action_emitter';
 import { WithBehaviors } from './behavior';
-import Options, { ITM_OPTIONS } from './options';
+import Registrer, { ITM_REGISTRER } from './registrer';
 import Grid from './grid';
 import GridFactory from './grid_factory';
 import GridRef, { ITM_SHARED_RESOLVERS_TOKEN } from './grid_ref';
@@ -98,8 +99,8 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
 
   constructor(
     private _sanitizer: DomSanitizer,
-    @Inject(ITM_OPTIONS)
-    private _opts: Options
+    @Inject(ITM_REGISTRER)
+    private _rgstr: Registrer
   ) {
     super({target: undefined, resolvers: Map()});
   }
@@ -129,7 +130,7 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
       const record = GridFactory(this.grid);
       try {
         this._ref = GridRef.buildRef(
-          this._opts,
+          this._rgstr,
           record,
           this.behaviors.target,
           this._actionEmitter

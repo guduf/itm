@@ -2,7 +2,6 @@
  * Public API Surface of itm-core
  */
 
-export * from './lib/core.module';
 export * from './lib/area';
 export * from './lib/action_emitter';
 export * from './lib/action';
@@ -14,6 +13,7 @@ export * from './lib/button_area.component';
 export * from './lib/column';
 export * from './lib/control_ref';
 export * from './lib/control.component';
+export * from './lib/core.module';
 export * from './lib/control';
 export * from './lib/field';
 export * from './lib/field.component';
@@ -31,6 +31,7 @@ export * from './lib/options';
 export { ItmProp as ItmPropRecord } from './lib/prop';
 export { ItmPropDecorator as ItmProp } from './lib/prop_decorator';
 export * from './lib/record_factory';
+export * from './lib/registrer';
 export * from './lib/table.component';
 export * from './lib/target';
 export { ItmTypeGridPipe, ItmTypeFormPipe, ItmTypeTablePipe } from './lib/type.pipes';

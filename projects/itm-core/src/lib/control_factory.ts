@@ -8,7 +8,7 @@ import ControlRef, { ITM_CONTROL_REF } from './control_ref';
 import FormRef from './form_ref';
 import FieldFactory from './field_factory';
 import Target from './target';
-import { isEnumIncludes } from './utils';
+import { checkTypeOrThrow } from './utils';
 
 export function ItmControlFactory(): AreaFactory<Control, Control.Config>;
 export function ItmControlFactory(...cfgs: Partial<Control.Config>[]): Control;
@@ -21,7 +21,7 @@ export function ItmControlFactory(...cfgs: Partial<Control.Config>[]): Control |
 export module ItmControlFactory {
   export function normalize(cfg: Control.ModelConfig): Control.Model {
     // tslint:disable-next-line:max-line-length
-    if (cfg.type && !isEnumIncludes(Control.Type, cfg.type)) throw new TypeError('Expected control type');
+    checkTypeOrThrow(Control.Type, cfg.type);
     return {
       type: cfg.type || Control.Type.string,
       pattern: cfg.pattern instanceof RegExp ? cfg.pattern : null,

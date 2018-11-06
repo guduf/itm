@@ -1,4 +1,4 @@
-import { Map, Record, Stack, Seq } from 'immutable';
+import { Map, Record, Stack, Seq, isCollection, Collection } from 'immutable';
 
 export interface ComponentType { new(...args: any[]); }
 
@@ -42,24 +42,44 @@ export abstract class AbstractRecord<TProps extends Object = {}> implements Reco
   abstract asImmutable(): this;
   abstract toSeq(): Seq.Keyed<keyof TProps, TProps[keyof TProps]>;
   // tslint:disable-next-line:max-line-length
-  [Symbol.iterator](): IterableIterator<[keyof TProps, TProps[keyof TProps]]> { return this[Symbol.iterator](); }
+  [Symbol.iterator](): IterableIterator<[keyof TProps, TProps[keyof TProps]]> { return; }
 }
 
-export function isEnumIncludes(target: any, val: any): boolean {
-  return Array.from(Object.values(target)).includes(val);
+export function checkType(check: any, val: any): boolean {
+  if (check === null) return true;
+  if (['string', 'function', 'number', 'boolean'].includes(check)) return typeof val === check;
+  if (typeof check === 'function') return val instanceof check;
+  if (Array.isArray(check)) return check.includes(val);
+  if (typeof check === 'object') return Array.from(Object.values(check)).includes(val);
+  throw new TypeError('Invalid check type');
 }
 
-export function mapOrArray<M extends Map<any, T>, T>(val: M | T[], prop: keyof T): M {
-  return (
-    Map.isMap(val) ? val :
-    !Array.isArray(val) ? Map() as M :
-      val.reduce<M>(
-        (acc, v) => {
-          const key = v[prop];
-          if (typeof key === 'undefined' || key === null) throw new TypeError('Excepted key');
-          return acc.set(key, v);
-        },
-        Map() as M
-      )
+export function checkTypeOrThrow(check: any, val: any): void {
+  if (checkType(check, val)) return;
+  let msg: string;
+  if (['string', 'function', 'number', 'boolean'].includes(check)) msg = `type of ${check}`;
+  else if (typeof check === 'function') msg = `instance of ${check.name}`;
+  else msg = `in [${Array.from(Object.values(check.toString())).join(', ')}]`;
+  throw new TypeError('Expected ' + msg);
+}
+
+// tslint:disable-next-line:max-line-length
+export function parseIter<V extends Object, R extends Object>(iter: Collection<any, V> | V[], prop: keyof V, predicate: (val: V) => R): Map<string, R>;
+// tslint:disable-next-line:max-line-length
+export function parseIter<V extends Object>(iter: Collection<any, V> | V[], prop: keyof V, predicate?: (val: V) => void): Map<string, V>;
+export function parseIter<M extends Map<K, R>, R extends Object, K, V extends Object>(
+  iter: Collection<K, R> | V[],
+  prop: keyof R,
+  predicate?: (val: V) => R | void,
+  init: M = Map() as any as M
+): M {
+  const collec = (isCollection(iter) ? iter : Collection(iter)) as Collection<any, V>;
+  return collec.reduce(
+    (acc, val) => {
+      const res: any = predicate ? predicate(val) || val : val;
+      if (typeof res !== 'object') throw new TypeError('Expected object');
+      return acc.set(res[prop], res);
+    },
+    init
   );
 }

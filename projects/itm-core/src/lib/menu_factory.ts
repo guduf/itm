@@ -8,6 +8,7 @@ import ButtonFactory from './button_factory';
 import Menu, { ItmMenuRef } from './menu';
 import Target from './target';
 import { ItmButtonRef } from './button';
+import { parseIter } from './utils';
 
 export function ItmMenuFactory(): AreaFactory<Menu, Menu.Config>;
 export function ItmMenuFactory(...cfgs: Partial<Menu.Config>[]): Menu;
@@ -24,13 +25,7 @@ export module ItmMenuFactory {
       Map.isMap(cfg.buttons) ? cfg.buttons.valueSeq().toArray() :
         []
     );
-    const buttons = buttonCfgs.reduce(
-      (acc, buttonCfg) => {
-        const button = ButtonFactory(buttonCfg);
-        return acc.set(button.key, button);
-      },
-      Map<string, Button>()
-    );
+    const buttons = parseIter(buttonCfgs, 'key', btnCfg => ButtonFactory(btnCfg));
     const mode = cfg.mode ? Target.defer(Button.Mode, cfg.mode) : null;
     const direction = cfg.direction ? Target.defer(Menu.Direction, cfg.direction) : null;
     return {buttons, mode, direction};

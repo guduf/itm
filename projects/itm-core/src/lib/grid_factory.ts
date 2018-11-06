@@ -8,7 +8,7 @@ import Grid from './grid';
 import Areas from './grid_areas';
 import Template from './grid_template';
 import RecordFactory from './record_factory';
-import {  mapOrArray } from './utils';
+import { parseIter } from './utils';
 
 // tslint:disable-next-line:max-line-length
 export type ItmGridFactory<R extends RecordOf<Grid.Model> = Grid , C extends Grid.Config = Grid.Config> = RecordFactory<R, C, any, ItmGridFactory.Shared>;
@@ -40,7 +40,7 @@ export module ItmGridFactory {
     readonly resolversProvider?: ResolversProvider;
 
     constructor({areaFactories, defaultSelector, providers, resolversProvider}: SharedConfig) {
-      this.areaFactories = mapOrArray(areaFactories, 'selector');
+      this.areaFactories = parseIter(areaFactories, 'selector');
       this.defaultSelector = (
         defaultSelector && typeof defaultSelector === 'string' ? defaultSelector : null
       );

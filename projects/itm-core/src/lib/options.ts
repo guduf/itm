@@ -10,15 +10,6 @@ export const ITM_OPTIONS = new InjectionToken<ItmOptions>('ITM_OPTIONS');
 /** The global options for the module */
 // tslint:disable-next-line:max-line-length
 export abstract class ItmOptions extends AbstractRecord<ItmOptions.Model> implements RecordOf<ItmOptions.Model> {
-  /** Records that defines item types. */
-  types: Map<string, Type>;
-
-  /** Record factories to build grids. Allows to extend the generic grid model. */
-  gridFactories: Map<string, RecordFactory>;
-
-  /** Record factories to build areas. Allows to extend the generic area model. */
-  areaFactories: Map<string, RecordFactory>;
-
   /** The component displayed in the button area when not specified in options. */
   defaultButtonComp: ComponentType;
 
@@ -38,9 +29,6 @@ export module ItmOptions {
     defaultControlComp?: ComponentType;
     defaultFieldComp?: ComponentType;
     defaultMenuComp?: ComponentType;
-    areaFactories?: Collection<any, RecordFactory<any>>;
-    gridFactories?: Collection<any, RecordFactory<any>>;
-    types?: List<any> | Map<string, Type>;
   }
 
   export interface Model extends Config {
@@ -48,9 +36,6 @@ export module ItmOptions {
     defaultControlComp: ComponentType;
     defaultFieldComp: ComponentType;
     defaultMenuComp: ComponentType;
-    areaFactories: Map<string, RecordFactory<any>>;
-    gridFactories: Map<string, RecordFactory<any>>;
-    types: Map<string, Type>;
   }
 
   export const selector = 'options';
