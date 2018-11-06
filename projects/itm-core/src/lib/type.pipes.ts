@@ -1,6 +1,6 @@
 import { Inject, Pipe, PipeTransform } from '@angular/core';
 
-import Config, { ITM_CONFIG } from './config';
+import Options, { ITM_OPTIONS } from './options';
 import Grid from './grid';
 import Form from './form';
 import FormFactory from './form_factory';
@@ -10,12 +10,12 @@ import TableFactory from './table_factory';
 @Pipe({name: 'itmTypeGrid'})
 export class ItmTypeGridPipe implements PipeTransform {
   constructor(
-    @Inject(ITM_CONFIG)
-    private _config: Config
+    @Inject(ITM_OPTIONS)
+    private _opts: Options
   ) { }
 
   transform(key: string, cfg?: Grid.Config): Grid {
-    const type = this._config.types.get(key);
+    const type = this._opts.types.get(key);
     if (!type) throw new ReferenceError(`Missing type with key: '${key}'`);
     return cfg ? FormFactory(type.grid, cfg) : type.grid;
   }
@@ -24,12 +24,12 @@ export class ItmTypeGridPipe implements PipeTransform {
 @Pipe({name: 'itmTypeForm'})
 export class ItmTypeFormPipe implements PipeTransform {
   constructor(
-    @Inject(ITM_CONFIG)
-    private _config: Config
+    @Inject(ITM_OPTIONS)
+    private _opts: Options
   ) { }
 
   transform(key: string, cfg?: Grid.Config): Form {
-    const type = this._config.types.get(key);
+    const type = this._opts.types.get(key);
     if (!type) throw new ReferenceError(`Missing type with key: '${key}'`);
     return cfg ? FormFactory(type.form, cfg) : type.form;
   }
@@ -38,12 +38,12 @@ export class ItmTypeFormPipe implements PipeTransform {
 @Pipe({name: 'itmTypeTable'})
 export class ItmTypeTablePipe implements PipeTransform {
   constructor(
-    @Inject(ITM_CONFIG)
-    private _config: Config
+    @Inject(ITM_OPTIONS)
+    private _opts: Options
   ) { }
 
   transform(key: string, cfg?: Grid.Config): Table {
-    const type = this._config.types.get(key);
+    const type = this._opts.types.get(key);
     if (!type) throw new ReferenceError(`Missing type with key: '${key}'`);
     return cfg ? TableFactory(type.table, cfg) : type.table;
   }

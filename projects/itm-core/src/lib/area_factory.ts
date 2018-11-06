@@ -3,7 +3,7 @@ import { Map, RecordOf } from 'immutable';
 import { empty } from 'rxjs';
 
 import Area from './area';
-import ItmConfig from './config';
+import Options from './options';
 import RecordFactory from './record_factory';
 import Target from './target';
 import { ComponentType } from './utils';
@@ -22,7 +22,7 @@ export function ItmAreaFactory(...cfgs: Partial<Area.Config>[]): Area | ItmAreaF
 export module ItmAreaFactory {
   // tslint:disable-next-line:max-line-length
   export class Shared<A extends Area<T> = Area<T>, T extends Object = {}> {
-    readonly defaultComp?: (cfg: ItmConfig) => ComponentType;
+    readonly defaultComp?: (opts: Options) => ComponentType;
 
     readonly defaultText?: Target.Pipe<{ area: A, target: T }, string>;
 

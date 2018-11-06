@@ -17,7 +17,7 @@ import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import Action from './action';
 import ActionEmitter from './action_emitter';
 import { WithBehaviors } from './behavior';
-import Config, { ITM_CONFIG } from './config';
+import Options, { ITM_OPTIONS } from './options';
 import Grid from './grid';
 import GridFactory from './grid_factory';
 import GridRef, { ITM_SHARED_RESOLVERS_TOKEN } from './grid_ref';
@@ -98,8 +98,8 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
 
   constructor(
     private _sanitizer: DomSanitizer,
-    @Inject(ITM_CONFIG)
-    private _config: Config
+    @Inject(ITM_OPTIONS)
+    private _opts: Options
   ) {
     super({target: undefined, resolvers: Map()});
   }
@@ -129,7 +129,7 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
       const record = GridFactory(this.grid);
       try {
         this._ref = GridRef.buildRef(
-          this._config,
+          this._opts,
           record,
           this.behaviors.target,
           this._actionEmitter

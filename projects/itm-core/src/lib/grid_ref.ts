@@ -6,7 +6,7 @@ import { mergeMap } from 'rxjs/operators';
 import Area, { ItmAreaText } from './area';
 import AreaFactory from './area_factory';
 import ActionEmitter from './action_emitter';
-import ItmConfig from './config';
+import Options from './options';
 import Grid, { ItmGrid } from './grid';
 import GridFactory from './grid_factory';
 import Template from './grid_template';
@@ -30,12 +30,12 @@ export module ItmGridRef {
   }
 
   export function buildRef(
-    config: ItmConfig,
+    opts: Options,
     record: ItmGrid,
     target: Target,
     actionEmitter: ActionEmitter
   ): ItmGridRef {
-    const gridFactories = config.gridFactories as Map<string, GridFactory<any>>;
+    const gridFactories = opts.gridFactories as Map<string, GridFactory<any>>;
     const shared = GridFactory().getShared(gridFactories, record).reduce(
       (acc, val) => ({
         defaultSelector: val.defaultSelector || acc.defaultSelector,
@@ -46,7 +46,7 @@ export module ItmGridRef {
       {defaultSelector: null, providers: Map(), resolversProvider: null} as Partial<GridFactory.Shared>
     );
     const providers = [
-      {provide: ItmConfig, useValue: config},
+      {provide: Options, useValue: opts},
       {provide: ItmGrid, useValue: record},
       {provide: ActionEmitter, useValue: actionEmitter},
       {provide: Target, useValue: target},
@@ -62,10 +62,10 @@ export module ItmGridRef {
   }
 
   export function buildAreaRefs(gridInjector: Injector): Map<Template.Fragment, AreaRef> {
-    let inj: { config: ItmConfig, grid: ItmGrid, target: Target };
+    let inj: { opts: Options, grid: ItmGrid, target: Target };
     try {
       inj = {
-        config: gridInjector.get(ItmConfig),
+        opts: gridInjector.get(Options),
         grid: gridInjector.get(ItmGrid),
         target: gridInjector.get(Target)
       };
@@ -75,7 +75,7 @@ export module ItmGridRef {
       const record: Area = inj.grid.areas.getIn([position.selector, position.key]);
       // tslint:disable-next-line:max-line-length
       if (!AreaFactory().isFactoryRecord(record)) throw new ReferenceError(`Missing record for fragment : '${position.selector}:${position.key}'`);
-      const areaFactories = inj.config.areaFactories as Map<string, AreaFactory<any>>;
+      const areaFactories = inj.opts.areaFactories as Map<string, AreaFactory<any>>;
       const areaShared = AreaFactory().getShared(areaFactories, record).reduce<AreaFactory.Shared>(
         (acc, {defaultComp, defaultText, providers: areaProviders}) => ({
           defaultComp: defaultComp || acc.defaultComp,
@@ -86,7 +86,7 @@ export module ItmGridRef {
       );
       const comp = (
         record.comp ||
-        typeof areaShared.defaultComp === 'function' ? areaShared.defaultComp(inj.config) :
+        typeof areaShared.defaultComp === 'function' ? areaShared.defaultComp(inj.opts) :
         null
       );
       const areaText = defer(() => (

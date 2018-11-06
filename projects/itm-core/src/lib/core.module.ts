@@ -10,8 +10,8 @@ import ButtonAreaFactory from './button_area_factory';
 import { ItmButtonAreaComponent } from './button_area.component';
 import ControlFactory from './control_factory';
 import { ItmControlComponent } from './control.component';
-import Config, { ITM_CONFIG } from './config';
-import ItmConfigFactory from './config_factory';
+import Options, { ITM_OPTIONS } from './options';
+import OptionsFactory from './options_factory';
 import { ItmFieldComponent } from './field.component';
 import FormFactory from './form_factory';
 import { ItmFormComponent } from './form.component';
@@ -51,7 +51,7 @@ const EXPORTED_DECLARATIONS = [
   ...ITM_TYPE_PIPES
 ];
 
-export const DEFAULT_CONFIG: Config.Model = {
+export const DEFAULT_CONFIG: Options.Model = {
   defaultButtonComp: ItmButtonAreaComponent,
   defaultControlComp: ItmControlComponent,
   defaultFieldComp: ItmFieldComponent,
@@ -70,14 +70,14 @@ export const DEFAULT_CONFIG: Config.Model = {
   types: null
 };
 
-const CONFIG_INIT_TOKEN = new InjectionToken('ITM_CONFIG_INIT');
+const CONFIG_INIT_TOKEN = new InjectionToken('ITM_OPTIONS_INIT');
 
-export function provideConfig(config: Config.ModelConfig = null): Config {
-  return ItmConfigFactory(DEFAULT_CONFIG, config);
+export function provideConfig(config: Options.Config = null): Options {
+  return OptionsFactory(DEFAULT_CONFIG, config);
 }
 
 const CONFIG_PROVIDER = {
-  provide: ITM_CONFIG,
+  provide: ITM_OPTIONS,
   deps: [[new Optional(), CONFIG_INIT_TOKEN]],
   useFactory: provideConfig
 };
@@ -97,10 +97,10 @@ export module ItmModule {
     types?: any[];
     areaFactories?: AreaFactory[];
     gridFactories?: GridFactory[];
-    config?: Config;
+    config?: Options;
   }
 
-  export function create(config: Config.ModelConfig): ModuleWithProviders<ItmModule> {
+  export function create(config: Options.Config): ModuleWithProviders<ItmModule> {
     return {
       ngModule: ItmModule,
       providers: [

@@ -46,7 +46,7 @@ export module ItmControlFactory {
       validator: null
     },
     shared: new AreaFactory.Shared({
-      defaultComp: cfg => cfg.defaultControlComp,
+      defaultComp: opts => opts.defaultControlComp,
       providers: Map<any, Area.Provider>().set(
         ITM_CONTROL_REF,
         {deps: [Area, Target, [new Optional(), FormRef]], useFactory: ControlRef.provide}

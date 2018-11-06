@@ -52,7 +52,7 @@ export module ItmMenuFactory {
     normalize,
     model: {buttons: null, mode: null, direction: null},
     shared: new AreaFactory.Shared({
-      defaultComp: cfg => cfg.defaultMenuComp,
+      defaultComp: opts => opts.defaultMenuComp,
       providers: Map<any, Area.Provider>()
         .set(ItmMenuRef, {deps: [Area, Target, ActionEmitter], useFactory: provideMenuRef})
     })

@@ -1,21 +1,21 @@
 import { Map, isCollection } from 'immutable';
 
-import Config from './config';
+import Options from './options';
 import RecordFactory from './record_factory';
 import Type from './type';
 import TypeDecorator from './type_decorator';
 import TypeFactory from './type_factory';
 
-export function ItmConfigFactory(): RecordFactory<Config, Config.ModelConfig>;
-export function ItmConfigFactory(...cfgs: Partial<Config.ModelConfig>[]): Config;
+export function ItmOptionsFactory(): RecordFactory<Options, Options.Config>;
+export function ItmOptionsFactory(...cfgs: Partial<Options.Config>[]): Options;
 // tslint:disable-next-line:max-line-length
-export function ItmConfigFactory(...cfgs: Partial<Config.ModelConfig>[]): Config | RecordFactory<Config, Config.ModelConfig> {
-  if (!cfgs.length) return ItmConfigFactory._static;
-  return ItmConfigFactory._static.serialize(...cfgs);
+export function ItmOptionsFactory(...cfgs: Partial<Options.Config>[]): Options | RecordFactory<Options, Options.Config> {
+  if (!cfgs.length) return ItmOptionsFactory._static;
+  return ItmOptionsFactory._static.serialize(...cfgs);
 }
 
-export module ItmConfigFactory {
-  export function normalize(cfg: Config.ModelConfig): Config.Model {
+export module ItmOptionsFactory {
+  export function normalize(cfg: Options.Config): Options.Model {
     if (typeof cfg.defaultButtonComp !== 'function') throw new TypeError('Expected ComponentType');
     const defaultButtonComp = cfg.defaultButtonComp;
 
@@ -50,7 +50,7 @@ export module ItmConfigFactory {
       cfg.gridFactories.reduce((acc, fact) => acc.set(fact.selector, fact), Map())
     );
 
-    if (!isCollection(cfg.types)) throw new TypeError('Expected Map of Types config');
+    if (!isCollection(cfg.types)) throw new TypeError('Expected Map of Types options');
     const types: Map<string, Type> = (
       Map.isMap(cfg.types) ? cfg.types :
         cfg.types.reduce(
@@ -76,8 +76,8 @@ export module ItmConfigFactory {
   }
 
   // tslint:disable-next-line:max-line-length
-  export const _static: RecordFactory<Config, Config.ModelConfig, Config.Model> = RecordFactory.build({
-    selector: Config.selector,
+  export const _static: RecordFactory<Options, Options.Config, Options.Model> = RecordFactory.build({
+    selector: Options.selector,
     normalize,
     model: {
       defaultButtonComp: null,
@@ -91,4 +91,4 @@ export module ItmConfigFactory {
   });
 }
 
-export default ItmConfigFactory;
+export default ItmOptionsFactory;

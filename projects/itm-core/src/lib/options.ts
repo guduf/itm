@@ -5,11 +5,11 @@ import RecordFactory from './record_factory';
 import Type from './type';
 import { ComponentType, AbstractRecord } from './utils';
 
-export const ITM_CONFIG = new InjectionToken<ItmConfig>('ITM_CONFIG');
+export const ITM_OPTIONS = new InjectionToken<ItmOptions>('ITM_OPTIONS');
 
-/** The global config for the module */
+/** The global options for the module */
 // tslint:disable-next-line:max-line-length
-export abstract class ItmConfig extends AbstractRecord<ItmConfig.Model> implements RecordOf<ItmConfig.Model> {
+export abstract class ItmOptions extends AbstractRecord<ItmOptions.Model> implements RecordOf<ItmOptions.Model> {
   /** Records that defines item types. */
   types: Map<string, Type>;
 
@@ -19,21 +19,21 @@ export abstract class ItmConfig extends AbstractRecord<ItmConfig.Model> implemen
   /** Record factories to build areas. Allows to extend the generic area model. */
   areaFactories: Map<string, RecordFactory>;
 
-  /** The component displayed in the button area when not specified in its configuration. */
+  /** The component displayed in the button area when not specified in options. */
   defaultButtonComp: ComponentType;
 
-  /** The component displayed in the control area when not specified in its configuration. */
+  /** The component displayed in the control area when not specified in options. */
   defaultControlComp: ComponentType;
 
-  /** The component displayed in the field area when not specified in its configuration. */
+  /** The component displayed in the field area when not specified in options. */
   defaultFieldComp: ComponentType;
 
-  /** The component displayed in the menu area when not specified in its configuration. */
+  /** The component displayed in the menu area when not specified in options. */
   defaultMenuComp: ComponentType;
 }
 
-export module ItmConfig {
-  export interface ModelConfig {
+export module ItmOptions {
+  export interface Config {
     defaultButtonComp?: ComponentType;
     defaultControlComp?: ComponentType;
     defaultFieldComp?: ComponentType;
@@ -43,7 +43,7 @@ export module ItmConfig {
     types?: List<any> | Map<string, Type>;
   }
 
-  export interface Model extends ModelConfig {
+  export interface Model extends Config {
     defaultButtonComp: ComponentType;
     defaultControlComp: ComponentType;
     defaultFieldComp: ComponentType;
@@ -53,7 +53,7 @@ export module ItmConfig {
     types: Map<string, Type>;
   }
 
-  export const selector = 'config';
+  export const selector = 'options';
 }
 
-export default ItmConfig;
+export default ItmOptions;

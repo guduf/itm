@@ -26,7 +26,7 @@ export module ItmButtonAreaFactory {
     normalize: ButtonFactory.normalize,
     model,
     shared: new AreaFactory.Shared({
-      defaultComp: cfg => cfg.defaultButtonComp,
+      defaultComp: opts => opts.defaultButtonComp,
       providers: Map<any, Area.Provider>()
         .set(ItmButtonRef, {deps: [Area, Target, ActionEmitter], useClass: ItmButtonRef})
     })

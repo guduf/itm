@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 
 import { ItmButtonRef } from './button';
-import Config, { ITM_CONFIG } from './config';
+import Options, { ITM_OPTIONS } from './options';
 import Menu, { ItmMenuRef } from './menu';
 
 const SELECTOR = 'itm-menu';
@@ -36,15 +36,15 @@ export class ItmMenuComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private readonly _ref: ItmMenuRef,
-    @Inject(ITM_CONFIG)
-    private readonly _config: Config,
+    @Inject(ITM_OPTIONS)
+    private readonly _opts: Options,
     private readonly _injector: Injector,
     private readonly _componentFactoryResolver: ComponentFactoryResolver
   ) { }
 
   ngAfterViewInit() {
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory(
-      this._config.defaultButtonComp
+      this._opts.defaultButtonComp
     );
     this._ref.buttons.forEach(buttonRef => {
       const injector = Injector.create(
