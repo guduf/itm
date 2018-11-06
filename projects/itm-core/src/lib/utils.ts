@@ -46,7 +46,8 @@ export abstract class AbstractRecord<TProps extends Object = {}> implements Reco
 }
 
 export function checkType(check: any, val: any): boolean {
-  if (check === null) return true;
+  if (typeof val === 'undefined') throw new TypeError('Expected value');
+  if (val === null) return true;
   if (['string', 'function', 'number', 'boolean'].includes(check)) return typeof val === check;
   if (typeof check === 'function') return val instanceof check;
   if (Array.isArray(check)) return check.includes(val);
@@ -59,7 +60,8 @@ export function checkTypeOrThrow(check: any, val: any): void {
   let msg: string;
   if (['string', 'function', 'number', 'boolean'].includes(check)) msg = `type of ${check}`;
   else if (typeof check === 'function') msg = `instance of ${check.name}`;
-  else msg = `in [${Array.from(Object.values(check.toString())).join(', ')}]`;
+  else msg = `in [${Array.from(Object.values(check)).join(', ')}]`;
+  console.log({check, val, msg});
   throw new TypeError('Expected ' + msg);
 }
 
