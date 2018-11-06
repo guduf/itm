@@ -9,8 +9,8 @@ export type ItmTable<T extends Object = {}>= Grid & RecordOf<ItmTable.Model<T>>;
 
 export module ItmTable {
   export interface ModelConfig<T extends Object = {}> {
-    headerMenu?: Menu.Config<T[]>;
-    menu?: Menu.Config<T>;
+    headerMenu?: Partial<Menu.Config<T[]>>;
+    menu?: Partial<Menu.Config<T>>;
   }
 
   export interface Model<T extends Object = {}> extends ModelConfig {
@@ -20,6 +20,8 @@ export module ItmTable {
     menu: Menu<T> | null;
     positions: Template.Positions;
   }
+
+  export type Config<T extends Object = {}> = Grid.Config<T> & ModelConfig<T>;
 
   export const selector = 'table';
 }

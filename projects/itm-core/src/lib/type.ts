@@ -14,7 +14,7 @@ export module ItmType {
     key?: string;
     grid?: Grid.Config<I>;
     form?: Grid.Config<I>;
-    table?: Grid.Config<I>;
+    table?: Table.Config<I>;
   }
 
   export interface Model<I extends Object = {}> extends Config<I> {

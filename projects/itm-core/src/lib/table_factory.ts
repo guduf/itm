@@ -55,7 +55,8 @@ export module ItmTableFactory {
     if (headerMenu) areas = Areas.insert(areas, MenuFactory(), headerMenu);
     return {areas, header, headerMenu, menu, positions};
   }
-  export const _static: GridFactory<Table, {}> = GridFactory().extend({
+
+  export const _static: GridFactory<Table, Table.Config> = GridFactory().extend({
     selector: Table.selector,
     normalize,
     model: {header: null, areas: null, positions: null, headerMenu: null, menu: null},

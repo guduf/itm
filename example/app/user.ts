@@ -4,7 +4,8 @@ import { ItmProp, ItmType } from 'itm-core';
   table: {
     template: `
       id gender firstName = lastName = email = =
-    `
+    `,
+    menu: {buttons: [{key: 'save'}]}
   }
 })
 export class User {
