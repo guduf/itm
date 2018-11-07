@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ItmCoreModule, ITM_INIT } from 'itm-core';
+import { ItmCoreModule, ItmReflector } from 'itm-core';
 
 import { AppComponent } from './app.component';
 import { User } from './user';
+
+const typesProvider = ItmReflector.provide(User);
 
 @NgModule({
   declarations: [
@@ -15,7 +17,7 @@ import { User } from './user';
     BrowserAnimationsModule,
     ItmCoreModule
   ],
-  providers: [{provide: ITM_INIT, multi: true, useValue: {types: [User]}}],
+  providers: [typesProvider],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,11 +1,9 @@
 import { Map } from 'immutable';
 
 import Prop from './prop';
-import PropDecorator from './prop_decorator';
 import PropFactory from './prop_factory';
-import Type from './type';
 import TypeFactory from './type_factory';
-import TypeDecorator from './type_decorator';
+import ItmReflector, { ItmTypeDecorator, ItmPropDecorator } from './reflector';
 
 class User { name: string; }
 const props = Map<string, Prop>();
@@ -20,9 +18,9 @@ describe('ItmTypeDef', () => {
 describe('ItmType', () => {
   it('should decorate the item type class', () => {
     const expectedKey = 'user';
-    @TypeDecorator({key: expectedKey})
+    @ItmTypeDecorator({key: expectedKey})
     class Person { }
-    const typeDef = TypeDecorator.get(Person);
+    const [typeDef] = ItmReflector.getTypes(Person);
     expect(TypeFactory().isFactoryRecord(typeDef)).toBeTruthy('Expected ItmTypeDef');
     expect(typeDef.key).toBe(expectedKey);
   });
@@ -32,9 +30,9 @@ describe('ItmProp', () => {
   it('should decorate the item prop method', () => {
     const expectedKey = 'firstName';
     class Person { name: string; }
-    PropDecorator({key: expectedKey})(Person.prototype, 'name');
-    TypeDecorator()(Person);
-    const typeDef = TypeDecorator.get(Person);
+    ItmPropDecorator({key: expectedKey})(Person.prototype, 'name');
+    ItmTypeDecorator()(Person);
+    const [typeDef] = ItmReflector.getTypes(Person);
     const propDef = typeDef.props.get('name');
     expect(PropFactory().isFactoryRecord(propDef)).toBeTruthy('Expected ItmPropDef');
     expect(propDef.key).toBe(expectedKey);

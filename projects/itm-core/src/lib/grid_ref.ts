@@ -6,11 +6,13 @@ import { mergeMap } from 'rxjs/operators';
 import Area, { ItmAreaText } from './area';
 import AreaFactory from './area_factory';
 import ActionEmitter from './action_emitter';
+import Behavior from './behavior';
 import Registrer from './registrer';
 import Grid, { ItmGrid } from './grid';
 import GridFactory from './grid_factory';
 import Template from './grid_template';
 import Target from './target';
+import { ITM_OPTIONS } from './options';
 import { ComponentType } from './utils';
 
 export const ITM_SHARED_RESOLVERS_TOKEN = new InjectionToken('ITM_SHARED_RESOLVERS_TOKEN');
@@ -47,6 +49,7 @@ export module ItmGridRef {
     );
     const providers = [
       {provide: Registrer, useValue: rgstr},
+      {provide: ITM_OPTIONS, useValue: Behavior.create(rgstr.registry, 'options')},
       {provide: ItmGrid, useValue: record},
       {provide: ActionEmitter, useValue: actionEmitter},
       {provide: Target, useValue: target},

@@ -10,9 +10,10 @@ import {
   HostBinding
 } from '@angular/core';
 
+import Behavior from './behavior';
 import { ItmButtonRef } from './button';
-import Options, { ITM_OPTIONS } from './options';
 import Menu, { ItmMenuRef } from './menu';
+import Options, { ITM_OPTIONS } from './options';
 
 const SELECTOR = 'itm-menu';
 
@@ -37,14 +38,14 @@ export class ItmMenuComponent implements AfterViewInit, OnDestroy {
   constructor(
     private readonly _ref: ItmMenuRef,
     @Inject(ITM_OPTIONS)
-    private readonly _opts: Options,
+    private readonly _opts: Behavior<Options>,
     private readonly _injector: Injector,
     private readonly _componentFactoryResolver: ComponentFactoryResolver
   ) { }
 
   ngAfterViewInit() {
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory(
-      this._opts.defaultButtonComp
+      this._opts.value.defaultButtonComp
     );
     this._ref.buttons.forEach(buttonRef => {
       const injector = Injector.create(

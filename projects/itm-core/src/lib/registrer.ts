@@ -23,22 +23,21 @@ import { parseIter } from './utils';
 
 export class ItmRegistrer implements ItmRegistrer.Registry {
   /** Records that defines item types. */
-  get types(): Map<string, Type> { return this._registry.value.types; }
+  get types(): Map<string, Type> { return this.registry.value.types; }
 
   /** Record factories to build grids. Allows to extend the generic grid model. */
-  get gridFactories(): Map<string, GridFactory<any>> { return this._registry.value.gridFactories; }
+  get gridFactories(): Map<string, GridFactory<any>> { return this.registry.value.gridFactories; }
 
   /** Record factories to build areas. Allows to extend the generic area model. */
-  get areaFactories(): Map<string, AreaFactory<any>> { return this._registry.value.areaFactories; }
+  get areaFactories(): Map<string, AreaFactory<any>> { return this.registry.value.areaFactories; }
 
-  get options(): Options { return this._registry.value.options; }
+  get options(): Options { return this.registry.value.options; }
 
-  private readonly _registry: BehaviorSubject<ItmRegistrer.Registry>;
+  readonly registry: BehaviorSubject<ItmRegistrer.Registry>;
 
   constructor(init: ItmRegistrer.Init[]) {
-    console.log(init);
     if (!Array.isArray(init)) init = [init];
-    this._registry = this._initRegistry(init);
+    this.registry = this._initRegistry(init);
   }
 
   private _initRegistry(inits: ItmRegistrer.Init[]): BehaviorSubject<ItmRegistrer.Registry> {
@@ -66,7 +65,7 @@ export class ItmRegistrer implements ItmRegistrer.Registry {
         if (init.options) options = [...options, init.options];
         return {types, gridFactories, areaFactories, options};
       },
-      {...DEFAULT_REGISTRY, options: [] as Options.Config[]}
+      {...DEFAULT_REGISTRY, options: [DEFAULT_REGISTRY.options as Options.Config]}
     );
     return new BehaviorSubject({
       ...initData,

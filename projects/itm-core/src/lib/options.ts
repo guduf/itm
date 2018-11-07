@@ -1,11 +1,10 @@
-import { Map, RecordOf, Collection, List } from 'immutable';
-
 import { InjectionToken } from '@angular/core';
-import RecordFactory from './record_factory';
-import Type from './type';
+import { RecordOf } from 'immutable';
+
+import Behavior from './behavior';
 import { ComponentType, AbstractRecord } from './utils';
 
-export const ITM_OPTIONS = new InjectionToken<ItmOptions>('ITM_OPTIONS');
+export const ITM_OPTIONS = new InjectionToken<Behavior<ItmOptions>>('ITM_OPTIONS');
 
 /** The global options for the module */
 // tslint:disable-next-line:max-line-length
