@@ -5,9 +5,8 @@ import Area from './area';
 import AreaFactory from './area_factory';
 import Button from './button';
 import ButtonFactory from './button_factory';
-import Menu, { ItmMenuRef } from './menu';
+import Menu, { ItmMenuRef as MenuRef } from './menu';
 import Target from './target';
-import { ItmButtonRef } from './button';
 import { parseIter } from './utils';
 
 export function ItmMenuFactory(): AreaFactory<Menu, Menu.Config>;
@@ -31,25 +30,16 @@ export module ItmMenuFactory {
     return {buttons, mode, direction};
   }
 
-  export function provideMenuRef(
-    menu: Menu,
-    target: Target,
-    emitter: ActionEmitter
-  ): ItmMenuRef {
-    return new ItmMenuRef(
-      Target.map(target, menu.direction),
-      menu.buttons.map(button => new ItmButtonRef(button, target, emitter))
-    );
-  }
-
   export const _static: AreaFactory<Menu, Menu.Config> = AreaFactory().extend({
     selector: Menu.selector,
     normalize,
     model: {buttons: null, mode: null, direction: null},
     shared: new AreaFactory.Shared({
       defaultComp: opts => opts.defaultMenuComp,
-      providers: Map<any, Area.Provider>()
-        .set(ItmMenuRef, {deps: [Area, Target, ActionEmitter], useFactory: provideMenuRef})
+      providers: Map<any, Area.Provider>().set(
+        MenuRef,
+        {deps: [Area, Target, ActionEmitter], useClass: MenuRef}
+      )
     })
   });
 }

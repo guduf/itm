@@ -35,7 +35,7 @@ export class ItmRegistrer implements ItmRegistrer.Registry {
 
   readonly registry: BehaviorSubject<ItmRegistrer.Registry>;
 
-  constructor(init: ItmRegistrer.Init[]) {
+  constructor(init: Partial<ItmRegistrer.Init>[]) {
     if (!Array.isArray(init)) init = [init];
     this.registry = this._initRegistry(init);
   }

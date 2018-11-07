@@ -6,12 +6,12 @@ import Action from './action';
 import Behavior from './behavior';
 
 // tslint:disable-next-line:max-line-length
-export class ItmActionEmitter<A extends Action.Generic<T> = Action.Generic<T>, T extends Object = {}> {
+export class ItmActionEmitter<A extends Action<T> = Action<T>, T extends Object = {}> {
   /** Emitted action flow. */
   get action(): Observable<A & Action<T>> { return this._action as Observable<A & Action<T>>; }
 
   /** Emitted action subject. */
-  private readonly _actionSub = new Subject<Action.Generic<T>>();
+  private readonly _actionSub = new Subject<Action<T>>();
 
   /** Pending action resolutions. */
   private _resolveSubscrs = Map<Action.Unresolved<T>, Subscription>();

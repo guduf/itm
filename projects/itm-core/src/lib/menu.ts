@@ -1,20 +1,30 @@
 import { Map, RecordOf } from 'immutable';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import Area from './area';
-import Button from './button';
+import Action from './action';
+import ActionEmitter from './action_emitter';
+import Button, { ItmButtonRef as ButtonRef } from './button';
 import Target from './target';
-import { ItmButtonRef } from './button';
 
-/** Record that describes specifics property of a button area. */
-export type ItmMenu<T = {}> = Area<T> & RecordOf<ItmMenu.Model<T>>;
+export class ItmMenuRef<A extends Action<T> = Action<T>, T extends Object = {}> {
+  readonly buttons: Map<string, ButtonRef>;
+  readonly direction: Observable<ItmMenu.Direction>;
+  readonly mode: Observable<Button.Mode>;
 
-export class ItmMenuRef {
   constructor(
-    readonly direction: Observable<ItmMenu.Direction>,
-    readonly buttons: Map<string, ItmButtonRef>
-  ) { }
+    menu: ItmMenu<T>,
+    target: Target<T>,
+    emitter: ActionEmitter<A>
+  ) {
+    this.buttons = menu.buttons.map(button => new ButtonRef(button, target, emitter));
+    this.direction = Target.map(target, menu.direction || (() => of(ItmMenu.Direction.right)));
+    this.mode = Target.map(target, menu.mode || (() => of(Button.Mode.basic)));
+  }
 }
+
+/** Record that describes specifics property of a menu area. */
+export type ItmMenu<T = {}> = Area<T> & RecordOf<ItmMenu.Model<T>>;
 
 export module ItmMenu {
   export enum Direction {
@@ -26,8 +36,8 @@ export module ItmMenu {
 
   export interface ModelConfig<T extends Object = {}> {
     buttons?: Button.Config<T>[] | Map<string, Button.Config<T>>;
-    mode?: Target.PipeLike<T, Button.Mode>;
     direction?: Target.PipeLike<T, Direction>;
+    mode?: Target.PipeLike<T, Button.Mode>;
   }
 
   export interface Model<T = {}> extends ModelConfig<T> {
