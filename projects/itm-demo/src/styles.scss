@@ -1,0 +1,46 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css?family=Work+Sans');
+
+@import '~@angular/material/theming';
+@import '~prismjs/themes/prism-dark';
+
+@import '../../itm-core/src/core';
+// Plus imports for other components in your app.
+
+$general-typography: mat-typography-config(
+  $font-family: '"Work Sans", sans-serif'
+);
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat-core($general-typography);
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$theme-primary: mat-palette($mat-grey);
+$theme-accent:  mat-palette($mat-lime);
+
+// The warn palette is optional (defaults to red).
+$theme-warn:    mat-palette($mat-red);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$theme-theme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($theme-theme);
+
+@include itm($theme-theme, $general-typography);
+
+body {
+  @extend .mat-body-1;
+  color: white;
+  background-color: mat-color($theme-primary, 800);
+}
+
+pre {
+  background-color: mat-color($theme-primary, 900);
+}
