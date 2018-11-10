@@ -38,6 +38,7 @@ const EXPORTED_DECLARATIONS = [
   ...ITM_TYPE_PIPES
 ];
 
+/** The core module of the library. */
 @NgModule({
   imports: IMPORTS,
   exports: EXPORTED_DECLARATIONS,
@@ -45,5 +46,4 @@ const EXPORTED_DECLARATIONS = [
   entryComponents: ENTRY_COMPONENTS,
   providers: [ITM_REGISTRER_PROVIDER]
 })
-/** The core module of the library. */
 export class ItmCoreModule { }

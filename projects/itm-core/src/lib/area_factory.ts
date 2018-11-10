@@ -42,37 +42,34 @@ export module ItmAreaFactory {
       cfg.text ? Target.defer('string', cfg.text) :
         null
     );
-    const sizeCfg: Partial<Area.Size> = (
-      !cfg.size || typeof cfg.size !== 'object' ? {} :
-      !Array.isArray(cfg.size) ? cfg.size :
-        ({
-          width: cfg.size[0] ? Array.isArray(cfg.size[0]) ? cfg.size[0][0] : cfg.size[0] : null,
-          flexWidth: Array.isArray(cfg.size[0]) && cfg.size[0][1] ? cfg.size[0][1] : null,
-          height: cfg.size[1] ? Array.isArray(cfg.size[1]) ? cfg.size[1][0] : cfg.size[1] : null,
-          flexHeight: Array.isArray(cfg.size[1]) &&  cfg.size[1][1] ? cfg.size[1][1] : null
-        })
-    );
-    const width = sizeCfg.width >= 1 ? Math.round(sizeCfg.width) : 3;
+    if (!Area.isSizeRecord(cfg.size)) throw new Error('Expected size record');
+    const width = cfg.size.width >= 1 ? Math.round(cfg.size.width) : 3;
     const flexWidth = (
-      sizeCfg.flexWidth !== null && sizeCfg.flexWidth >= 0 ?
-        Math.round(sizeCfg.flexWidth * 10e8) / 10e8 :
+      cfg.size.flexWidth !== null && cfg.size.flexWidth >= 0 ?
+        Math.round(cfg.size.flexWidth * 10e8) / 10e8 :
         0
     );
-    const height = sizeCfg.height >= 1 ? Math.round(sizeCfg.height) : 1;
+    const height = cfg.size.height >= 1 ? Math.round(cfg.size.height) : 1;
     const flexHeight = (
-      sizeCfg.flexHeight !== null && sizeCfg.flexHeight >= 0 ?
-        Math.round(sizeCfg.flexHeight * 10e8) / 10e8 :
+      cfg.size.flexHeight !== null && cfg.size.flexHeight >= 0 ?
+        Math.round(cfg.size.flexHeight * 10e8) / 10e8 :
         0
     );
     const size = Area.sizeFactory({width, flexWidth, height, flexHeight});
     return {key, comp, text, size};
   }
 
+  const model = {
+    key: null,
+    comp: null,
+    text: null,
+    size: Area.parseSize
+  };
 
   export const _static: ItmAreaFactory = RecordFactory.build({
     selector: Area.selector,
     normalize,
-    model: {key: null, comp: null, text: null, size: null},
+    model,
     shared: new Shared({})
   });
 }

@@ -38,7 +38,7 @@ export module ItmTableFactory {
     let areas = Map() as Areas;
     const menu = (
       MenuFactory().isFactoryRecord(cfg.menu) ? cfg.menu as Menu :
-      cfg.menu ? MenuFactory({key: '$rowMenu'}, cfg.menu) :
+      cfg.menu ? MenuFactory({key: '$rowMenu', size: {width: 1, flexWidth: 1}}, cfg.menu) :
         null
     );
     const positions  = (

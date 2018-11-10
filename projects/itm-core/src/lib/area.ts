@@ -32,7 +32,7 @@ export module ItmArea {
     text?: Target.PipeLike<T, string> | false;
 
     /** The fraction of the available grid space occupied by the area. */
-    size?: [number | [number, number], number | [number, number]] | Partial<Size>;
+    size?: Partial<Size>;
 
     /**
      * The component displayed in the area.
@@ -48,8 +48,10 @@ export module ItmArea {
     flexHeight: number;
   }
 
+  const sizeFactoryDescriptiveName = 'areaSize';
+
   // tslint:disable-next-line:max-line-length
-  export const sizeFactory = Record<Size>({width: null, flexWidth: null, height: null, flexHeight: null});
+  export const sizeFactory = Record<Size>({width: null, flexWidth: null, height: null, flexHeight: null}, sizeFactoryDescriptiveName);
 
   export interface Model<T = {}> extends Config<T> {
     key: string;
@@ -61,6 +63,14 @@ export module ItmArea {
   export type Provider = ValueSansProvider | FactorySansProvider | StaticClassSansProvider;
 
   export type Providers = Map<any, Provider>;
+
+  export function isSizeRecord(val: any): boolean {
+    return Record.isRecord(val) && Record.getDescriptiveName(val) === sizeFactoryDescriptiveName;
+  }
+
+  export function parseSize(cfg: Partial<Size>): RecordOf<Size> {
+    return isSizeRecord(cfg) ? cfg as RecordOf<Size> : sizeFactory(cfg);
+  }
 
   export const selector = 'area';
   export const defaultKey = '$default';

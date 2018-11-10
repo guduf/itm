@@ -1,3 +1,4 @@
+import { FactorySansProvider } from '@angular/core/src/di/provider';
 import { Map, RecordOf, List } from 'immutable';
 import { Observable } from 'rxjs';
 
@@ -28,7 +29,7 @@ export module ItmGridFactory {
     resolversProvider?: ResolversProvider;
   }
 
-  export interface ResolversProvider {
+  export interface ResolversProvider extends FactorySansProvider {
     deps?: any[];
     useFactory: (...args: any[]) => Observable<Action.Resolvers>;
   }

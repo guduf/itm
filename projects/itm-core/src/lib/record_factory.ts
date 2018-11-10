@@ -1,7 +1,10 @@
-import { RecordOf, Record, OrderedMap, Collection, Set } from 'immutable';
+import { RecordOf, Record, OrderedMap, Collection, Map, Set, isCollection } from 'immutable';
 
 // tslint:disable-next-line:max-line-length
 export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M extends C = C, S extends Object = {}> {
+  mappers: Map<string, (val: any) => any>;
+  model: M;
+
   private readonly _cfgFactory: Record.Factory<C>;
 
   static build<M extends C, C extends Object, S extends Object>(
@@ -9,7 +12,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
       selector: string,
       shared?: S,
       normalize?: ItmRecordFactory.Serializer<C, M, null, S>,
-      model?: { [P in keyof M]: null },
+      model?: ItmRecordFactory.ModelMapper<M>,
       ancestors?: never
     }
   ): ItmRecordFactory<RecordOf<M>, C, M, S>;
@@ -20,7 +23,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
       selector: string,
       shared?: S,
       normalize?: ItmRecordFactory.Serializer<C, M, AR, S>,
-      model?: { [P in keyof M]: null },
+      model?: ItmRecordFactory.ModelMapper<M>,
       ancestors: [ItmRecordFactory<AR, AC>]
     }
   ): ItmRecordFactory<AR & RecordOf<M>, AC & C, any, S>;
@@ -41,7 +44,7 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
       selector: string;
       shared?: any;
       normalize?: ItmRecordFactory.Serializer<C, M, RecordOf<any>, any>;
-      model?: { [P in keyof M]: null };
+      model?: ItmRecordFactory.ModelMapper<M>;
       ancestors?: ItmRecordFactory[];
     }
   ): ItmRecordFactory<RecordOf<M>, C, any, any> {
@@ -64,23 +67,44 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
     );
     // tslint:disable-next-line:max-line-length
     const normalize: ItmRecordFactory.Serializer<C, M> = typeof cfg.normalize === 'function' ? cfg.normalize : null;
-    const model = ancestors
-      .toStack()
-      .map(ancestor => ancestor.model)
-      .push(cfg.model)
-      .reduce((acc, val) => acc === val ? val : ({...(acc as any || {}), ...(val || {})}));
-    return new ItmRecordFactory(selector, ancestors, cfg.shared || {}, model, normalize);
+    const modelMappers = typeof cfg.model === 'object' ? cfg.model : null;
+    return new ItmRecordFactory(selector, ancestors, cfg.shared || {}, normalize, modelMappers);
   }
 
   private constructor(
     readonly selector: string,
     readonly ancestors: OrderedMap<string, ItmRecordFactory>,
     readonly shared: S,
-    readonly model: { [P in keyof M]: null },
-    private readonly _normalizer: ItmRecordFactory.Serializer<C, M>
+    private readonly _normalizer: ItmRecordFactory.Serializer<C, M>,
+    modelMappers: ItmRecordFactory.ModelMapper<M>
   ) {
     if (this.ancestors.has(selector)) throw new TypeError('Ancestors has selector');
-    this._cfgFactory = Record(this.model as M);
+    const {mappers: ancestorsMappers, model: ancestorsModel} = this.ancestors.reduce(
+      (acc, ancestor) => ({
+        mappers: acc.mappers.merge(ancestor.mappers),
+        model: {...(acc.model as {}), ...ancestor.model} as M
+      }),
+      {mappers: Map<string, (val: any) => any>(), model: {} as M}
+    );
+    if (modelMappers) {
+      const {mappers, model} = Object.keys(modelMappers).reduce(
+        (acc, key) => ({
+          mappers: (
+            typeof modelMappers[key] === 'function' ? acc.mappers.set(key, modelMappers[key]) :
+              acc.mappers
+          ),
+          model: {...(acc.model as {}), [key]: null} as M
+        }),
+        {mappers: ancestorsMappers, model: ancestorsModel}
+      );
+      this.model = model;
+      this.mappers = mappers;
+    }
+    else {
+      this.model = ancestorsModel;
+      this.mappers = ancestorsMappers;
+    }
+    this._cfgFactory = Record(this.model);
   }
 
   isFactoryRecord(maybeRecord: any): boolean {
@@ -96,7 +120,34 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
     if (maybeCfgs.length < 1) return null;
     if (maybeCfgs.length === 1 && this.isFactoryRecord(maybeCfgs[0])) return maybeCfgs[0] as any;
     // tslint:disable-next-line:max-line-length
-    const rootCfg = maybeCfgs.reduce<RecordOf<C>>((acc, maybeCfg) => acc.mergeDeep(maybeCfg), this._cfgFactory());
+    const rootCfg = maybeCfgs.reduce<RecordOf<C>>(
+      (acc, maybeCfg) => {
+        if (!maybeCfg || typeof maybeCfg !== 'object') return acc;
+        if (this.isFactoryRecord(maybeCfg)) return acc.mergeDeep(maybeCfg);
+        const keys = (
+          Record.isRecord(maybeCfg) ? Object.keys((maybeCfg as RecordOf<any>).toJS()) :
+          isCollection(maybeCfg) ? Object.keys((maybeCfg as Collection<any, any>).toJS()) :
+            Object.keys(maybeCfg)
+        );
+        const mappedCfg = keys.reduce(
+          (cfgAcc, key) => {
+            if (typeof this.model[key] === 'undefined') return cfgAcc;
+            if (!this.mappers.has(key)) return {...(cfgAcc as {}), [key]: maybeCfg[key]};
+            let mapped: any;
+            try { mapped = this.mappers.get(key)(maybeCfg[key]); }
+            catch (err) {
+              console.error('MODEL MAPPER ERROR', err);
+              // tslint:disable-next-line:max-line-length
+              console.error('MODEL MAPPER ERROR CONTEXT', {selector: this.selector, cfg: maybeCfg});
+            }
+            return {...(cfgAcc as {}), [key]: mapped};
+          },
+          {} as Partial<C>
+        );
+        return acc.mergeDeep(mappedCfg);
+      },
+      this._cfgFactory()
+    );
     return this.ancestors.toSet()
       .add(this)
       .reduce<{ record: R, ancestors: Set<ItmRecordFactory> }>(
@@ -112,9 +163,9 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
           let model: R;
           if (normalizer) try { model = normalizer(rootCfg, record, this.shared) as R; }
           catch (err) {
-            console.error('SERIALIZE ERROR', err);
+            console.error('NORMALIZE ERROR', err);
             // tslint:disable-next-line:max-line-length
-            console.error('SERIALIZE ERROR CONTEXT', {selector: this.selector, cfg: rootCfg.toJS()});
+            console.error('NORMALIZE ERROR CONTEXT', {selector: this.selector, cfg: rootCfg.toJS()});
             throw err;
           }
           record = Record(this.model as M, descriptiveName)(
@@ -161,12 +212,13 @@ export class ItmRecordFactory<R extends RecordOf<M> = RecordOf<M>, C = {}, M ext
 }
 
 export module ItmRecordFactory {
-  export const selectorPattern = '[a-z]\\w+';
-  export const selectorRegex = new RegExp(`^${ItmRecordFactory.selectorPattern}$`);
-  export const selectorSeparator = ',';
-
   // tslint:disable-next-line:max-line-length
   export type Serializer<C extends Object = {}, M extends C = C, A extends RecordOf<Object> = RecordOf<Object>, S extends Object = {}> = (cfg: RecordOf<C>, ancestor?: A, shared?: S) => M;
+
+  export type ModelMapper<C extends Object = {}, M extends C = C> = (
+    { [P in keyof C]: (val: any) => C[P] | null; } &
+    { [P in keyof M]: (val: any) => any | null; }
+  );
 
   // tslint:disable-next-line:max-line-length
   export function getFactories<R extends RecordOf<M> = RecordOf<M>, C = {}, M extends C = C, S extends Object = {}>(
@@ -178,6 +230,10 @@ export module ItmRecordFactory {
       OrderedMap<string, ItmRecordFactory<R, C, M, S>>()
     );
   }
+
+  export const selectorPattern = '[a-z]\\w+';
+  export const selectorRegex = new RegExp(`^${ItmRecordFactory.selectorPattern}$`);
+  export const selectorSeparator = ',';
 }
 
 export default ItmRecordFactory;
