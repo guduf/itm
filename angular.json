@@ -159,6 +159,142 @@
           }
         }
       }
+    },
+    "itm-demo": {
+      "root": "projects/itm-demo/",
+      "sourceRoot": "projects/itm-demo/src",
+      "projectType": "application",
+      "prefix": "itm-demo",
+      "schematics": {
+        "@schematics/angular:component": {
+          "styleext": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/itm-demo",
+            "index": "projects/itm-demo/src/index.html",
+            "main": "projects/itm-demo/src/main.ts",
+            "polyfills": "projects/itm-demo/src/polyfills.ts",
+            "tsConfig": "projects/itm-demo/tsconfig.app.json",
+            "assets": [
+              "projects/itm-demo/src/favicon.ico",
+              "projects/itm-demo/src/assets",
+              {
+                "glob": "**/*",
+                "input": "projects/itm-demo/tmp/monaco",
+                "output": "monaco"
+              }
+            ],
+            "styles": [
+              "projects/itm-demo/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/itm-demo/src/environments/environment.ts",
+                  "with": "projects/itm-demo/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "itm-demo:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "itm-demo:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "itm-demo:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/itm-demo/src/test.ts",
+            "polyfills": "projects/itm-demo/src/polyfills.ts",
+            "tsConfig": "projects/itm-demo/tsconfig.spec.json",
+            "karmaConfig": "projects/itm-demo/karma.conf.js",
+            "styles": [
+              "projects/itm-demo/src/styles.scss"
+            ],
+            "scripts": [],
+            "assets": [
+              "projects/itm-demo/src/favicon.ico",
+              "projects/itm-demo/src/assets"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/itm-demo/tsconfig.app.json",
+              "projects/itm-demo/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "itm-demo-e2e": {
+      "root": "projects/itm-demo-e2e/",
+      "projectType": "application",
+      "prefix": "",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/itm-demo-e2e/protractor.conf.js",
+            "devServerTarget": "itm-demo:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "itm-demo:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "projects/itm-demo-e2e/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "itm"

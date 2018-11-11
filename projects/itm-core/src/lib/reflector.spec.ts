@@ -6,7 +6,6 @@ describe('ItmReflector', () => {
     it('should provide with minimal', () => {
       const provider = Reflector.provide();
       const init = provider.useFactory();
-      console.log(init);
       expect(init && Array.isArray(init.types)).toBeTruthy('Expected array');
     });
 

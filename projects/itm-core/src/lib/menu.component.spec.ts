@@ -44,7 +44,6 @@ describe('ItmMenuComponent', () => {
 
   it('should initialize', () => {
     const fixture = TestBed.createComponent(ItmMenuComponent);
-    console.log(fixture);
     expect(fixture).toBeTruthy();
   });
 });

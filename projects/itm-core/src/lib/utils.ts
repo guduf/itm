@@ -61,7 +61,6 @@ export function checkTypeOrThrow(check: any, val: any): void {
   if (['string', 'function', 'number', 'boolean'].includes(check)) msg = `type of ${check}`;
   else if (typeof check === 'function') msg = `instance of ${check.name}`;
   else msg = `in [${Array.from(Object.values(check)).join(', ')}]`;
-  console.log({check, val, msg});
   throw new TypeError('Expected ' + msg);
 }
 
