@@ -1,5 +1,6 @@
 import { AfterViewInit, OnDestroy, Component, ViewChild, ElementRef, NgZone } from '@angular/core';
 import * as monaco from 'monaco-editor';
+import { MonacoService } from './monaco.service';
 
 // tslint:disable-next-line:max-line-length
 declare function createEditor(nativeElement: HTMLElement, options: monaco.editor.IEditorConstructionOptions): monaco.editor.IStandaloneCodeEditor;
@@ -18,15 +19,10 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
   private _editor: monaco.editor.IStandaloneCodeEditor;
 
-  constructor(private _ngZone: NgZone) { }
+  constructor(private _service: MonacoService) { }
 
   ngAfterViewInit() {
-    this._ngZone.runOutsideAngular(() => {
-      this._editor = createEditor(this.editorRef.nativeElement, {
-        language: 'json'
-      });
-    });
-    setTimeout(() => console.log('afterInit', {f: Promise}), 5000);
+    // this._service.createJsonEditor(this.editorRef.nativeElement, 'area.json');
   }
 
   ngOnDestroy() {

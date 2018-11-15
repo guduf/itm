@@ -1,47 +1,71 @@
-// import { Injectable, APP_INITIALIZER, NgZone } from '@angular/core';
-// import * as Monaco from 'monaco-editor';
+import { DOCUMENT } from '@angular/common';
+import { Injectable, APP_INITIALIZER, NgZone, Inject } from '@angular/core';
+import { Map } from 'immutable';
+import * as monaco from 'monaco-editor';
+import { parseIter } from '../../../itm-core/src/lib/utils';
 
-// @Injectable()
-// export class MonacoService {
-//   private _monaco: typeof Monaco;
+declare const loadMonaco: () => Promise<typeof monaco>;
+// tslint:disable-next-line:max-line-length
+declare const createEditor: (nativeElement: HTMLElement, opts?: monaco.editor.IEditorConstructionOptions) => monaco.editor.IStandaloneCodeEditor;
 
-//   constructor(private _ngZone: NgZone) { console.log(this._ngZone); }
+@Injectable()
+export class MonacoService {
+  private _monaco: typeof monaco;
+  private _schemas = Map<string, { $id: string}>();
 
-//   load(): Promise<void> {
-//     return this._ngZone.runOutsideAngular(() => new Promise(resolve => {
-//       const script = document.createElement('script');
-//       script.type = 'text/javascript';
-//       script.src = 'monaco-editor/loader.js';
-//       script.onload = () => {
-//         (window as any).require.config({
-//           paths: {vs: 'monaco-editor'}
-//         });
-//         (window as any).require(['vs/editor/editor.main'], () => {
-//           this._monaco = (window as any).monaco;
-//           resolve();
-//         });
-//       };
-//       document.body.appendChild(script);
-//     }));
-//   }
+  constructor(
+    @Inject(DOCUMENT)
+    private _document: Document,
+    private _ngZone: NgZone
+  ) { }
 
-//   create(nativeElement: HTMLElement) {
-//     return this._ngZone.runOutsideAngular(() => this._monaco.editor.create(nativeElement, {
-//       value: [
-//         'function x() {',
-//         '\tconsole.log("Hello world!");',
-//         '}'
-//       ].join('\n'),
-//       language: 'javascript'
-//     }));
-//   }
-// }
+  createJsonEditor(
+    nativeElement: HTMLElement,
+    schemaUri: string
+  ): monaco.editor.IStandaloneCodeEditor {
+    return createEditor(nativeElement);
+  }
 
-// export function loadMonaco(service: MonacoService): () => Promise<void> {
-//   return service.load.bind(service);
-// }
+  load(): Promise<void> {
+    return this._ngZone.runOutsideAngular(() => {
+      const loadScript = new Promise(resolve => {
+        const script = this._document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = '/monaco/runtime.bundle.js';
+        script.onload = resolve;
+        this._document.body.appendChild(script);
+      });
+      return loadScript
+      .then(() => loadMonaco())
+      .then(_monaco => (this._monaco = _monaco))
+      .then(() => Promise.all(['area'].map(uri => this._loadSchema(uri))))
+      .then(schemas => this._setJsonSchema(...schemas));
+    });
+  }
 
-// export const MONACO_PROVIDERS = [
-//   {provide: MonacoService, useClass: MonacoService},
-//   {provide: APP_INITIALIZER, multi: true, deps: [MonacoService], useFactory: loadMonaco}
-// ];
+  private _loadSchema(uri: string): Promise<{ $id: string }> {
+    return this._ngZone.runOutsideAngular(() => {
+      return fetch(`/assets/json_schemas/${uri}.json`).then(res => res.json());
+    });
+  }
+
+  private _setJsonSchema(...schemas: { $id: string }[]): void {
+    this._schemas = this._schemas.merge(parseIter(schemas, '$id'));
+    monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+      validate: true,
+      schemas: this._schemas.reduce(
+        (acc, schema) => ([...acc, {uri: schema.$id, fileMatch: [schema.$id], schema}]),
+        []
+      )
+    });
+  }
+}
+
+export function loadFactory(service: MonacoService): () => Promise<void> {
+  return service.load.bind(service);
+}
+
+export const MONACO_PROVIDERS = [
+  {provide: MonacoService, useClass: MonacoService},
+  {provide: APP_INITIALIZER, multi: true, deps: [MonacoService], useFactory: loadFactory}
+];

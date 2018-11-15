@@ -1,0 +1,51 @@
+@import '../theme';
+
+:host {
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 120vw;
+}
+
+svg {
+  display: inline-block;
+  width: 200px;
+  height: 136px;
+  margin-right: 6px;
+
+  & > g {
+    stroke: rgba(mat-color($accent, 400), 0.25);
+    stroke-dasharray: 100;
+    animation: dash 8s linear infinite;
+
+    @keyframes dash {
+      0% {
+        stroke-dashoffset: 0;
+      }
+
+      50% {
+        stroke-dashoffset: 400;
+      }
+
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+  }
+
+  &:nth-child(4n+2) > g {
+    animation-delay: -2s;
+  }
+
+  &:nth-child(3n+2) > g {
+    stroke: rgba(mat-color($accent, 600), 0.25);
+    animation-delay: -3s;
+  }
+
+  &:nth-child(3n+3) > g {
+    stroke: rgba(mat-color($accent, 800), 0.25);
+    animation-delay: -6s;
+  }
+}

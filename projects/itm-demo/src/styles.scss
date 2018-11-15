@@ -1,6 +1,23 @@
-/* You can add global styles to this file, and also import other style files */
-.itm-demo-editor {
-  display: block;
-  width: 600px;
-  height: 600px;
+@import 'theme';
+@import '../../itm-core/src/core';
+
+@import url('//fonts.googleapis.com/css?family=Bitter:700|Open+Sans:400,400i,600,700');
+
+@include angular-material-theme($theme);
+
+@include mat-core($general-typography);
+
+@include itm($theme, $general-typography);
+
+a, a:visited {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+body {
+  @extend .mat-body-1;
+
+  margin: 0;
+  color: white;
+  background-color: mat-color($primary, 900);
 }

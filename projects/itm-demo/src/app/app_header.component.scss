@@ -1,0 +1,99 @@
+@import '../theme';
+
+:host {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  height: 4rem;
+  padding: 1rem;
+  background: linear-gradient(to bottom, mat-color($accent, 400), 50%, mat-color($accent, 400), 50%, transparent);
+  background-size: 100% 200%;
+  background-position: 0 100%;
+  transition: background-position 0.18s ease-out;
+
+  & > *:first-child, & > *:last-child {
+    width: 20rem;
+  }
+
+  & > nav {
+    display: flex;
+    flex-flow: row nowrap;
+    margin: -1rem 0;
+    line-height: 2rem;
+
+    & > a {
+      padding: 1rem;
+    }
+  }
+}
+
+h1 {
+  height: 2rem;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  margin: 0;
+
+  span {
+    display: block;
+  }
+
+  span:first-child {
+    letter-spacing: 1px;
+    line-height: 2rem;
+    font-family: $alt-font-family;
+    font-size: 26px;
+    color: mat-color($accent, 400);
+  }
+
+  span:nth-child(n+2) {
+    line-height: 15px;
+    color: mat-color($primary, 600);
+    text-shadow: 3px 3px 6px mat-color($primary, 900);
+  }
+}
+
+a[aria-label=github] {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  height: 2rem;
+
+  & > span {
+    margin-right: 0.25rem;
+    vertical-align: top;
+    line-height: 2rem;
+    color: mat-color($primary, 600);
+  }
+
+  & > button {
+    position: relative;
+    top: -4px;
+  }
+}
+
+:host.fixed {
+  color: mat-color($primary, 900);
+  background-position: 0 0;
+
+  & > h1 {
+    & > span:first-child {
+      color: mat-color($primary, 900);
+    }
+
+    & > span:last-child {
+      display: none;
+    }
+  }
+
+  & > nav {
+    font-weight: 700;
+  }
+
+  & > a[aria-label=github] > span {
+    color: white;
+  }
+}
+

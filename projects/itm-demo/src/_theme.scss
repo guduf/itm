@@ -1,0 +1,12 @@
+@import '~@angular/material/theming';
+
+$general-typography: mat-typography-config(
+  $font-family: '"Open Sans", sans-serif'
+);
+
+$alt-font-family: "Bitter", serif;
+
+$primary: mat-palette($mat-grey);
+$accent: mat-palette($mat-green);
+$warn: mat-palette($mat-red);
+$theme: mat-dark-theme($primary, $accent, $warn);

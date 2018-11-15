@@ -1,0 +1,12 @@
+@import '../theme';
+
+:host > svg {
+  g {
+    stroke: white;
+  }
+
+  text {
+    fill: white;
+    stroke: none !important;
+  }
+}

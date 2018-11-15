@@ -1,0 +1,83 @@
+@import '../theme';
+@import '../utils';
+
+:host {
+  display: block;
+
+  .hero {
+    @extend %hero;
+
+    position: relative;
+    overflow: hidden;
+    margin-top: -4rem;
+    text-shadow: 3px 3px 6px mat-color($primary, 900);
+
+    & > .background {
+      position: fixed;
+    }
+
+    & > div {
+      position: relative;
+
+      & > p {
+        text-align: center;
+        font-size: 2rem;
+        line-height: 2rem;
+        margin-bottom: 4rem;
+        font-weight: 700;
+      }
+
+      & > ul {
+        list-style: none;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+
+        & > li {
+          max-width: 380px;
+          padding: 0 2rem;
+
+          & > span {
+            font-family: $alt-font-family;
+            font-size: 18px;
+            color: mat-color($accent, 400);
+          }
+        }
+      }
+    }
+  }
+
+  .banner {
+    position: relative;
+    padding: 2em;
+    color: white;
+    background-color: mat-color($accent, 800);
+
+    & > p {
+      max-width: 640px;
+      margin: 0 auto 0.75rem;
+      font-size: 19px;
+      line-height: 1.5rem;
+
+      & > em {
+        font-style: normal;
+        font-family: $alt-font-family;
+      }
+
+      & > a {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .schema {
+    @extend %hero;
+
+    height: 800px;
+
+    position: relative;
+    background-color: mat-color($primary, 900);
+  }
+}
