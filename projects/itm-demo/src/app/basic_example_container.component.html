@@ -1,0 +1,21 @@
+<div class="view">
+  <h3>Basic example</h3>
+  <div>
+    <div class="grid-blueprint">
+      <div *ngFor="let cell of blueprintCells"></div>
+    </div>
+    <itm-demo-basic-example></itm-demo-basic-example>
+    <p>borders have been added for the example</p>
+  </div>
+</div>
+<div class="source">
+  <div>
+    <h4>Source code</h4>
+    <nav>
+      <button *ngFor="let val of ['basic', 'radar']"
+        mat-button [class.active]="(activated === val)"
+        (click)="(activated = val)">{{val === 'basic' ? 'grid' : 'area'}}</button>
+    </nav>
+  </div>
+  <markdown cdkScrollable [data]="activated | exampleMarkdown | async"></markdown>
+</div>

@@ -1,4 +1,4 @@
-<div class="hero">
+<section class="hero">
   <itm-demo-background class="background"></itm-demo-background>
   <div>
     <p>Build components without HTML</p>
@@ -9,7 +9,11 @@
       </li>
       <li>
         <span>Easily hackable</span><br />
-        <p>Modules functions and interfaces are typed with Typescript for.</p>
+        <p>
+          Our modules use immutable records built with a common factory pattern.
+          Factories are easily extendables and you can easily add your own via
+          the dynamic registrer.
+        </p>
       </li>
       <li>
         <span>Flex designed</span><br />
@@ -17,12 +21,13 @@
       </li>
     </ul>
   </div>
-</div>
-<div class="banner">
+</section>
+<section class="banner">
   <p>
-    <em>itm</em> is an <a href="//angular.io" target="_blank">angular</a> framework
-    for creating templates based on
-    <a href="//developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout" target="_blank">CSS&nbsp;Grid&nbsp;Layout</a>.
+    <em>itm</em> is an
+    <a href="//angular.io" target="_blank" matTooltip="Visit angular website">angular</a>
+    framework for creating templates based on
+    <a href="//developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout" target="_blank" matTooltip="Read the MDN documentation">CSS&nbsp;Grid&nbsp;Layout</a>.
     Each area is a text observable or a entry component.
   </p>
   <p>
@@ -33,7 +38,10 @@
     <em>itm</em> grids can take the shape of tables, forms, cards…
     They are immutables, fully extendables and may be configured on the fly.
   </p>
-</div>
-<div class="schema">
+</section>
+<section class="schema">
   <itm-demo-schema></itm-demo-schema>
-</div>
+</section>
+<section class="basic-example">
+  <itm-demo-basic-example-container></itm-demo-basic-example-container>
+</section>

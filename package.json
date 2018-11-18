@@ -8,6 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
+    "core:doc": "typedoc --out dist/doc projects/itm-core/src --theme doc",
     "demo:monaco:clean": "rimraf projects/itm-demo/tmp/monaco && mkdir -p projects/itm-demo/tmp/monaco",
     "demo:monaco:compile": "wp --config projects/itm-demo/monaco.webpack.config.js",
     "demo:monaco:build": "npm run demo:monaco:clean && npm run demo:monaco:compile",
@@ -33,9 +34,13 @@
     "core-js": "^2.5.4",
     "core-js-pure": "0.0.1",
     "immutable": "^4.0.0-rc.10",
+    "marked": "^0.5.1",
     "monaco-editor": "^0.14.3",
+    "ngx-markdown": "^7.0.2",
+    "prismjs": "^1.15.0",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.3.3",
+    "typedoc": "^0.13.0",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {

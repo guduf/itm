@@ -1,0 +1,121 @@
+@import '../theme';
+
+:host {
+  position: relative;
+  display: flex;
+  padding: 2rem;
+  background-color: mat-color($accent, 600);
+
+  & > .source {
+    width: 100%;
+    max-width: 700px;
+
+    & > div {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      background-color: mat-color($accent, 800);
+
+      & h4 {
+        @extend %heading;
+
+        width: 100%;
+        margin: -0.5rem 0;
+      }
+
+      & > nav {
+        display: flex;
+
+        & > button {
+          color: mat-color($primary, 200);
+          margin: 0 0.5rem;
+          border: 1px solid transparent;
+          transition: border-color 0.33s ease-out;
+
+          &.active {
+            border-color: mat-color($accent, 200);
+          }
+        }
+      }
+    }
+
+    & > markdown::ng-deep {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      overflow: scroll;
+
+      & > pre {
+        margin: 0;
+      }
+    }
+  }
+
+  & > .view {
+    flex: 1;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: center;
+
+
+    & h3 {
+      @extend %heading;
+
+      width: 100%;
+    }
+
+    & > div {
+      position: relative;
+      width: 240px;
+      height: 120px;
+
+      & > p {
+        position: absolute;
+        top: 100%;
+        margin-top: 3rem;
+        font-style: italic;
+        color: mat-color($primary, 200);
+        white-space: nowrap;
+      }
+    }
+
+    .grid-blueprint,
+    .itm-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .grid-blueprint {
+      box-sizing: content-box;
+      display: flex;
+      flex-flow: row wrap;
+      border-top: 1px dashed rgba(white, 0.3334);
+      border-left: 1px dashed rgba(white, 0.3334);
+
+      & > div {
+        box-sizing: border-box;
+        width: 60px;
+        height: 60px;
+        border-right: 1px dashed rgba(white, 0.3334);
+        border-bottom: 1px dashed rgba(white, 0.3334);
+      }
+    }
+
+    &::after {
+      content: '';
+
+      display: block;
+      width: 100%;
+      height: 4rem;
+    }
+
+    &::ng-deep .itm-grid-area {
+      border: 2px solid mat-color($accent, 900);
+    }
+  }
+}
+

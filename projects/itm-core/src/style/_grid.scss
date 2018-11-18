@@ -8,6 +8,7 @@
   }
 
   .#{$selector}-area {
+    box-sizing: border-box;
     position: relative;
     padding: 6px;
 

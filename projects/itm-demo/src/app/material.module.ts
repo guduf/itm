@@ -1,10 +1,20 @@
 import { NgModule } from '@angular/core';
-import { MatButtonModule, MatIconRegistry, MatIconModule } from '@angular/material';
+import {
+  MatButtonModule,
+  MatIconRegistry,
+  MatIconModule,
+  MatDialogModule,
+  MatTooltipModule
+} from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 const MODULES = [
+  BrowserAnimationsModule,
   MatButtonModule,
-  MatIconModule
+  MatDialogModule,
+  MatIconModule,
+  MatTooltipModule
 ];
 
 @NgModule({

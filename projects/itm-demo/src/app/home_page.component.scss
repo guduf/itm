@@ -9,6 +9,8 @@
 
     position: relative;
     overflow: hidden;
+    height: 60vh;
+    min-height: 400px;
     margin-top: -4rem;
     text-shadow: 3px 3px 6px mat-color($primary, 900);
 
@@ -51,9 +53,9 @@
 
   .banner {
     position: relative;
-    padding: 2em;
+    padding: 2rem;
     color: white;
-    background-color: mat-color($accent, 800);
+    background-color: mat-color($accent, 600);
 
     & > p {
       max-width: 640px;
