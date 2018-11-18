@@ -88,7 +88,7 @@ export module ItmGridRef {
         {defaultComp: null, defaultText: null, providers: Map<any, Area.Provider>()}
       );
       const comp = (
-        record.comp ||
+        record.comp ? record.comp :
         typeof areaShared.defaultComp === 'function' ?
           areaShared.defaultComp(inj.rgstr.options) :
           null
