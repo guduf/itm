@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "esNext",
+    "skipLibCheck": true
+  },
+  "files": [
+    "src/monaco.ts"
+  ],
+  "exclude": [
+    "**/node_modules"
+  ]
+}

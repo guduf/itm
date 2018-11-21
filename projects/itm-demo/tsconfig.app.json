@@ -2,10 +2,11 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/app",
-    "types": []
+    "types": [],
+    "module": "es2015"
   },
   "exclude": [
-    "src/monaco*",
+    "src/monaco.ts",
     "test.ts",
     "**/*.spec.ts"
   ]

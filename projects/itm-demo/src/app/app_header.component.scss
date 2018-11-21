@@ -36,11 +36,11 @@ h1 {
   line-height: inherit;
   margin: 0;
 
-  span {
+  a, span {
     display: block;
   }
 
-  span:first-child {
+  a {
     letter-spacing: 1px;
     line-height: 2rem;
     font-family: $alt-font-family;
@@ -48,7 +48,7 @@ h1 {
     color: mat-color($accent, 400);
   }
 
-  span:nth-child(n+2) {
+  span {
     line-height: 15px;
     color: mat-color($primary, 600);
     text-shadow: 3px 3px 6px mat-color($primary, 900);

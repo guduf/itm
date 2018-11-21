@@ -52,6 +52,7 @@
     "@types/jasmine": "~2.8.6",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
+    "awesome-typescript-loader": "^5.2.1",
     "codelyzer": "~4.5.0",
     "css-loader": "^1.0.1",
     "jasmine-core": "~2.99.1",

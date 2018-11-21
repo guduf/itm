@@ -17,12 +17,6 @@ export class BackgroundComponent implements OnInit {
   ngOnInit() {
     if (typeof window === 'undefined') return;
     const {width, height} = (this._hostRef.nativeElement as HTMLElement).getBoundingClientRect();
-    console.log({
-      width,
-      height,
-      size: Math.ceil(width / PATTERN_SIZE),
-      rows: Math.ceil(height / PATTERN_HEIGHT)
-    });
     this.size = Range(0, 6).toArray();
   }
 }
