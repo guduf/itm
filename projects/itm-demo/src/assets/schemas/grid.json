@@ -10,12 +10,12 @@
         {
           "type": "object",
           "patternProperties": {
-            "^[a-z]\\w+$": { "$ref": "#definitions/areas" }
+            "^[a-z]\\w+$": { "$ref": "#/definitions/areas" }
           },
           "additionalProperties": false,
           "minProperties": 1
         },
-        { "$ref": "#definitions/areas" }
+        { "$ref": "#/definitions/areas" }
       ]
     },
     "template": {
@@ -25,7 +25,7 @@
           "type": "array",
           "items": {
             "type": "array",
-            "items": {"$ref": "#definitions/template-item"},
+            "items": { "$ref": "#/definitions/template-item" },
             "minItems": 1
           },
           "minItems": 1
@@ -41,14 +41,14 @@
     "areas", "template"
   ],
   "definitions": {
-    "area": {"$ref": "area.json"},
+    "area": { "$ref": "area.json" },
     "template-item": {
       "type": "string",
-      "pattern": "^(?:[a-z]\\w+:)[a-z]\\w+(?:\\.[a-z]\\w+)*$"
+      "pattern": "^(?:[a-z]\\w+:)?[a-z]\\w+(?:\\.[a-z]\\w+)*$"
     },
     "areas": {
       "type": "array",
-      "items": {"$ref": "#definitions/area"},
+      "items": { "$ref": "#/definitions/area" },
       "minItems": 1
     }
   }
