@@ -79,11 +79,11 @@ a[aria-label=github] {
   background-position: 0 0;
 
   & > h1 {
-    & > span:first-child {
+    & > a {
       color: mat-color($primary, 900);
     }
 
-    & > span:last-child {
+    & > span {
       display: none;
     }
   }

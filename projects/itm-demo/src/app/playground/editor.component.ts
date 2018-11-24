@@ -1,7 +1,7 @@
 import { AfterViewInit, OnDestroy, Component, ViewChild, ElementRef, NgZone } from '@angular/core';
 
 // tslint:disable-next-line:max-line-length
-declare function createJsonEditor(nativeElement: HTMLElement, filename: string, code: string): () => void;
+declare function createJsonEditor(nativeElement: HTMLElement, filename: string, code?: string, onDidChangeContent?: (content: string) => void): () => void;
 
 @Component({
   selector: 'itm-demo-editor',
@@ -20,7 +20,23 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   constructor() { }
 
   ngAfterViewInit() {
-    this._dispose = createJsonEditor(this.editorRef.nativeElement, 'area', '');
+    const content = (
+`{
+  "areas": [
+    {
+      "key": ""
+    }
+  ],
+  "template": [
+    [""]
+  ]
+}
+`
+    );
+    this._dispose = createJsonEditor(
+      this.editorRef.nativeElement,
+      'grid', content
+    );
   }
 
   ngOnDestroy() { this._dispose(); }

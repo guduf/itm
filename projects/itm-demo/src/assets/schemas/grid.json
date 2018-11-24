@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "grid.json",
+  "type": "object",
+  "description": "The configuration for a grid.",
+  "properties": {
+    "areas": {
+      "description": "The area configurations for the grid.",
+      "anyOf": [
+        {
+          "type": "object",
+          "patternProperties": {
+            "^[a-z]\\w+$": { "$ref": "#definitions/areas" }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        { "$ref": "#definitions/areas" }
+      ]
+    },
+    "template": {
+      "description": "The template of the grid.",
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {"$ref": "#definitions/template-item"},
+            "minItems": 1
+          },
+          "minItems": 1
+        },
+        {
+          "type": "string",
+          "minLength": 4
+        }
+      ]
+    }
+  },
+  "required": [
+    "areas", "template"
+  ],
+  "definitions": {
+    "area": {"$ref": "area.json"},
+    "template-item": {
+      "type": "string",
+      "pattern": "^(?:[a-z]\\w+:)[a-z]\\w+(?:\\.[a-z]\\w+)*$"
+    },
+    "areas": {
+      "type": "array",
+      "items": {"$ref": "#definitions/area"},
+      "minItems": 1
+    }
+  }
+}
