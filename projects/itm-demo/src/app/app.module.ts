@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule, NgZone } from '@angular/core';
+import { NgModule, NgZone } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MarkdownModule } from 'ngx-markdown';
 
@@ -20,26 +20,6 @@ const ROUTES: Routes = [
   {path: 'playground', component: PlaygroundComponent}
 ];
 
-const MONACO_INIT_PROVIDER = {
-  provide: APP_INITIALIZER,
-  multi: true,
-  deps: [NgZone],
-  useFactory: (zone: NgZone) => () => {
-    console.log('Load monaco…');
-    if (typeof window === 'undefined') {
-      console.log('Monaco is not loaded because window is undefined');
-      return Promise.resolve();
-    }
-    if (typeof initMonaco !== 'function') {
-      const err = new ReferenceError('Failed to found initMonaco function');
-      return Promise.reject(err);
-    }
-    return zone.runOutsideAngular(() => (
-      initMonaco().then(() => console.log('Monaco is loaded.'))
-    ));
-  }
-};
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -55,9 +35,6 @@ const MONACO_INIT_PROVIDER = {
     RouterModule.forRoot(ROUTES),
     ExampleModule,
     PlaygroundModule
-  ],
-  providers: [
-    MONACO_INIT_PROVIDER
   ],
   bootstrap: [AppComponent]
 })

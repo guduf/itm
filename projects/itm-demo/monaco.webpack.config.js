@@ -1,11 +1,35 @@
 const path = require('path');
 const webpack = require('webpack');
-const { CheckerPlugin } = require('awesome-typescript-loader');
+const VirtualModulesPlugin = require('webpack-virtual-modules');
+
+const runtime = `
+  self.MonacoEnvironment = {
+    getWorkerUrl: function (moduleId, label) {
+      if (label === 'json') return './monaco/json.worker.js';
+      if (label === 'typescript' || label === 'javascript') return './monaco/ts.worker.js';
+      return './monaco/editor.worker.js';
+    }
+  };
+
+  self.initMonaco = function initMonaco() {
+    return import('monaco-editor').then(() => self.monaco);
+  };
+`;
+
+const promiseShim = `
+  const Promise = require('core-js/es6/promise');
+
+  module.exports = class PromiseShim extends Promise {
+    constructor(executor) {
+      super(executor);
+    }
+  }
+`;
 
 module.exports = {
 	mode: 'development',
 	entry: {
-		'runtime': path.resolve(__dirname, 'src/monaco.ts'),
+		'runtime': '.runtime',
 		'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker.js',
 		'json.worker': 'monaco-editor/esm/vs/language/json/json.worker',
 		'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker',
@@ -17,24 +41,15 @@ module.exports = {
     publicPath: 'monaco/'
   },
   module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        loader: 'awesome-typescript-loader',
-        options: {
-          configFileName: path.resolve(__dirname, 'tsconfig.monaco.json')
-        }
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      }
-    ]
+    rules: [{test: /\.css$/, use: ['style-loader', 'css-loader']}]
   },
   plugins: [
     new webpack.ProvidePlugin({
-      'Promise': path.resolve(__dirname, 'promise.shim')
+      'Promise': '.promise.shim'
     }),
-    new CheckerPlugin()
+    new VirtualModulesPlugin({
+      'node_modules/.runtime': runtime,
+      'node_modules/.promise.shim': promiseShim
+    })
   ]
 };
