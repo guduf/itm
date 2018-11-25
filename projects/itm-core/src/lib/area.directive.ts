@@ -6,7 +6,8 @@ import {
   OnChanges,
   Directive,
   ElementRef,
-  Renderer2
+  Renderer2,
+  OnDestroy
 } from '@angular/core';
 import { Observable, isObservable, Subscription } from 'rxjs';
 import { map, startWith, pairwise } from 'rxjs/operators';
@@ -17,7 +18,7 @@ import { ComponentType } from './utils';
 /** Directive used by ItmGridComponent to build grid area. */
 @Directive({selector: '[itmArea]'})
 // tslint:disable-next-line:max-line-length
-export class ItmAreaDirective implements OnChanges {
+export class ItmAreaDirective implements OnChanges, OnDestroy {
   /**
    * The reference that contains data needed to create the area component.
    * The view container is cleaned at each changes and a new component is created.
@@ -54,6 +55,11 @@ export class ItmAreaDirective implements OnChanges {
     );
     try { this._viewContainerRef.createComponent(componentFactory, null, this.areaRef.injector); }
     catch (err) { console.error(err); }
+  }
+
+  ngOnDestroy() {
+    this._viewContainerRef.clear();
+    if (this._textSubscr) this._textSubscr.unsubscribe();
   }
 
   private _renderText(areaText: Observable<string>): void {

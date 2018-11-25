@@ -1,4 +1,4 @@
-import { ItmGrid } from '../../../../itm-core/src/public_api';
+import { ItmGrid, ItmJsonRegistrer } from '../../../../itm-core/src/public_api';
 
 import { Component } from '@angular/core';
 
@@ -14,12 +14,19 @@ import { ErrorObject } from 'ajv';
 export class GridPlaygroundComponent {
   grid: ItmGrid.Config;
   target = {id: 63};
-  errors: ErrorObject[];
+  ajvErrors: ErrorObject[];
 
-  constructor() { }
+  constructor(
+    private _jsonRegistrer: ItmJsonRegistrer
+  ) { }
 
   handleEditorChange(e: EditorModel) {
-    this.grid = e.valid ? e.value : null;
-    this.errors = e.valid ? null : (e as InvalidEditorModel).errors;
+    this.grid = null;
+    if (e.valid) this._jsonRegistrer.buildGrid(e.value).then(
+      grid => (this.grid = grid),
+      err => console.error(err)
+    );
+    this.ajvErrors = e.valid ? null : (e as InvalidEditorModel).errors;
+    console.log(e.valid, this);
   }
 }

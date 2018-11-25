@@ -8,8 +8,7 @@ import {
   OnChanges,
   OnDestroy,
   Output,
-  SimpleChanges,
-  forwardRef
+  SimpleChanges
 } from '@angular/core';
 import { SafeStyle, DomSanitizer } from '@angular/platform-browser';
 import { Map, Range } from 'immutable';

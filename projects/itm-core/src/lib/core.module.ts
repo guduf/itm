@@ -8,6 +8,7 @@ import { ItmControlComponent } from './control.component';
 import { ItmFieldComponent } from './field.component';
 import { ItmFormComponent } from './form.component';
 import { ItmGridComponent } from './grid.component';
+import { ItmJsonRegistrer } from './json_registrer';
 import { ItmMaterialModule } from './material.module';
 import { ItmMenuComponent } from './menu.component';
 import { ItmPipeSandbox } from './pipe_sandbox';
@@ -41,6 +42,7 @@ const EXPORTED_DECLARATIONS = [
 
 const PROVIDERS = [
   ITM_REGISTRER_PROVIDER,
+  ItmJsonRegistrer,
   ItmPipeSandbox
 ];
 

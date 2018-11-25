@@ -1,12 +1,10 @@
 @import '~@angular/material/theming';
 
-$general-typography: mat-typography-config(
-  $font-family: '"Open Sans", sans-serif'
-);
-
+$main-font-family: "Open Sans", sans-serif;
 $alt-font-family: "Bitter", serif;
-
 $code-font-family: Menlo, Monaco, "Courier New", monospace;
+
+$general-typography: mat-typography-config($font-family: '"Open Sans", sans-serif');
 
 $primary: mat-palette($mat-grey);
 $accent: mat-palette($mat-green);

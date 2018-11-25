@@ -1,3 +1,4 @@
+import { Injectable } from '@angular/core';
 import { fromEvent, from } from 'rxjs';
 import { filter, first, map } from 'rxjs/operators';
 
@@ -17,7 +18,7 @@ const IFRAME_CONTENT = `
       pipe = eval(e.data.input);
       if (typeof pipe !== 'function') throw new TypeError('Pipe is not a function');
     }
-    catch (err) { console.error('Failed to add pipe', err); }
+    catch (err) { console.error('Failed to add pipe. Input: "' + e.data.input + '"', err.message); }
     pipes[id] = pipe;
     e.source.postMessage(
       {id, action: '${ADD_PIPE_ACTION}', created: Boolean(pipe)},
@@ -50,11 +51,13 @@ interface ItmPipeSandboxMessage {
   [key: string]: any;
 }
 
+@Injectable()
 export class ItmPipeSandbox {
   private _iframeListenner: (msg: ItmPipeSandboxMessage) => Promise<ItmPipeSandboxMessage>;
 
   private _initFrame(): Promise<void> {
     const iframe = document.createElement('iframe');
+    (iframe as any).style = 'display: none;';
     (iframe as any).sandbox = 'allow-scripts';
     const blob = new Blob([IFRAME_CONTENT], {type: 'text/html'});
     iframe.src = URL.createObjectURL(blob);
@@ -62,12 +65,11 @@ export class ItmPipeSandbox {
     document.body.appendChild(iframe);
     return onLoad.then(() => {
       const messages = fromEvent<MessageEvent>(window, 'message').pipe(
-        map(e => this._handleIframeMessage(e)),
-        filter(e => Boolean(e))
+        map(e => this._handleIframeMessage(e))
       );
       this._iframeListenner = (msg: ItmPipeSandboxMessage) => {
         const obs = messages.pipe(
-          filter(({id, action}) => id === msg.id && action === msg.action),
+          filter((e) => e && e.id === msg.id && e.action === msg.action),
           first()
         );
         iframe.contentWindow.postMessage(msg, '*');

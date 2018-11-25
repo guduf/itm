@@ -27,6 +27,7 @@ export * from './lib/grid_ref';
 export * from './lib/grid_template';
 export * from './lib/grid.component';
 export * from './lib/grid';
+export * from './lib/json_registrer';
 export * from './lib/menu.component';
 export * from './lib/menu';
 export * from './lib/options';
