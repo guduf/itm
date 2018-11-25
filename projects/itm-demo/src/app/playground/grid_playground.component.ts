@@ -1,6 +1,6 @@
 import { ItmGrid } from '../../../../itm-core/src/public_api';
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { EditorModel, InvalidEditorModel } from './editor.service';
 import { ErrorObject } from 'ajv';
@@ -11,18 +11,15 @@ import { ErrorObject } from 'ajv';
   styleUrls: ['grid_playground.component.scss']
 })
 
-export class GridPlaygroundComponent implements OnInit {
+export class GridPlaygroundComponent {
   grid: ItmGrid.Config;
   target = {id: 63};
   errors: ErrorObject[];
 
   constructor() { }
 
-  ngOnInit() { }
-
   handleEditorChange(e: EditorModel) {
     this.grid = e.valid ? e.value : null;
     this.errors = e.valid ? null : (e as InvalidEditorModel).errors;
-    console.log(this);
   }
 }

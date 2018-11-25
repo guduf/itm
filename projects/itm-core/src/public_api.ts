@@ -30,6 +30,7 @@ export * from './lib/grid';
 export * from './lib/menu.component';
 export * from './lib/menu';
 export * from './lib/options';
+export * from './lib/pipe_sandbox';
 export { ItmProp as ItmPropRecord } from './lib/prop';
 export * from './lib/record_factory';
 export * from './lib/registrer';

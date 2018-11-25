@@ -2,7 +2,6 @@
 
 import * as Ajv from 'ajv';
 import { ErrorObject } from 'ajv';
-import * as ajvErrors from 'ajv-errors';
 import { Injectable, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as _m from 'monaco-editor';

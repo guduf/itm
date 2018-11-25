@@ -9,9 +9,10 @@ import { ItmFieldComponent } from './field.component';
 import { ItmFormComponent } from './form.component';
 import { ItmGridComponent } from './grid.component';
 import { ItmMaterialModule } from './material.module';
+import { ItmMenuComponent } from './menu.component';
+import { ItmPipeSandbox } from './pipe_sandbox';
 import { ItmTableComponent } from './table.component';
 import { ITM_TYPE_PIPES } from './type.pipes';
-import { ItmMenuComponent } from './menu.component';
 import { ITM_REGISTRER_PROVIDER } from './registrer';
 
 const IMPORTS = [
@@ -38,12 +39,17 @@ const EXPORTED_DECLARATIONS = [
   ...ITM_TYPE_PIPES
 ];
 
+const PROVIDERS = [
+  ITM_REGISTRER_PROVIDER,
+  ItmPipeSandbox
+];
+
 /** The core module of the library. */
 @NgModule({
   imports: IMPORTS,
   exports: EXPORTED_DECLARATIONS,
   declarations: [...DECLARATIONS, ...ENTRY_COMPONENTS, ...EXPORTED_DECLARATIONS],
   entryComponents: ENTRY_COMPONENTS,
-  providers: [ITM_REGISTRER_PROVIDER]
+  providers: PROVIDERS
 })
 export class ItmCoreModule { }
