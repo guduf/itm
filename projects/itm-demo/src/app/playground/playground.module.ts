@@ -9,14 +9,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { AjvErrorsComponent } from './ajv_errors.component';
 
 const ROUTES: Routes = [
-  {
-    path: 'playground',
-    component: PlaygroundPageComponent,
-    children: [
-      {path: 'grid', component: GridPlaygroundComponent},
-      {path: '', redirectTo: './grid', pathMatch: 'full'}
-    ]
-  }
+  {path: 'grid', component: GridPlaygroundComponent},
+  {path: '', redirectTo: './grid', pathMatch: 'full'}
 ];
 
 @NgModule({

@@ -16,7 +16,7 @@ svg {
   margin-right: 6px;
 
   & > g {
-    stroke: rgba(mat-color($accent, 400), 0.25);
+    stroke: accent-color(4, 0.25);
     stroke-dasharray: 100;
     animation: dash 8s linear infinite;
 
@@ -40,12 +40,12 @@ svg {
   }
 
   &:nth-child(3n+2) > g {
-    stroke: rgba(mat-color($accent, 600), 0.25);
+    stroke: accent-color(6, 0.25);
     animation-delay: -3s;
   }
 
   &:nth-child(3n+3) > g {
-    stroke: rgba(mat-color($accent, 800), 0.25);
+    stroke: accent-color(8, 0.25);
     animation-delay: -6s;
   }
 }

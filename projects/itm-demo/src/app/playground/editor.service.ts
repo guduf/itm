@@ -8,13 +8,14 @@ import * as _m from 'monaco-editor';
 import { Observable, from } from 'rxjs';
 import { map, mergeMap, reduce } from 'rxjs/operators';
 
-const JSON_SCHEMAS = ['area.json', 'grid.json'];
+const JSON_SCHEMAS = ['target.json', 'area.json', 'grid.json'];
 
 const JSON_SCHEMAS_ENDPOINT = '/assets/schemas';
 
 const DEFAULT_EDITOR_OPTIONS: EditorOptions = {
   theme: 'vs-dark',
-  minimap: {enabled: false}
+  minimap: {enabled: false},
+  automaticLayout: true
 };
 
 export type EditorOptions = monaco.editor.IEditorConstructionOptions & { model?: never };
@@ -66,7 +67,9 @@ export class EditorService {
           try { value = JSON.parse(model.getValue()); }
           catch { value = null; }
           this._ajv.validate(filename, value);
-          if (this._ajv.errors) return emitter.next({valid: false, errors: this._ajv.errors});
+          if (!value || this._ajv.errors) return (
+            emitter.next({valid: false, errors: this._ajv.errors})
+          );
           return emitter.next({valid: true, value});
         };
         handleChange();

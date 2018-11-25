@@ -4,7 +4,7 @@
   position: relative;
   display: flex;
   padding: 2rem;
-  background-color: mat-color($accent, 600);
+  background-color: accent-color(6);
 
   & > .source {
     width: 100%;
@@ -14,7 +14,7 @@
       display: flex;
       justify-content: space-between;
       padding: 0.5rem 0;
-      background-color: mat-color($accent, 800);
+      background-color: accent-color(8);
 
       & h4 {
         @extend %heading;
@@ -27,13 +27,13 @@
         display: flex;
 
         & > button {
-          color: mat-color($primary, 200);
+          color: primary-color(2);
           margin: 0 0.5rem;
           border: 1px solid transparent;
           transition: border-color 0.33s ease-out;
 
           &.active {
-            border-color: mat-color($accent, 200);
+            border-color: accent-color(2);
           }
         }
       }
@@ -75,7 +75,7 @@
         top: 100%;
         margin-top: 3rem;
         font-style: italic;
-        color: mat-color($primary, 200);
+        color: primary-color(2);
         white-space: nowrap;
       }
     }
@@ -114,7 +114,7 @@
     }
 
     &::ng-deep .itm-grid-area {
-      border: 2px solid mat-color($accent, 900);
+      border: 2px solid accent-color(9);
     }
   }
 }

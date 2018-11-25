@@ -25,6 +25,18 @@ const GRID_CONTENT = (
 `
 );
 
+const TARGET_CONTENT = (
+`{
+  "id": 63
+}
+`
+);
+
+export interface JsonEditorModel {
+  schema: 'grid' | 'target';
+  content: string | Object;
+}
+
 @Component({
   selector: 'itm-demo-json-editor',
   template: `
@@ -35,10 +47,10 @@ const GRID_CONTENT = (
 })
 export class JsonEditorComponent<T extends Object = Object> implements AfterViewInit, OnDestroy {
   @Input()
-  filename: string;
+  model: JsonEditorModel;
 
   @Output()
-  change = new EventEmitter<EditorModel<T>>();
+  modelChange = new EventEmitter<EditorModel<T>>();
 
   @ViewChild('editor')
   editorRef: ElementRef;
@@ -64,10 +76,16 @@ export class JsonEditorComponent<T extends Object = Object> implements AfterView
   ngOnDestroy() { if (this._subscr) this._subscr.unsubscribe(); }
 
   private _create(): void {
-    this._subscr = this._service.createJsonEditor(
-      this.editorRef.nativeElement,
-      this.filename,
-      GRID_CONTENT
-    ).subscribe(this.change);
+    const el = this.editorRef.nativeElement;
+    const model = this.model || {} as JsonEditorModel;
+    const schema = (this.model.schema || 'target') + '.json';
+    const content = (
+      !model.content ? '{}' :
+      typeof model.content === 'string' ? model.content :
+        JSON.stringify(model.content, null, 2)
+    );
+    this._subscr = (
+      this._service.createJsonEditor(el, schema, content).subscribe(this.modelChange)
+    );
   }
 }

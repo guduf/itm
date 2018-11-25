@@ -1,38 +1,112 @@
 @import '../../theme';
 
 :host {
-  display: flex;
+  position: relative;
+  display: block;
+  width: 100%;
   height: 100%;
-  flex-flow: row nowrap;
+}
 
-  & > section {
+$aside-width: 2.5rem;
+
+aside {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  width: $aside-width;
+  height: 100%;
+  background-color: primary-color(8);
+
+  & > button {
+    width: $aside-width;
+    height: $aside-width;
+    border-radius: 0;
+  }
+}
+
+.mat-sidenav-container {
+  width: 100%;
+  height: 100%;
+}
+
+.mat-sidenav {
+  border-color: transparent;
+  padding-left: $aside-width;
+  width: 20rem;
+
+  header {
+    @extend %toolbar;
+
+    padding-left: 1rem;
+
+    color: primary-color(3);
+  }
+
+  button {
+    width: 100%;
+    padding: 0 1.5rem 0 1rem;
+    text-align: left;
+  }
+}
+
+.mat-sidenav-content {
+  display: flex;
+  padding-left: 0;
+  transition: padding-left 0.12s linear;
+
+  &.padded {
+    padding-left: $aside-width;
+  }
+}
+
+section {
+  flex: 1;
+  display: flex;
+  flex-flow: column nowrap;
+
+  & > header {
+    @extend %toolbar;
+  }
+
+  & > div {
     flex: 1;
-    display: flex;
-    flex-flow: column nowrap;
+  }
+
+  &.editor {
+    background-color: primary-color(9);
 
     & > header {
-      font-size: 18px;
-      font-weight: 700;
-      padding: 0.75rem 1.5rem 0.75rem;
-      margin-bottom: 0.5rem;
+      background-color: accent-color(8);
     }
 
-    &.editor {
-      & > header {
-        background-color: mat-color($accent, 800);
+    & > div {
+      position: relative;
+      overflow: hidden;
+
+      & > * {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        &.hidden {
+          left: -100%;
+        }
       }
     }
+  }
 
-    &.view {
-      background-color: mat-color($accent, 600);
+  &.view {
+    background-color: accent-color(6);
 
-      .grid-container {
-        flex: 1;
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: center;
-        align-items: center;
-      }
+    .grid-container {
+      flex: 1;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: center;
+      align-items: center;
     }
   }
 }

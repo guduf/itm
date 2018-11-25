@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Routes } from '@angular/router';
 import { MarkdownModule } from 'ngx-markdown';
 
@@ -12,8 +13,13 @@ import { SchemaComponent } from './schema.component';
 import { SharedModule } from './shared/shared.module';
 import { PlaygroundModule } from './playground/playground.module';
 
+export function loadPlaygroundModule() {
+  return PlaygroundModule;
+}
+
 const ROUTES: Routes = [
-  {path: '', component: HomePageComponent}
+  {path: '', component: HomePageComponent},
+  {path: 'playground', loadChildren: loadPlaygroundModule}
 ];
 
 @NgModule({
@@ -27,10 +33,10 @@ const ROUTES: Routes = [
   ],
   imports: [
     SharedModule,
+    BrowserAnimationsModule,
     MarkdownModule.forRoot(),
-    RouterModule.forRoot(ROUTES),
-    ExampleModule,
-    PlaygroundModule
+    RouterModule.forRoot(ROUTES, { enableTracing: true }),
+    ExampleModule
   ],
   bootstrap: [AppComponent]
 })

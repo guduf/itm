@@ -12,7 +12,7 @@
     height: 60vh;
     min-height: 400px;
     margin-top: -4rem;
-    text-shadow: 3px 3px 6px mat-color($primary, 900);
+    text-shadow: 3px 3px 6px primary-color(9);
 
     & > .background {
       position: fixed;
@@ -44,7 +44,7 @@
           & > span {
             font-family: $alt-font-family;
             font-size: 18px;
-            color: mat-color($accent, 400);
+            color: accent-color(4);
           }
         }
       }
@@ -55,7 +55,7 @@
     position: relative;
     padding: 2rem;
     color: white;
-    background-color: mat-color($accent, 600);
+    background-color: accent-color(6);
 
     & > p {
       max-width: 640px;
@@ -80,6 +80,6 @@
     height: 800px;
 
     position: relative;
-    background-color: mat-color($primary, 900);
+    background-color: primary-color(9);
   }
 }

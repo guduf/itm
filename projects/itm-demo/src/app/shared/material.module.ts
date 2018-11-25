@@ -4,16 +4,16 @@ import {
   MatIconRegistry,
   MatIconModule,
   MatDialogModule,
+  MatSidenavModule,
   MatTooltipModule
 } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 const MODULES = [
-  BrowserAnimationsModule,
   MatButtonModule,
   MatDialogModule,
   MatIconModule,
+  MatSidenavModule,
   MatTooltipModule
 ];
 

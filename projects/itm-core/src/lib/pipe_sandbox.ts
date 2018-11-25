@@ -83,7 +83,7 @@ export class ItmPipeSandbox {
     const id = Date.now() + Math.random();
     const msg = {id, action: ADD_PIPE_ACTION, input};
     const {created} = await this._iframeListenner(msg);
-    if (!created) throw new Error('Failed to register pipe');
+    if (!created) return () => { throw new Error('Invalid sandboxpipe'); };
     return (target: any) => {
       return from(this._iframeListenner({id, action: RUN_PIPE_ACTION, target})).pipe(
         map(({result}) => result)

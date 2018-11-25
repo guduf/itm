@@ -11,6 +11,26 @@ $accent: mat-palette($mat-green);
 $warn: mat-palette($mat-red);
 $theme: mat-dark-theme($primary, $accent, $warn);
 
+@function accent-color($hue: default, $opacity: null) {
+  @if type-of($hue) == number and $hue < 10 {
+    $hue: $hue * 100
+  }
+  @if type-of($hue) == number and $hue < 100 {
+    $hue: $hue * 10
+  }
+  @return mat-color($accent, $hue, $opacity);
+}
+
+@function primary-color($hue: default, $opacity: null) {
+  @if type-of($hue) == number and $hue < 10 {
+    $hue: $hue * 100
+  }
+  @if type-of($hue) == number and $hue < 100 {
+    $hue: $hue * 10
+  }
+  @return mat-color($primary, $hue, $opacity);
+}
+
 %heading {
   padding: 0.5rem 1rem;
   margin: 0;
@@ -25,6 +45,47 @@ $theme: mat-dark-theme($primary, $accent, $warn);
   font-size: 12px;
   line-height: 18px;
   letter-spacing: 0px;
-  color: mat-color($primary, 300);
-  background-color: mat-color($primary, 900);
+  color: primary-color(3);
+  background-color: primary-color(9);
+}
+
+%lead {
+  font-family: $main-font-family;
+  font-size: 18px;
+  line-height: 1.5rem;
+  font-weight: 700;
+}
+
+%toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0 1.5rem;
+  margin-bottom: 0.5rem;
+
+  & > h2, h3, h4 {
+    @extend %lead;
+
+    flex: 1;
+    margin: 0;
+  }
+
+  & > nav {
+    flex: 1;
+    display: flex;
+  }
+}
+
+%button {
+  border: 1px solid transparent;
+  border-radius: 0;
+  line-height: 2.5rem;
+  color: primary-color(2);
+  transition: border-color 0.33s ease-out;
+
+  &.active {
+    color: primary-color(1);
+    background-color: primary-color(2, 0.25);
+  }
 }
