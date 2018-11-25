@@ -1,4 +1,8 @@
+/// <reference path="../../../../../node_modules/monaco-editor/monaco.d.ts" />
+
 import * as Ajv from 'ajv';
+import { ErrorObject } from 'ajv';
+import * as ajvErrors from 'ajv-errors';
 import { Injectable, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as _m from 'monaco-editor';
@@ -9,16 +13,30 @@ const JSON_SCHEMAS = ['area.json', 'grid.json'];
 
 const JSON_SCHEMAS_ENDPOINT = '/assets/schemas';
 
-export type EditorModel<T> = (
-  { valid: true, value: T } |
-  { valid: false, errors: Ajv.ErrorObject[] }
-);
+const DEFAULT_EDITOR_OPTIONS: EditorOptions = {
+  theme: 'vs-dark',
+  minimap: {enabled: false}
+};
+
+export type EditorOptions = monaco.editor.IEditorConstructionOptions & { model?: never };
+
+export interface InvalidEditorModel {
+  valid: false;
+  errors: ErrorObject[];
+}
+
+export interface ValidEditorModel<T extends Object = Object> {
+  valid: true;
+  value: T;
+}
+
+export type EditorModel<T extends Object = Object> = ValidEditorModel<T> | InvalidEditorModel;
 
 @Injectable()
 export class EditorService {
   get loaded() { return this._loaded; }
 
-  private _ajv = new Ajv();
+  private readonly _ajv = new Ajv();
   private _monaco: typeof _m;
 
   private _loaded = false;
@@ -33,24 +51,28 @@ export class EditorService {
     elem: HTMLElement,
     filename: string,
     code = `{\n}\n`,
-    onDidChangeContent: (content: string) => void = () => {}
+    opts: EditorOptions = {}
   ): Observable<EditorModel<T>> {
     return this._run(() => {
       return new Observable(emitter => {
         const modelUri = this._monaco.Uri.parse('monaco://' + filename);
         const model = this._monaco.editor.createModel(code, 'json', modelUri);
-        const opts = {model, theme: 'vs-dark', minimap: {enabled: false}};
-        const editor = this._monaco.editor.create(elem, opts);
-        const changes = model.onDidChangeContent(() => {
+        const editor = this._monaco.editor.create(elem, {
+          ...DEFAULT_EDITOR_OPTIONS,
+          ...opts,
+          model
+        });
+        const handleChange = () => {
           let value: any;
           try { value = JSON.parse(model.getValue()); }
           catch { value = null; }
           this._ajv.validate(filename, value);
           if (this._ajv.errors) return emitter.next({valid: false, errors: this._ajv.errors});
           return emitter.next({valid: true, value});
-        });
+        };
+        handleChange();
+        const changes = model.onDidChangeContent(handleChange);
         return () => {
-          console.log('dispose');
           model.dispose();
           editor.dispose();
           changes.dispose();

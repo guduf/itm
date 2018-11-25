@@ -1,0 +1,13 @@
+<section class="editor">
+  <header>Editor</header>
+  <itm-demo-json-editor filename="grid.json" (change)="handleEditorChange($event)"></itm-demo-json-editor>
+</section>
+<section class="view">
+  <header>View</header>
+  <div *ngIf="grid && target; else info;" class="grid-container">
+    <itm-grid [grid]="grid" [target]="target"></itm-grid>
+  </div>
+</section>
+<ng-template #info>
+  <itm-demo-ajv-errors [errors]="errors"></itm-demo-ajv-errors>
+</ng-template>

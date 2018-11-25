@@ -79,7 +79,9 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
 
   get ref(): GridRef { return this._ref; }
 
-  private _hostStyle: { gridTemplateColumns: SafeStyle, gridTemplateRows: SafeStyle };
+  private _hostStyle: { gridTemplateColumns: SafeStyle, gridTemplateRows: SafeStyle } = (
+    {gridTemplateColumns: null, gridTemplateRows: null}
+  );
 
   private _ref: GridRef;
 
@@ -127,26 +129,29 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
     super.ngOnChanges(changes);
     if (changes.grid) {
       if (this._sharedResolversSubscr) this._sharedResolversSubscr.unsubscribe();
-      const record = GridFactory(this.grid);
-      try {
-        this._ref = GridRef.buildRef(
-          this._rgstr,
-          record,
-          this.behaviors.target,
-          this._actionEmitter
+      this._ref = null;
+      if (this.grid) {
+        try {
+          const record = GridFactory(this.grid);
+          this._ref = GridRef.buildRef(
+            this._rgstr,
+            record,
+            this.behaviors.target,
+            this._actionEmitter
+          );
+        } catch (err) {
+          console.error('BUILD GRID ERROR', err);
+          // tslint:disable-next-line:max-line-length
+          console.error('BUILD GRID ERROR CONTEXT', {grid: this.grid});
+          return;
+        }
+        const sharedResolvers = (
+          this.ref.injector.get(ITM_SHARED_RESOLVERS_TOKEN) as Observable<Action.Resolvers>
         );
-      } catch (err) {
-        console.error('BUILD GRID ERROR', err);
-        // tslint:disable-next-line:max-line-length
-        console.error('BUILD GRID ERROR CONTEXT', {record: record.toJS()});
-        return;
+        this._sharedResolversSubscr = sharedResolvers.subscribe(this._sharedResolversSub);
       }
-      const sharedResolvers = (
-        this.ref.injector.get(ITM_SHARED_RESOLVERS_TOKEN) as Observable<Action.Resolvers>
-      );
-      this._sharedResolversSubscr = sharedResolvers.subscribe(this._sharedResolversSub);
-      this.fragments = record.positions.keySeq().toArray();
-      this._setHostStyle();
+      this.fragments = this._ref ? this._ref.record.positions.keySeq().toArray() : null;
+      this._hostStyle = this._buildHostStyle();
     }
   }
 
@@ -158,7 +163,8 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
     if (this._sharedResolversSubscr) this._sharedResolversSubscr.unsubscribe();
   }
 
-  private _setHostStyle(): void {
+  private _buildHostStyle(): { gridTemplateColumns: SafeStyle, gridTemplateRows: SafeStyle } {
+    if (!this.record) return { gridTemplateColumns: null, gridTemplateRows: null };
     const range = Template.getRange(this.record.positions);
     const initialCols = Range(0, range.cols).map(() => -1).toArray();
     const initialRows = Range(0, range.rows).map(() => -1).toArray();
@@ -180,7 +186,7 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
       },
       {rows: initialRows, cols: initialCols}
     );
-    this._hostStyle = {
+    return {
       gridTemplateColumns: this._sanitizer.bypassSecurityTrustStyle(
         cols.map(col => col > 0 ? `minmax(${GRID_RHYTHM} , ${col}fr)` : GRID_RHYTHM).join(' ')
       ),

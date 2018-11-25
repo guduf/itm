@@ -1,0 +1,17 @@
+<ng-container *ngIf="articles">
+  <header>
+    <mat-icon>error_outline</mat-icon>
+    <span>The model is invalid.</span>
+    <span>Please correct the following errors in the editor.</span>
+  </header>
+  <ul>
+    <li *ngFor="let article of articles">
+      <article *ngIf="article">
+        <header>
+          <span *ngFor="let fragment of article.fragments">{{fragment}}</span>
+        </header>
+        <p>{{article.message}}</p>
+      </article>
+    </li>
+  </ul>
+</ng-container>

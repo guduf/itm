@@ -1,37 +1,49 @@
-import { AfterViewInit, OnDestroy, Component, ViewChild, ElementRef, NgZone } from '@angular/core';
-import { EditorService } from './editor.service';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnDestroy,
+  Output,
+  ViewChild,
+  Input
+} from '@angular/core';
+import { EditorService, EditorModel } from './editor.service';
 import { Subscription } from 'rxjs';
 
 const GRID_CONTENT = (
 `{
   "areas": [
     {
-      "key": ""
+      "key": "id"
     }
   ],
   "template": [
-    [""]
+    ["id"]
   ]
 }
 `
 );
 
 @Component({
-  selector: 'itm-demo-editor',
+  selector: 'itm-demo-json-editor',
   template: `
     <div *ngIf="loading">Loading…</div>
-    <div #editor [ngStyle]="editorStyle"></div>
-  `
+    <div #editor></div>
+  `,
+  styleUrls: ['editor.component.scss']
 })
-export class EditorComponent implements AfterViewInit, OnDestroy {
+export class JsonEditorComponent<T extends Object = Object> implements AfterViewInit, OnDestroy {
+  @Input()
+  filename: string;
+
+  @Output()
+  change = new EventEmitter<EditorModel<T>>();
+
   @ViewChild('editor')
   editorRef: ElementRef;
 
   loading = false;
-
-  get editorStyle() {
-    return {display: 'block', width: '600px', height: '600px'};
-  }
 
   private _subscr: Subscription;
 
@@ -54,11 +66,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   private _create(): void {
     this._subscr = this._service.createJsonEditor(
       this.editorRef.nativeElement,
-      'grid.json',
+      this.filename,
       GRID_CONTENT
-    ).subscribe(
-      e => console.log(e),
-      err => console.log(err)
-    );
+    ).subscribe(this.change);
   }
 }

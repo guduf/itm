@@ -6,6 +6,8 @@ $general-typography: mat-typography-config(
 
 $alt-font-family: "Bitter", serif;
 
+$code-font-family: Menlo, Monaco, "Courier New", monospace;
+
 $primary: mat-palette($mat-grey);
 $accent: mat-palette($mat-green);
 $warn: mat-palette($mat-red);
@@ -17,4 +19,14 @@ $theme: mat-dark-theme($primary, $accent, $warn);
   line-height: 2rem;
   font-size: 1.5rem;
   font-weight: 400;
+}
+
+%code {
+  font-family: $code-font-family;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0px;
+  color: mat-color($primary, 300);
+  background-color: mat-color($primary, 900);
 }

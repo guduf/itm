@@ -85,7 +85,7 @@ export module ItmGridRef {
           defaultText: defaultText || acc.defaultText,
           providers: acc.providers.merge(areaProviders)
         }),
-        {defaultComp: null, defaultText: null, providers: Map<any, Area.Provider>()}
+        {defaultComp: null, defaultText: () => of(record.key), providers: Map<any, Area.Provider>()}
       );
       const comp = (
         record.comp ? record.comp :

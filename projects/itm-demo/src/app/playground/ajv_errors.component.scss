@@ -1,0 +1,41 @@
+@import '../../theme';
+
+:host {
+  display: block;
+
+  padding: 1rem;
+
+  & > header {
+    display: flex;
+    height: 2.5rem;
+    padding: 0.5rem;
+    background-color: mat-color($warn, 800);
+
+    .mat-icon {
+      margin-right: 4px;
+    }
+
+    span {
+      margin: 2px;
+    }
+  }
+}
+
+ul {
+  @extend %code;
+
+  padding: 1rem;
+
+  header {
+    color: mat-color($warn, 400);
+    margin-bottom: 6px;
+  }
+
+  span {
+    display: inline-block;
+    padding: 0 6px;
+    margin-right: 6px;
+    background-color: rgba(mat-color($warn, 400), 0.12);
+    border-radius: 3px;
+  }
+}

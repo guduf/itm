@@ -1,4 +1,4 @@
-import { NgModule, NgZone } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MarkdownModule } from 'ngx-markdown';
 
@@ -8,16 +8,12 @@ import { BasicExampleContainerComponent } from './basic_example_container.compon
 import { BackgroundComponent } from './background.component';
 import { ExampleModule } from './example/example.module';
 import { HomePageComponent } from './home_page.component';
-import { PlaygroundModule } from './playground/playground.module';
-import { PlaygroundComponent } from './playground/playground.component';
 import { SchemaComponent } from './schema.component';
 import { SharedModule } from './shared/shared.module';
-
-declare const initMonaco: () => Promise<void>;
+import { PlaygroundModule } from './playground/playground.module';
 
 const ROUTES: Routes = [
-  {path: '', component: HomePageComponent},
-  {path: 'playground', component: PlaygroundComponent}
+  {path: '', component: HomePageComponent}
 ];
 
 @NgModule({
