@@ -10,7 +10,7 @@ import { AjvErrorsComponent } from './ajv_errors.component';
 
 const ROUTES: Routes = [
   {path: 'grid', component: GridPlaygroundComponent},
-  {path: '', redirectTo: './grid', pathMatch: 'full'}
+  {path: '**', redirectTo: '/playground/grid', pathMatch: 'full'}
 ];
 
 @NgModule({

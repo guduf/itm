@@ -34,10 +34,7 @@ export const GRID_PLAYGROUNDS: { [key: string]: GridPlayground } = {
     target: {
       id: 1,
       firstName: 'Bernice',
-      lastName: 'Sperring',
-      email: 'bsperring0@reddit.com',
-      gender: 'Female',
-      ipAddress: '113.72.188.91'
+      lastName: 'Sperring'
     }
   }
 };

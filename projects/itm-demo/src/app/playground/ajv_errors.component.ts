@@ -17,7 +17,7 @@ export class AjvErrorsComponent implements OnChanges {
 
   get articles(): AjvErrorArticle[] { return this._articles; }
 
-  private _articles: AjvErrorArticle[];
+  private _articles: AjvErrorArticle[] = null;
 
   ngOnChanges() {
     this._articles = (

@@ -13,13 +13,11 @@ import { SchemaComponent } from './schema.component';
 import { SharedModule } from './shared/shared.module';
 import { PlaygroundModule } from './playground/playground.module';
 
-export function loadPlaygroundModule() {
-  return PlaygroundModule;
-}
+export function loadPlaygroundModule() { return PlaygroundModule; }
 
 const ROUTES: Routes = [
-  {path: '', component: HomePageComponent},
-  {path: 'playground', loadChildren: loadPlaygroundModule}
+  {path: 'playground', loadChildren: loadPlaygroundModule},
+  {path: '**', component: HomePageComponent}
 ];
 
 @NgModule({

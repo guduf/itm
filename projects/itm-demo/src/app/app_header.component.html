@@ -3,13 +3,13 @@
   <span>angular<br/>framework</span>
 </h1>
 <nav>
-  <a href=".">Guides</a>
-  <a href=".">API Doc</a>
+  <a [routerLink]="['/']">Guides</a>
+  <a [routerLink]="['/']">API Doc</a>
   <a [routerLink]="['/', 'playground']">Playground</a>
 </nav>
-<a href="//github.com/guduf/itm" aria-label="github">
+<a href="//github.com/guduf/itm" target="_blank" aria-label="github">
   <span>github</span>
-  <button mat-icon-button><!-- href="//github.com/guduf/itm"> -->
+  <button mat-icon-button>
     <mat-icon svgIcon="github" aria-label="github"></mat-icon>
   </button>
 </a>

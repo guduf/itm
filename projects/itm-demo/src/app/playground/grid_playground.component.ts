@@ -17,13 +17,13 @@ import { JsonEditorModel } from './json_editor.component';
 export class GridPlaygroundComponent {
   activatedEditor: 'grid' | 'target' = 'grid';
 
-  grid: ItmGrid.Config;
+  grid: ItmGrid.Config = null;
 
-  target: Object;
+  target: Object = null;
 
-  gridErrors: ErrorObject[];
+  gridErrors: ErrorObject[] = null;
 
-  targetErrors: ErrorObject[];
+  targetErrors: ErrorObject[] = null;
 
   sidenavMode = 'side';
 
