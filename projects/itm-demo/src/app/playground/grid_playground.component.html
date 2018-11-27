@@ -3,8 +3,10 @@
     <nav>
       <header><h3>Playground</h3></header>
       <ul>
-        <li *ngFor="let link of links">
-          <button mat-button [class.active]="link.model === activeModel">{{link.label}}</button>
+        <li *ngFor="let playgroundId of playgroundIds">
+          <button mat-button [class.active]="(activePlaygroundId === playgroundId)">
+            {{getPlaygroundLabel(playgroundId)}}
+          </button>
         </li>
       </ul>
     </nav>
@@ -20,9 +22,9 @@
         </nav>
       </header>
       <div>
-        <itm-demo-json-editor [model]="gridModel" (modelChange)="handleGridChange($event)"
+        <itm-demo-json-editor [model]="getActivePlaygroundModel('grid')" (modelChange)="handleGridChange($event)"
           [class.hidden]="(activatedEditor !== 'grid')"></itm-demo-json-editor>
-        <itm-demo-json-editor [model]="targetModel" (modelChange)="handleTargetChange($event)"
+        <itm-demo-json-editor [model]="getActivePlaygroundModel('target')" (modelChange)="handleTargetChange($event)"
           [class.hidden]="(activatedEditor !== 'target')"></itm-demo-json-editor>
       </div>
     </section>

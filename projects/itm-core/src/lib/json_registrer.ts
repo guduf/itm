@@ -7,7 +7,7 @@ import Grid from './grid';
 import GridFactory from './grid_factory';
 import PipeSandbox from './pipe_sandbox';
 import { from } from 'rxjs';
-import { map, mergeMap, reduce, tap } from 'rxjs/operators';
+import { map, mergeMap, reduce } from 'rxjs/operators';
 
 @Injectable()
 export class ItmJsonRegistrer {
@@ -40,13 +40,26 @@ export class ItmJsonRegistrer {
     const {key, size} = json;
     let text: any = null;
     if (typeof json.text === 'string') {
-      const pipeInput = (
-        /^\([^\)]*\) => {.*\sreturn\s.*;\s+}$/.test(json.text) ? json.text :
-          '(target, key, it) => (' + json.text + ')'
-      );
+      const pipeInput = ItmJsonRegistrer.parsePipeInput(json.text);
       text = await this._pipeSandbox.eval(pipeInput);
     }
     return AreaFactory({key, size, text});
+  }
+}
+
+export module ItmJsonRegistrer {
+  export function parsePipeInput(input: string): string {
+    if (!input) return '() => null';
+    if (/^\s*\([^\)]*\) => {.*}\s*$/.test(input)) return input;
+    if (/^\s*`.*`\s*$/.test(input)) (
+      input = input.replace(
+        /\$\.[a-z]\w*(\.[a-z]\w*)*/g,
+        match => {
+          return ('${target' + match.slice(1) + '}');
+        }
+      )
+    );
+    return `target => (${input})`;
   }
 }
 

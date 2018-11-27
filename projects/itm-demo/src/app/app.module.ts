@@ -35,7 +35,7 @@ const ROUTES: Routes = [
     SharedModule,
     BrowserAnimationsModule,
     MarkdownModule.forRoot(),
-    RouterModule.forRoot(ROUTES, { enableTracing: true }),
+    RouterModule.forRoot(ROUTES),
     ExampleModule
   ],
   bootstrap: [AppComponent]

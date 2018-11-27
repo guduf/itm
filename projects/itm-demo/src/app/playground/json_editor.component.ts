@@ -11,27 +11,6 @@ import {
 import { EditorService, EditorModel } from './editor.service';
 import { Subscription } from 'rxjs';
 
-const GRID_CONTENT = (
-`{
-  "areas": [
-    {
-      "key": "id"
-    }
-  ],
-  "template": [
-    ["id"]
-  ]
-}
-`
-);
-
-const TARGET_CONTENT = (
-`{
-  "id": 63
-}
-`
-);
-
 export interface JsonEditorModel {
   schema: 'grid' | 'target';
   content: string | Object;

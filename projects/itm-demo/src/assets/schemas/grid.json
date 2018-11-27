@@ -44,7 +44,7 @@
     "area": { "$ref": "area.json" },
     "template-item": {
       "type": "string",
-      "pattern": "^(?:[a-z]\\w+:)?[a-z]\\w+(?:\\.[a-z]\\w+)*$"
+      "pattern": "^(([a-z]\\w+:)?[a-z]\\w+(\\.[a-z]\\w+)*)|=|\\.$"
     },
     "areas": {
       "type": "array",

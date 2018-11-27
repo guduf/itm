@@ -53,7 +53,8 @@ interface ItmPipeSandboxMessage {
 
 @Injectable()
 export class ItmPipeSandbox {
-  private _iframeListenner: (msg: ItmPipeSandboxMessage) => Promise<ItmPipeSandboxMessage>;
+  private _iframeListener: (msg: ItmPipeSandboxMessage) => Promise<ItmPipeSandboxMessage>;
+  private _ready: Promise<void>;
 
   private _initFrame(): Promise<void> {
     const iframe = document.createElement('iframe');
@@ -67,7 +68,7 @@ export class ItmPipeSandbox {
       const messages = fromEvent<MessageEvent>(window, 'message').pipe(
         map(e => this._handleIframeMessage(e))
       );
-      this._iframeListenner = (msg: ItmPipeSandboxMessage) => {
+      this._iframeListener = (msg: ItmPipeSandboxMessage) => {
         const obs = messages.pipe(
           filter((e) => e && e.id === msg.id && e.action === msg.action),
           first()
@@ -79,13 +80,14 @@ export class ItmPipeSandbox {
   }
 
   async eval<T extends Object, R>(input: string): Promise<Target.Pipe<T, R>> {
-    if (!this._iframeListenner) await this._initFrame();
+    if (!this._ready) await (this._ready = this._initFrame());
+    if (!this._iframeListener) await this._ready;
     const id = Date.now() + Math.random();
     const msg = {id, action: ADD_PIPE_ACTION, input};
-    const {created} = await this._iframeListenner(msg);
+    const {created} = await this._iframeListener(msg);
     if (!created) return () => { throw new Error('Invalid sandboxpipe'); };
     return (target: any) => {
-      return from(this._iframeListenner({id, action: RUN_PIPE_ACTION, target})).pipe(
+      return from(this._iframeListener({id, action: RUN_PIPE_ACTION, target})).pipe(
         map(({result}) => result)
       );
     };

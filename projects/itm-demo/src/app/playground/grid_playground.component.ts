@@ -1,9 +1,12 @@
 import { ItmGrid, ItmJsonRegistrer } from '../../../../itm-core/src/public_api';
 
 import { Component } from '@angular/core';
+import { ErrorObject } from 'ajv';
+
 
 import { EditorModel, InvalidEditorModel } from './editor.service';
-import { ErrorObject } from 'ajv';
+import { GRID_PLAYGROUNDS } from './grid_playground';
+import { JsonEditorModel } from './json_editor.component';
 
 @Component({
   selector: 'itm-demo-grid-playground',
@@ -13,25 +16,39 @@ import { ErrorObject } from 'ajv';
 
 export class GridPlaygroundComponent {
   activatedEditor: 'grid' | 'target' = 'grid';
-  grid: ItmGrid.Config;
-  target: Object;
-  gridErrors: ErrorObject[];
-  targetErrors: ErrorObject[];
-  sidenavMode = 'side';
-  sidenavOpened = true;
-  activeModel = 'simple';
 
-  gridModel = {schema: 'grid', content: {areas: [{key: 'id'}], template: 'id'}};
-  targetModel = {schema: 'target', content: {id: 63}};
-  links = [{label: 'Simple grid', model: 'simple'}];
+  grid: ItmGrid.Config;
+
+  target: Object;
+
+  gridErrors: ErrorObject[];
+
+  targetErrors: ErrorObject[];
+
+  sidenavMode = 'side';
+
+  sidenavOpened = true;
+
+  activePlaygroundId = 'simple';
+
+  readonly playgroundIds = Object.keys(GRID_PLAYGROUNDS);
+
+  readonly playgrounds = GRID_PLAYGROUNDS;
 
   constructor(
     private _jsonRegistrer: ItmJsonRegistrer
   ) { }
 
+  getActivePlaygroundModel(schema: 'grid' | 'target'): JsonEditorModel {
+    return {schema, content: this.playgrounds[this.activePlaygroundId][schema]};
+  }
+
+  getPlaygroundLabel(playgroundId: string): string {
+    return this.playgrounds[playgroundId].label;
+  }
+
   handleGridChange(e: EditorModel) {
     this.grid = null;
-    console.log(e);
     if (e.valid) this._jsonRegistrer.buildGrid(e.value).then(
       grid => (this.grid = grid),
       err => console.error(err)
