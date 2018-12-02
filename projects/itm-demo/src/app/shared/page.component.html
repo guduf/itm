@@ -1,7 +1,7 @@
 <mat-sidenav-container>
   <mat-sidenav [mode]="sidenavMode" [opened]="sidenavOpened">
     <header>
-      <h2>{{heading | async}}</h2>
+      <h2>{{heading | translate}}</h2>
     </header>
     <nav *ngFor="let route of routes">
       <a mat-button [routerLink]="route.link" [class.active]="route.active | async">

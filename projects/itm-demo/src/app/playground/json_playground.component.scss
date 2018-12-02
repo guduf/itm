@@ -25,6 +25,19 @@ section {
 
     & > header {
       background-color: accent-color(8);
+
+      button {
+        position: relative;
+
+        &.errored {
+          &::after {
+            content: '●';
+            position: absolute;
+            right: 0.25rem;
+            color: mat-color($warn);
+          }
+        }
+      }
     }
 
     & > div {
@@ -48,12 +61,28 @@ section {
   &.view {
     background-color: accent-color(6);
 
-    .grid-container {
+    & > div {
       flex: 1;
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: center;
-      align-items: center;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+
+      & > div {
+        position: absolute;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        &.hidden {
+          left: -100%;
+        }
+      }
     }
   }
 }

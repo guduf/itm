@@ -13,7 +13,8 @@ const IMPORTS = [
   HttpClientModule,
   MaterialModule,
   ItmCoreModule,
-  RouterModule
+  RouterModule,
+  TranslateModule
 ];
 
 const DECLARATIONS = [
@@ -22,7 +23,7 @@ const DECLARATIONS = [
 
 @NgModule({
   declarations: DECLARATIONS,
-  imports: [IMPORTS, TranslateModule.forChild()],
+  imports: [IMPORTS],
   exports: [...DECLARATIONS, ...IMPORTS]
 })
 export class SharedModule { }

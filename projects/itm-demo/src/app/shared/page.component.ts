@@ -11,7 +11,7 @@ const SELECTOR = 'itm-demo-page';
   styleUrls: ['page.component.scss']
 })
 export class PageComponent {
-  readonly heading: Observable<string>;
+  readonly heading: string;
 
   sidenavMode = 'side';
 
@@ -32,6 +32,7 @@ export class PageComponent {
   }[];
 
   constructor(private _route: ActivatedRoute) {
+    this.heading = 'page.' + this._route.parent.snapshot.url[0].path;
     const root = this._route.firstChild;
     const active = combineLatest(root.url, root.fragment).pipe(
       map(([[{path}], fragment]) => ({path, fragment})),
@@ -40,12 +41,12 @@ export class PageComponent {
     this.routes = this._route.routeConfig.children
       .filter(({path}) => path && path !== '**')
       .map(route => {
-        const text = 'page' + '.route.' + route.path;
+        const text = this.heading + '.' + route.path;
         const hashRoutes = (
           Array.isArray(route.data.hashRoutes) ?
             route.data.hashRoutes.map(hashRoute => ({
               fragment: hashRoute,
-              text: text + '.hash.' + hashRoute,
+              text: text + '.' + hashRoute,
               active: active.pipe(
                 map(({fragment}) => fragment === hashRoute),
                 distinctUntilChanged()
@@ -61,6 +62,5 @@ export class PageComponent {
           hashRoutes
         };
       });
-    this.heading = this._route.data.pipe(map(data => data.heading));
   }
 }

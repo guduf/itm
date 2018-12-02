@@ -23,6 +23,7 @@ export * from './lib/form_ref';
 export * from './lib/form';
 export * from './lib/form.component';
 export * from './lib/grid_areas';
+export * from './lib/grid_factory';
 export * from './lib/grid_ref';
 export * from './lib/grid_template';
 export * from './lib/grid.component';

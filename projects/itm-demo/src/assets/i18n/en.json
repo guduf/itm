@@ -1,5 +1,7 @@
 {
-  "page.menu.playground": "Playground",
-  "page.route.grid": "Grid",
-  "page.route.grid.hash.simple_grid": "Simple grid"
+  "page.playground": "Playground",
+  "page.playground.grid": "Grid",
+  "page.playground.grid.simple": "Simple grid",
+  "playground.editor": "Editor",
+  "playground.view": "View"
 }
