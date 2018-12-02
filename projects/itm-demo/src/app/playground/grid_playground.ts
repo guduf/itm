@@ -1,14 +1,12 @@
 import { ItmGrid } from '../../../../itm-core/src/public_api';
 
 export interface GridPlayground {
-  label: string;
   grid: ItmGrid.Config;
   target: Object;
 }
 
 export const GRID_PLAYGROUNDS: { [key: string]: GridPlayground } = {
   simple: {
-    label: 'Simple grid',
     grid: {
       areas: [
         {

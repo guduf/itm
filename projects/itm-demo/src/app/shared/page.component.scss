@@ -1,0 +1,85 @@
+@import '../../theme';
+
+:host {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+$aside-width: 2.5rem;
+
+aside {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  width: $aside-width;
+  height: 100%;
+  background-color: primary-color(8);
+
+  & > button {
+    width: $aside-width;
+    height: $aside-width;
+    border-radius: 0;
+  }
+}
+
+header {
+  @extend %toolbar;
+
+  padding-left: 1rem;
+
+  color: primary-color(3);
+}
+
+nav {
+  background-color: primary-color(6);
+
+  & > a {
+    width: 100%;
+    font-weight: 700;
+    background-color: primary-color(7);
+    text-align: left;
+  }
+
+  & > ul li {
+    padding: 0.5rem 1rem;
+
+    & > a {
+      display: block;
+      width: 100%;
+
+      &.active {
+        color: accent-color(A200);
+      }
+    }
+  }
+}
+
+.mat-sidenav-container {
+  width: 100%;
+  height: 100%;
+}
+
+.mat-sidenav {
+  border-color: transparent;
+  padding-left: $aside-width;
+  width: 20rem;
+
+  & > button {
+    width: 100%;
+    padding: 0 1.5rem 0 1rem;
+    text-align: left;
+  }
+}
+
+.mat-sidenav-content {
+  display: flex;
+  padding-left: 0;
+  transition: padding-left 0.12s linear;
+
+  &.padded {
+    padding-left: $aside-width;
+  }
+}

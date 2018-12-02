@@ -1,48 +1,27 @@
-<mat-sidenav-container>
-  <mat-sidenav [mode]="sidenavMode" [opened]="sidenavOpened">
+<section class="editor">
+  <header>
+    <h3>Editor</h3>
     <nav>
-      <header><h3>Playground</h3></header>
-      <ul>
-        <li *ngFor="let playgroundId of playgroundIds">
-          <button mat-button [class.active]="(activePlaygroundId === playgroundId)">
-            {{getPlaygroundLabel(playgroundId)}}
-          </button>
-        </li>
-      </ul>
+      <button *ngFor="let editor of ['grid', 'target']"
+        mat-button [class.active]="(activatedEditor === editor)"
+        (click)="(activatedEditor = editor)">{{editor}}</button>
     </nav>
-  </mat-sidenav>
-  <mat-sidenav-content [class.padded]="sidenavMode === 'side' && !sidenavOpened">
-    <section class="editor">
-      <header>
-        <h3>Editor</h3>
-        <nav>
-          <button *ngFor="let editor of ['grid', 'target']"
-            mat-button [class.active]="(activatedEditor === editor)"
-            (click)="(activatedEditor = editor)">{{editor}}</button>
-        </nav>
-      </header>
-      <div>
-        <itm-demo-json-editor [model]="getActivePlaygroundModel('grid')" (modelChange)="handleGridChange($event)"
-          [class.hidden]="(activatedEditor !== 'grid')"></itm-demo-json-editor>
-        <itm-demo-json-editor [model]="getActivePlaygroundModel('target')" (modelChange)="handleTargetChange($event)"
-          [class.hidden]="(activatedEditor !== 'target')"></itm-demo-json-editor>
-      </div>
-    </section>
-    <section class="view">
-      <header>
-        <h3>View</h3>
-      </header>
-      <div *ngIf="grid && target; else info;" class="grid-container">
-        <itm-grid [grid]="grid" [target]="target"></itm-grid>
-      </div>
-    </section>
-  </mat-sidenav-content>
-</mat-sidenav-container>
-<aside>
-  <button mat-icon-button (click)="(sidenavOpened = !sidenavOpened)">
-    <mat-icon>{{sidenavOpened ? 'chevron_left' : 'menu'}}</mat-icon>
-  </button>
-</aside>
+  </header>
+  <div>
+    <itm-demo-json-editor [model]="getActivePlaygroundModel('grid')" (modelChange)="handleGridChange($event)"
+      [class.hidden]="(activatedEditor !== 'grid')"></itm-demo-json-editor>
+    <itm-demo-json-editor [model]="getActivePlaygroundModel('target')" (modelChange)="handleTargetChange($event)"
+      [class.hidden]="(activatedEditor !== 'target')"></itm-demo-json-editor>
+  </div>
+</section>
+<section class="view">
+  <header>
+    <h3>View</h3>
+  </header>
+  <div *ngIf="grid && target; else info;" class="grid-container">
+    <itm-grid [grid]="grid" [target]="target"></itm-grid>
+  </div>
+</section>
 <ng-template #info>
   <itm-demo-ajv-errors [errors]="gridErrors"></itm-demo-ajv-errors>
   <itm-demo-ajv-errors [errors]="targetErrors"></itm-demo-ajv-errors>

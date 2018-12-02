@@ -1,0 +1,29 @@
+<mat-sidenav-container>
+  <mat-sidenav [mode]="sidenavMode" [opened]="sidenavOpened">
+    <header>
+      <h2>{{heading | async}}</h2>
+    </header>
+    <nav *ngFor="let route of routes">
+      <a mat-button [routerLink]="route.link" [class.active]="route.active | async">
+        {{route.text | translate}}
+      </a>
+      <ul>
+        <li *ngFor="let hashRoute of route.hashRoutes">
+          <a
+            [routerLink]="hashRoute.link" [fragment]="hashRoute.fragment"
+            [class.active]="hashRoute.active | async">
+            {{hashRoute.text | translate}}
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </mat-sidenav>
+  <mat-sidenav-content [class.padded]="sidenavMode === 'side' && !sidenavOpened">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+<aside>
+  <button mat-icon-button (click)="(sidenavOpened = !sidenavOpened)">
+    <mat-icon>{{sidenavOpened ? 'chevron_left' : 'menu'}}</mat-icon>
+  </button>
+</aside>

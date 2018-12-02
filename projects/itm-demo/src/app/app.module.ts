@@ -12,6 +12,7 @@ import { HomePageComponent } from './home_page.component';
 import { SchemaComponent } from './schema.component';
 import { SharedModule } from './shared/shared.module';
 import { PlaygroundModule } from './playground/playground.module';
+import { CoreModule } from './core.module';
 
 export function loadPlaygroundModule() { return PlaygroundModule; }
 
@@ -31,10 +32,10 @@ const ROUTES: Routes = [
   ],
   imports: [
     SharedModule,
-    BrowserAnimationsModule,
-    MarkdownModule.forRoot(),
+    CoreModule,
     RouterModule.forRoot(ROUTES),
-    ExampleModule
+    ExampleModule,
+    MarkdownModule.forChild()
   ],
   bootstrap: [AppComponent]
 })

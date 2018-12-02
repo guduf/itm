@@ -25,10 +25,6 @@ export class GridPlaygroundComponent {
 
   targetErrors: ErrorObject[] = null;
 
-  sidenavMode = 'side';
-
-  sidenavOpened = true;
-
   activePlaygroundId = 'simple';
 
   readonly playgroundIds = Object.keys(GRID_PLAYGROUNDS);
@@ -44,7 +40,7 @@ export class GridPlaygroundComponent {
   }
 
   getPlaygroundLabel(playgroundId: string): string {
-    return this.playgrounds[playgroundId].label;
+    return playgroundId;
   }
 
   handleGridChange(e: EditorModel) {

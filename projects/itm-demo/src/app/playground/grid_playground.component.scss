@@ -2,62 +2,9 @@
 
 :host {
   position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-$aside-width: 2.5rem;
-
-aside {
-  position: absolute;
-  z-index: 10;
-  top: 0;
-  left: 0;
-  width: $aside-width;
-  height: 100%;
-  background-color: primary-color(8);
-
-  & > button {
-    width: $aside-width;
-    height: $aside-width;
-    border-radius: 0;
-  }
-}
-
-.mat-sidenav-container {
-  width: 100%;
-  height: 100%;
-}
-
-.mat-sidenav {
-  border-color: transparent;
-  padding-left: $aside-width;
-  width: 20rem;
-
-  header {
-    @extend %toolbar;
-
-    padding-left: 1rem;
-
-    color: primary-color(3);
-  }
-
-  button {
-    width: 100%;
-    padding: 0 1.5rem 0 1rem;
-    text-align: left;
-  }
-}
-
-.mat-sidenav-content {
   display: flex;
-  padding-left: 0;
-  transition: padding-left 0.12s linear;
-
-  &.padded {
-    padding-left: $aside-width;
-  }
+  width: 100%;
+  height: 100%;
 }
 
 section {
