@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  OnChanges,
   OnDestroy,
   Output,
   ViewChild,
@@ -10,6 +11,7 @@ import {
 } from '@angular/core';
 import { EditorService, EditorModel } from './editor.service';
 import { Subscription } from 'rxjs';
+import { SimpleChanges } from '@angular/core';
 
 export interface JsonEditorModel {
   schema: 'grid' | 'target';
@@ -24,7 +26,8 @@ export interface JsonEditorModel {
   `,
   styleUrls: ['editor.component.scss']
 })
-export class JsonEditorComponent<T extends Object = Object> implements AfterViewInit, OnDestroy {
+// tslint:disable-next-line:max-line-length
+export class JsonEditorComponent<T extends Object = Object> implements AfterViewInit, OnChanges, OnDestroy {
   @Input()
   model: JsonEditorModel;
 
@@ -43,18 +46,25 @@ export class JsonEditorComponent<T extends Object = Object> implements AfterView
   ) { }
 
   ngAfterViewInit() {
-    if (this._service.loaded) return this._create();
+    if (this._service.loaded) return this._createEditor();
     const timeout = setTimeout(() => (this.loading = true));
     this._service.load().then(() => {
       clearTimeout(timeout);
       this.loading = false;
-      this._create();
+      this._createEditor();
     });
   }
 
-  ngOnDestroy() { if (this._subscr) this._subscr.unsubscribe(); }
+  ngOnChanges({model: modelChanges}: SimpleChanges) {
+    if (modelChanges.isFirstChange) return;
+    this._subscr.unsubscribe();
+  }
 
-  private _create(): void {
+  ngOnDestroy() {
+    if (this._subscr) this._subscr.unsubscribe();
+  }
+
+  private _createEditor(): void {
     const el = this.editorRef.nativeElement;
     const model = this.model || {} as JsonEditorModel;
     const schema = (this.model.schema || 'target') + '.json';

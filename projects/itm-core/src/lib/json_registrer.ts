@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { Map } from 'immutable';
 
 import Area from './area';
@@ -6,13 +6,16 @@ import AreaFactory from './area_factory';
 import Grid from './grid';
 import GridFactory from './grid_factory';
 import PipeSandbox from './pipe_sandbox';
-import { from } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { map, mergeMap, reduce } from 'rxjs/operators';
+import Registrer, { ITM_REGISTRER } from './registrer';
 
 @Injectable()
 export class ItmJsonRegistrer {
   constructor(
-    private _pipeSandbox: PipeSandbox
+    private _pipeSandbox: PipeSandbox,
+    @Inject(ITM_REGISTRER)
+    private _rgstr: Registrer
   ) { }
 
   async buildGrid(grid: Grid.Config): Promise<Grid> {
@@ -24,8 +27,9 @@ export class ItmJsonRegistrer {
     return from(Object.keys(areasCfg))
       .pipe(
         mergeMap(key => {
+          const factory = this._rgstr.areaFactories.get(key, AreaFactory());
           return from(areasCfg[key]).pipe(
-            mergeMap(cfg => this.buildArea(cfg)),
+            mergeMap((cfg: Area.Config) => this.buildArea(factory, cfg)),
             reduce<Area, Map<string, Area>>((acc, area) => acc.set(area.key, area), Map()),
             map(areas => Map({[key]: areas}))
           );
@@ -36,14 +40,13 @@ export class ItmJsonRegistrer {
       .toPromise();
   }
 
-  async buildArea(json: Area.Config): Promise<Area> {
-    const {key, size} = json;
-    let text: any = null;
+  async buildArea(factory: AreaFactory, json: Area.Config): Promise<Area> {
     if (typeof json.text === 'string') {
       const pipeInput = ItmJsonRegistrer.parsePipeInput(json.text);
-      text = await this._pipeSandbox.eval(pipeInput);
+      const text = await this._pipeSandbox.eval(pipeInput) as () => Observable<string>;
+      json = {...json, text};
     }
-    return AreaFactory({key, size, text});
+    return factory.serialize(json);
   }
 }
 

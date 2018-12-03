@@ -2,17 +2,17 @@
   <header>
     <h3>{{'playground.editor' | translate}}</h3>
     <nav>
-      <button *ngFor="let fileKey of fileKeys"
+      <button *ngFor="let file of files"
         mat-button
-        [class.active]="(editorFile === fileKey)"
-        [class.errored]="errorKeys.includes(fileKey)"
-        (click)="(editorFile = fileKey)">{{fileKey}}</button>
+        [class.active]="(editorFile === file.schema)"
+        [class.errored]="errorKeys.includes(file.schema)"
+        (click)="(editorFile = file.schema)">{{file.schema}}</button>
     </nav>
   </header>
   <div>
-    <itm-demo-json-editor *ngFor="let fileKey of fileKeys"
-      [model]="getEditorModel(fileKey)" (modelChange)="handleEditorChange(fileKey, $event)"
-      [class.hidden]="(editorFile !== fileKey)"></itm-demo-json-editor>
+    <itm-demo-json-editor *ngFor="let file of files"
+      [model]="file" (modelChange)="handleEditorChange(file.schema, $event)"
+      [class.hidden]="(editorFile !== file.schema)"></itm-demo-json-editor>
   </div>
 </section>
 <section class="view">

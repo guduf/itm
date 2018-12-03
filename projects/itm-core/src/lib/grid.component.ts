@@ -29,13 +29,17 @@ const SELECTOR = 'itm-grid';
 
 const GRID_RHYTHM = '60px';
 
+export interface AreaProps {
+  ref: GridRef.AreaRef;
+  ngStyle: { [key: string]: string };
+  ngClass: string;
+}
+
 @Component({
   selector: SELECTOR,
   template: `
-    <div *ngFor="let fragment of fragments"
-      [class]="getAreaClass(fragment)"
-      [ngStyle]="getAreaStyle(fragment)">
-      <ng-container [itmArea]="getAreaRef(fragment)"></ng-container>
+    <div *ngFor="let area of areas" [class]="area.ngClass" [ngStyle]="area.ngStyle">
+      <ng-container [itmArea]="area.ref"></ng-container>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -61,14 +65,14 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
   /** The target of the grid. */
   target: T;
 
-  /** The grid grid area map of the displayed areas. */
-  fragments: Template.Fragment[];
+  /** The iterable for area directives. */
+  areas: AreaProps[];
 
   /** The CSS class of the host element. */
   @HostBinding('class')
   get hostClass(): string { return [SELECTOR, this.ngClass].join(' '); }
 
-  get record(): Grid { return this.ref.record; }
+  get record(): Grid { return this.ref ? this.ref.record : null; }
 
   @HostBinding('style.gridTemplateColumns')
   get gridTemplateColumnsStyle(): SafeStyle { return this._hostStyle.gridTemplateColumns; }
@@ -106,14 +110,7 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
     super({target: undefined, resolvers: Map()});
   }
 
-  getAreaRef(fragment: Template.Fragment): GridRef.AreaRef { return this.ref.areas.get(fragment); }
-
-  getAreaStyle(fragment: Template.Fragment): { [key: string]: string } {
-    const {row, col, width, height} = this.record.positions.get(fragment);
-    return {gridArea: `${row} / ${col} / ${row + height} / ${col + width}`};
-  }
-
-  getAreaClass(fragment: Template.Fragment): string {
+  private _buildAreaProps(fragment: Template.Fragment): AreaProps {
     const {rows, cols} = Template.getRange(this.record.positions);
     const {row, col, width, height} = this.record.positions.get(fragment);
     const areaClass: string[] = [`${SELECTOR}-area`];
@@ -121,7 +118,10 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
     if (col + width === cols) areaClass.push(`${SELECTOR}-last-col`);
     if (row === 1) areaClass.push(`${SELECTOR}-first-row`);
     if (row + height === rows) areaClass.push(`${SELECTOR}-last-row`);
-    return areaClass.join(' ');
+    const ngClass = areaClass.join(' ');
+    const ngStyle = {gridArea: `${row} / ${col} / ${row + height} / ${col + width}`};
+    const ref = this.ref.areas.get(fragment);
+    return {ngClass, ngStyle, ref};
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -129,27 +129,30 @@ export class ItmGridComponent<A extends Action<T> = Action<T>, T extends Object 
     if (changes.grid) {
       if (this._sharedResolversSubscr) this._sharedResolversSubscr.unsubscribe();
       this._ref = null;
-      if (this.grid) {
-        try {
-          const record = GridFactory(this.grid);
-          this._ref = GridRef.buildRef(
-            this._rgstr,
-            record,
-            this.behaviors.target,
-            this._actionEmitter
-          );
-        } catch (err) {
-          console.error('BUILD GRID ERROR', err);
-          // tslint:disable-next-line:max-line-length
-          console.error('BUILD GRID ERROR CONTEXT', {grid: this.grid});
-          return;
-        }
+      this.areas = null;
+      if (this.grid) try {
+        const record = GridFactory(this.grid);
+        this._ref = GridRef.buildRef(
+          this._rgstr,
+          record,
+          this.behaviors.target,
+          this._actionEmitter
+        );
+      }
+      catch (err) {
+        console.error('BUILD GRID ERROR', err);
+        console.error('BUILD GRID ERROR CONTEXT', {grid: this.grid});
+      }
+      if (this.ref) {
         const sharedResolvers = (
           this.ref.injector.get(ITM_SHARED_RESOLVERS_TOKEN) as Observable<Action.Resolvers>
         );
         this._sharedResolversSubscr = sharedResolvers.subscribe(this._sharedResolversSub);
+        this.areas = this.ref.record.positions.keySeq().reduce(
+          (acc, fragment: Template.Fragment) => [...acc, this._buildAreaProps(fragment)],
+          [] as AreaProps[]
+        );
       }
-      this.fragments = this._ref ? this._ref.record.positions.keySeq().toArray() : null;
       this._hostStyle = this._buildHostStyle();
     }
   }

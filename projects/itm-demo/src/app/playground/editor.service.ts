@@ -5,10 +5,11 @@ import { ErrorObject } from 'ajv';
 import { Injectable, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as _m from 'monaco-editor';
-import { Observable, from } from 'rxjs';
-import { map, mergeMap, reduce } from 'rxjs/operators';
+import { Observable, defer, forkJoin } from 'rxjs';
+import { map, reduce, concatAll } from 'rxjs/operators';
+import { JSONSchema7 } from 'json-schema';
 
-const JSON_SCHEMAS = ['target.json', 'area.json', 'grid.json'];
+const JSON_SCHEMAS = ['target.json', 'area.json', 'field.json', 'control.json', 'grid.json'];
 
 const JSON_SCHEMAS_ENDPOINT = '/assets/schemas';
 
@@ -84,36 +85,44 @@ export class EditorService {
   }
 
   load(): Promise<true> {
-    if (this._loaded) return Promise.resolve<true>(true);
     if (this._loading) return this._loading;
     this._loading = this._run(async () => {
+      if (this._loaded) return true as true;
       const script = document.createElement('script');
       script.src = '/monaco/runtime.js';
       const onLoad = new Promise(resolve => script.onload = resolve);
       document.body.appendChild(script);
-      return onLoad
-        .then(() => (window as any).initMonaco())
-        .then(monaco => (this._monaco = monaco))
-        .then(() => this._loadJsonSchemas())
-        .then(() => (this._loaded = true) as true);
+      await onLoad;
+      await (window as any).initMonaco();
+      this._monaco = (window as any).monaco;
+      await this._loadJsonSchemas();
+      return this._loaded = true as true;
     });
     return this._loading;
   }
 
-  async _loadJsonSchemas(): Promise<void> {
-    return from(JSON_SCHEMAS).pipe(
-      mergeMap(key => {
+  _loadJsonSchemas(): Promise<void> {
+    const schemaReqs = [
+      defer(() => (
+        this._http.get<any>('//json-schema.org/draft-07/schema', {responseType: 'json'}).pipe(
+          map((schema) => ({'schema.json': schema}))
+        )
+      )),
+      ...JSON_SCHEMAS.map(key => {
         const uri = `${JSON_SCHEMAS_ENDPOINT}/${key}`;
-        return this._http.get<any>(uri, {responseType: 'json'}).pipe(
+        return defer(() => this._http.get<any>(uri, {responseType: 'json'}).pipe(
           map((schema) => ({[key]: schema}))
-        );
-      }),
+        ));
+      })
+    ];
+    return forkJoin(schemaReqs).pipe(
+      concatAll(),
       reduce((acc, val) => ({...acc, ...val})),
-      map(schemas => this._resolveSchemas(schemas)),
+      map(schemas => this._resolveSchemas(schemas).slice(1)),
       map(schemas => {
         const monacoSchemas = schemas.map(schema => {
           const uri = schema.$id;
-          const filename = uri.match(/(\w+.json)$/)[1];
+          const filename = uri.match(/(\w+)(?:\.json)?#?$/)[1] + '.json';
           this._ajv.addSchema(schema, filename);
           return {uri, schema, fileMatch: [filename, `*.${filename}`]};
         });
@@ -126,23 +135,28 @@ export class EditorService {
     .toPromise();
   }
 
-  private _resolveSchemas(schemas: { [key: string]: any; }): any[] {
-    const resolved: { [key: string]: any; } = {};
-    Object.keys(schemas).forEach(key => {
-      const schema = schemas[key];
-      const defs = schema.definitions || {};
-      resolved[key] = {
-        ...schema,
-        definitions: Object.keys(defs).reduce(
-          (acc, defKey) => ({
-            ...acc,
-            [defKey]: defs[defKey].$ref ? resolved[defs[defKey].$ref] : defs[defKey]
-          }),
+  // tslint:disable-next-line:max-line-length
+  private _resolveSchemas(schemas: { [key: string]: JSONSchema7; }): JSONSchema7[] {
+    const resolved: { [$ref: string]: JSONSchema7; } = {};
+    return Object.keys(schemas).reduce(
+      (acc, key) => {
+        const schema = schemas[key];
+        let definitions = schema.definitions || {};
+        definitions = Object.keys(definitions).reduce(
+          (defAcc, defKey) => {
+            let def = (
+              typeof definitions[defKey] === 'object' ?  definitions[defKey] : {}
+            ) as JSONSchema7;
+            def = def.$ref && resolved[def.$ref] ? resolved[def.$ref] : def;
+            return {...defAcc, ...def.definitions, [defKey]: def};
+          },
           {}
-        )
-      };
-    });
-    return Array.from(Object.values(resolved));
+        );
+        resolved[schema.$id] = {...schema, definitions};
+        return [...acc, resolved[schema.$id]];
+      },
+      []
+    );
   }
 
   private _run<T>(fn: () => T) { return this._zone.runOutsideAngular(fn); }

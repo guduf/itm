@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "control.json",
+  "description": "The configuration for a grid control.",
+  "allOf": [
+    { "$ref": "#/definitions/field" },
+    {
+      "properties": {
+        "schema": { "$ref": "#/definitions/schema" },
+        "required": {
+          "description": "Whether the control value is required for validation.",
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": ["type"]
+    }
+  ],
+  "definitions": {
+    "schema": { "$ref": "http://json-schema.org/draft-07/schema#" },
+    "field": { "$ref": "field.json" }
+  }
+}

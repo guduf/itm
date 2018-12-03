@@ -12,14 +12,11 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { Map } from 'immutable';
 import { BehaviorSubject, combineLatest, merge, Subscription, asyncScheduler } from 'rxjs';
-import { map, tap, distinctUntilKeyChanged, observeOn } from 'rxjs/operators';
+import { map, tap, distinctUntilKeyChanged, observeOn, reduce } from 'rxjs/operators';
 
 import { EditorModel, InvalidEditorModel } from './editor.service';
+import { JsonEditorModel } from './json_editor.component';
 
-interface JsonPlaygroundFile {
-  name: string;
-  content: string | Object;
-}
 
 // tslint:disable-next-line:max-line-length
 export const ITM_DEMO_JSON_PLAYGROUND_MODELS = new InjectionToken('ITM_DEMO_JSON_PLAYGROUND_MODELS');
@@ -30,8 +27,7 @@ export const ITM_DEMO_JSON_PLAYGROUND_MODELS = new InjectionToken('ITM_DEMO_JSON
   styleUrls: ['json_playground.component.scss']
 })
 export class JsonPlaygroundComponent implements AfterViewInit, OnDestroy {
-  files: { [key: string]: JsonPlaygroundFile };
-  fileKeys: string[];
+  files: JsonEditorModel[];
 
   @ViewChild('viewCompContainer', {read: ViewContainerRef})
   viewCompContainerRef: ViewContainerRef;
@@ -70,9 +66,12 @@ export class JsonPlaygroundComponent implements AfterViewInit, OnDestroy {
       }),
       observeOn(asyncScheduler),
       tap(files => {
-        this.files = files;
-        this.fileKeys = Object.keys(this.files);
-        this.editorFile = this.fileKeys[0];
+        this.models.next({});
+        this.files = Object.keys(files).reduce(
+          (acc, key) => [...acc, {schema: key, content: files[key]}],
+          []
+        );
+        this.editorFile = this.files[0].schema;
       }),
     );
     this._routeSubscr = merge(viewCompObs, fragmentObs).subscribe(null, err => console.error(err));

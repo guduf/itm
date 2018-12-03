@@ -13,8 +13,9 @@ export const ITM_CONTROL_REF = new InjectionToken('ITM_CONTROL_REF');
 export class ItmControlRef<T extends Object = {}> extends FormControl {
   readonly record: Control;
 
-  constructor(record: Control, init: T) {
-    super(init[record.key], null, (c: this) => ItmControlRef.validateSchema(c, record));
+  constructor(record: Control, target: T) {
+    const init = target && target[record.key];
+    super(init || null, null, (c: this) => ItmControlRef.validateSchema(c, record));
     this.record = record;
   }
 }
@@ -26,7 +27,7 @@ export module ItmControlRef {
 
   export function provide(control: Control, target: Target, formRef?: FormRef): ItmControlRef {
     return (
-      formRef ? formRef.get(control.key) : new ItmControlRef(control, target.value[control.key])
+      formRef ? formRef.get(control.key) : new ItmControlRef(control, target.value)
     );
   }
 
@@ -37,13 +38,13 @@ export module ItmControlRef {
     const {value} = control;
     if (typeof value === 'undefined' || value === null)
       return of(record.required ? {required: true} : null);
-    const {pattern, min, max} = record;
+    const {pattern, minLength, maxLength} = record.schema;
     if (
-      pattern instanceof RegExp && !pattern.test(value) ||
+      pattern && !new RegExp(pattern).test(value) ||
       isCollection(pattern) && !pattern.has(value) ||
-      (min !== null && max !== null) && !(value >= min && value <= max) ||
-      (min !== null) && !(value >= min) ||
-      (max !== null) && !(value <= max)
+      (minLength !== null && maxLength !== null) && !(value >= minLength && value <= maxLength) ||
+      (minLength !== null) && !(value >= minLength) ||
+      (maxLength !== null) && !(value <= maxLength)
     ) return of({schema: true});
     return record.validator ? record.validator(control) : of(null);
   }

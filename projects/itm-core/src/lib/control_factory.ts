@@ -20,15 +20,16 @@ export function ItmControlFactory(...cfgs: Partial<Control.Config>[]): Control |
 
 export module ItmControlFactory {
   export function normalize(cfg: Control.ModelConfig): Control.Model {
-    // tslint:disable-next-line:max-line-length
     checkTypeOrThrow(Control.Type, cfg.type);
+    const schemaConfig = (
+      cfg.schema && typeof cfg.schema === 'object' ? cfg.schema :
+        {type: cfg.type} as Control.Schema
+    );
+    Object.freeze(schemaConfig);
     return {
-      type: cfg.type || Control.Type.string,
-      pattern: cfg.pattern instanceof RegExp ? cfg.pattern : null,
+      type: cfg.type,
+      schema: schemaConfig,
       required: typeof cfg.required === 'boolean' ? cfg.required : false,
-      max: typeof cfg.max === 'number' ? cfg.max || 0 : null,
-      min: typeof cfg.min === 'number' ? cfg.min || 0 : null,
-      enum: isCollection(cfg.enum) ? cfg.enum : null,
       validator: cfg.validator ? Target.defer(Object, cfg.validator) : null
     };
   }
@@ -38,11 +39,8 @@ export module ItmControlFactory {
     normalize,
     model: {
       type: null,
-      pattern: null,
+      schema: null,
       required: null,
-      min: null,
-      max: null,
-      enum: null,
       validator: null
     },
     shared: new AreaFactory.Shared({

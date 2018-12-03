@@ -1,4 +1,4 @@
-import { ItmGrid } from '../../../../itm-core/src/public_api';
+import { ItmGrid, ItmControl } from '../../../../itm-core/src/public_api';
 
 export interface GridPlayground {
   grid: ItmGrid.Config;
@@ -41,29 +41,39 @@ export const GRID_PLAYGROUNDS: { [key: string]: GridPlayground } = {
           control: [
           {
             key: 'id',
-            text: '`#$.id`'
+            type: 'string',
+            label: '#ID'
           },
           {
-            key: 'name',
-            text: '`$.firstName $.lastName`'
+            key: 'firstName',
+            type: 'string',
+            label: 'First name'
+          },
+          {
+            key: 'lastName',
+            type: 'string',
+            label: 'Last name'
           }
-        ]
+        ] as ItmControl.Config[]
       },
       template: [
         [
-          'id'
+          'control:id'
         ],
         [
-          'name',
+          'control:firstName',
+          '=',
+          '=',
+          'control:lastName',
           '=',
           '='
         ]
       ]
     },
     target: {
-      id: 1,
-      firstName: 'Bernice',
-      lastName: 'Sperring'
+      id: 2,
+      firstName: 'Mark',
+      lastName: 'Kingsberg'
     }
   }
 };

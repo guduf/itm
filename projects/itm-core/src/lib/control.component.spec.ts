@@ -3,7 +3,7 @@ import { MatFormFieldModule } from '@angular/material';
 import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 import { of } from 'rxjs';
 
-import ControlRef, { ITM_CONTROL_REF } from './control_ref';
+import { ITM_CONTROL_REF } from './control_ref';
 import { ItmControlComponent } from './control.component';
 import { ItmFieldLabel } from './field';
 
