@@ -4,37 +4,32 @@ import { RecordOf } from 'immutable';
 import ControlRef from './control_ref';
 import Field from './field';
 import Target from './target';
-import { JSONSchema7 } from 'json-schema';
+import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 
 // tslint:disable-next-line:max-line-length
-export type ItmControl<T extends Object = {}, K extends ItmControl.Type = ItmControl.Type.string> = (
-  Field<T> & RecordOf<ItmControl.Model<K>>
+export type ItmControl<T extends Object = {}> = (
+  Field<T> & RecordOf<ItmControl.Model>
 );
 
 export module ItmControl {
-  export enum Type {
-    number = 'number',
-    string = 'string'
+  export interface Schema extends JSONSchema7 {
+    type: JSONSchema7TypeName;
   }
 
-  export type Schema<K extends Type = any> = JSONSchema7 & { type: K };
-
-  export interface ModelConfig<K extends Type = any> {
-    type?: ItmControl.Type;
+  export interface ModelConfig {
     required?: boolean;
-    schema?: Schema<K>;
+    schema?: Schema;
     validator?: Target.PipeLike<AbstractControl, ControlRef.Validation>;
   }
 
-  export interface Model<K extends Type = any> extends ModelConfig<K> {
-    type: ItmControl.Type;
+  export interface Model extends ModelConfig {
     required: boolean;
-    schema: Schema<K>;
+    schema: Schema;
     validator: Target.Pipe<AbstractControl, ControlRef.Validation> | null;
   }
 
-  export type Config<T extends Object = {}, K extends Type = any> = (
-    Field.Config<T> &  ModelConfig<K>
+  export type Config<T extends Object = {}> = (
+    Field.Config<T> &  ModelConfig
   );
 
   export const selector = 'control';

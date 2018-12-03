@@ -8,7 +8,6 @@ import ControlRef, { ITM_CONTROL_REF } from './control_ref';
 import FormRef from './form_ref';
 import FieldFactory from './field_factory';
 import Target from './target';
-import { checkTypeOrThrow } from './utils';
 
 export function ItmControlFactory(): AreaFactory<Control, Control.Config>;
 export function ItmControlFactory(...cfgs: Partial<Control.Config>[]): Control;
@@ -20,14 +19,11 @@ export function ItmControlFactory(...cfgs: Partial<Control.Config>[]): Control |
 
 export module ItmControlFactory {
   export function normalize(cfg: Control.ModelConfig): Control.Model {
-    checkTypeOrThrow(Control.Type, cfg.type);
     const schemaConfig = (
-      cfg.schema && typeof cfg.schema === 'object' ? cfg.schema :
-        {type: cfg.type} as Control.Schema
+      cfg.schema && typeof cfg.schema === 'object' ? cfg.schema : {type: 'string'} as Control.Schema
     );
     Object.freeze(schemaConfig);
     return {
-      type: cfg.type,
       schema: schemaConfig,
       required: typeof cfg.required === 'boolean' ? cfg.required : false,
       validator: cfg.validator ? Target.defer(Object, cfg.validator) : null
@@ -38,7 +34,6 @@ export module ItmControlFactory {
     selector: Control.selector,
     normalize,
     model: {
-      type: null,
       schema: null,
       required: null,
       validator: null

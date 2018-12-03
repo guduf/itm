@@ -12,8 +12,7 @@
           "default": false,
           "type": "boolean"
         }
-      },
-      "required": ["type"]
+      }
     }
   ],
   "definitions": {

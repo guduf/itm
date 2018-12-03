@@ -41,17 +41,23 @@ export const GRID_PLAYGROUNDS: { [key: string]: GridPlayground } = {
           control: [
           {
             key: 'id',
-            type: 'string',
-            label: '#ID'
+            label: '#ID',
+            schema: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 999
+            }
           },
           {
             key: 'firstName',
-            type: 'string',
-            label: 'First name'
+            label: 'First name',
+            schema: {
+              type: 'string',
+              maxLength: 12
+            }
           },
           {
             key: 'lastName',
-            type: 'string',
             label: 'Last name'
           }
         ] as ItmControl.Config[]
