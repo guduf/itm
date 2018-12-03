@@ -9,7 +9,7 @@ import {
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Map } from 'immutable';
 import { BehaviorSubject, combineLatest, merge, Subscription, asyncScheduler } from 'rxjs';
 import { map, tap, distinctUntilKeyChanged, observeOn } from 'rxjs/operators';
@@ -45,6 +45,7 @@ export class JsonPlaygroundComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private _route: ActivatedRoute,
+    private _router: Router,
     private _cfr: ComponentFactoryResolver
   ) { }
 
@@ -60,6 +61,10 @@ export class JsonPlaygroundComponent implements AfterViewInit, OnDestroy {
     );
     const fragmentObs = combineLatest(playgroundsObs, this._route.fragment).pipe(
       map(([playgrounds, fragment]) => {
+        if (!fragment) this._router.navigate(
+          ['.'],
+          {relativeTo: this._route, fragment: Object.keys(playgrounds)[0]}
+        );
         playgrounds = typeof playgrounds === 'object' ? playgrounds : {};
         return typeof playgrounds[fragment] === 'object' ? playgrounds[fragment] : {};
       }),

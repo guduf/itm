@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, Observable } from 'rxjs';
-import { map, distinctUntilChanged, tap, share } from 'rxjs/operators';
+import { map, distinctUntilChanged, shareReplay } from 'rxjs/operators';
 
 const SELECTOR = 'itm-demo-page';
 
@@ -36,7 +36,7 @@ export class PageComponent {
     const root = this._route.firstChild;
     const active = combineLatest(root.url, root.fragment).pipe(
       map(([[{path}], fragment]) => ({path, fragment})),
-      share()
+      shareReplay(1)
     );
     this.routes = this._route.routeConfig.children
       .filter(({path}) => path && path !== '**')

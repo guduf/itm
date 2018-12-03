@@ -34,5 +34,36 @@ export const GRID_PLAYGROUNDS: { [key: string]: GridPlayground } = {
       firstName: 'Bernice',
       lastName: 'Sperring'
     }
+  },
+  control: {
+    grid: {
+      areas: {
+          control: [
+          {
+            key: 'id',
+            text: '`#$.id`'
+          },
+          {
+            key: 'name',
+            text: '`$.firstName $.lastName`'
+          }
+        ]
+      },
+      template: [
+        [
+          'id'
+        ],
+        [
+          'name',
+          '=',
+          '='
+        ]
+      ]
+    },
+    target: {
+      id: 1,
+      firstName: 'Bernice',
+      lastName: 'Sperring'
+    }
   }
 };

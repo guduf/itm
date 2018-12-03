@@ -24,7 +24,6 @@ export module ItmProp {
     column?: Partial<Column.Config>;
     control?: Partial<Control.Config>;
     field?: Partial<Field.Config>;
-    type?: Control.Type;
   }
 
   export interface Model<T extends Object = {}> extends Config<T> {

@@ -2,6 +2,7 @@
   "page.playground": "Playground",
   "page.playground.grid": "Grid",
   "page.playground.grid.simple": "Simple grid",
+  "page.playground.grid.control": "Grid controls",
   "playground.editor": "Editor",
   "playground.view": "View"
 }

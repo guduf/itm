@@ -21,7 +21,7 @@ export module ItmPropFactory {
     const area = AreaFactory({key}, cfg, cfg.area);
     const field = FieldFactory(area, {label: cfg.label}, cfg.field);
     const column = ColumnFactory(field, {header: field.label}, cfg.column);
-    const control = ControlFactory(field, {type: cfg.type}, cfg.control);
+    const control = ControlFactory(field, cfg.control);
     return {key, area, column, control, field};
   }
 
