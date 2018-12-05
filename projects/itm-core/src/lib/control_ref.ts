@@ -39,7 +39,6 @@ export module ItmControlRef {
     if (typeof value === 'undefined' || value === null)
       return of(required ? {required: true} : null);
     const valid = schemaValidator(value);
-    console.log(typeof value, value, valid, schemaValidator.errors);
     if (valid) return of(null);
     return of({schema: schemaValidator.errors});
   }
