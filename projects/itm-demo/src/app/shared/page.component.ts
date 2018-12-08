@@ -32,7 +32,8 @@ export class PageComponent {
   }[];
 
   constructor(private _route: ActivatedRoute) {
-    this.heading = 'page.' + this._route.parent.snapshot.url[0].path;
+    const rootPath = this._route.parent.snapshot.url[0].path;
+    this.heading = 'page.' + rootPath;
     const root = this._route.firstChild;
     const active = combineLatest(root.url, root.fragment).pipe(
       map(([[{path}], fragment]) => ({path, fragment})),
@@ -48,14 +49,14 @@ export class PageComponent {
               fragment: hashRoute,
               text: text + '.' + hashRoute,
               active: active.pipe(
-                map(({fragment}) => fragment === hashRoute),
+                map(({path, fragment}) => (path === route.path && fragment === hashRoute)),
                 distinctUntilChanged()
               )
             })) :
             []
         );
         return  {
-          link: ['..', route.path],
+          link: ['/', rootPath, route.path],
           path: route.path,
           text,
           active: active.pipe(map(({path}) => path === route.path), distinctUntilChanged()),

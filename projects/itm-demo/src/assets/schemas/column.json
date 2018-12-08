@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "column.json",
+  "type": "object",
+  "description": "The configuration for a column.",
+  "properties": {
+    "$ref": {
+      "description": "The area configurations for the column.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/area"
+        },
+        {
+          "properties": {
+            "header": {
+              "description": "The configuration for the header cell.",
+              "oneOf": [
+                {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                {
+                  "$ref": "#/definitions/area"
+                }
+              ]
+            },
+            "sortable": {
+              "description": "Whether the column is sortable",
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "area": { "$ref": "area.json" }
+  }
+}

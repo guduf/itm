@@ -18,7 +18,7 @@ export class ItmJsonRegistrer {
     private _rgstr: Registrer
   ) { }
 
-  async buildGrid(grid: Grid.Config): Promise<Grid> {
+  async buildGrid(grid: Grid.Config, factory: GridFactory = GridFactory()): Promise<Grid> {
     const {template} = grid;
     const areasCfg = (
       Array.isArray(grid.areas) ? {[Area.selector]: grid.areas} :
@@ -27,20 +27,20 @@ export class ItmJsonRegistrer {
     return from(Object.keys(areasCfg))
       .pipe(
         mergeMap(key => {
-          const factory = this._rgstr.areaFactories.get(key, AreaFactory());
+          const areaFactory = this._rgstr.areaFactories.get(key, AreaFactory());
           return from(areasCfg[key]).pipe(
-            mergeMap((cfg: Area.Config) => this.buildArea(factory, cfg)),
+            mergeMap((cfg: Area.Config) => this.buildArea(cfg, areaFactory)),
             reduce<Area, Map<string, Area>>((acc, area) => acc.set(area.key, area), Map()),
             map(areas => Map({[key]: areas}))
           );
         }),
         reduce((acc, val) => acc.merge(val)),
-        map(areas => GridFactory({template, areas}))
+        map(areas => factory.serialize({template, areas}))
       )
       .toPromise();
   }
 
-  async buildArea(factory: AreaFactory, json: Area.Config): Promise<Area> {
+  async buildArea(json: Area.Config, factory: AreaFactory = AreaFactory()): Promise<Area> {
     if (typeof json.text === 'string') {
       const pipeInput = ItmJsonRegistrer.parsePipeInput(json.text);
       const text = await this._pipeSandbox.eval(pipeInput) as () => Observable<string>;

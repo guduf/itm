@@ -1,9 +1,9 @@
 import { Component, Inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 
-import { ITM_DEMO_JSON_PLAYGROUND_MODELS } from './json_playground.component';
+import { JSON_PLAYGROUND_VIEW_DATA, JsonPlaygroundViewData } from './json_playground.component';
 import { distinctUntilKeyChanged, map, mergeMap } from 'rxjs/operators';
-import ItmJsonRegistrer from '../../../../itm-core/src/lib/json_registrer';
+import { ItmGrid, ItmJsonRegistrer } from '../../../../itm-core/src/public_api';
 
 @Component({
   selector: 'itm-demo-grid-playground-view',
@@ -12,19 +12,19 @@ import ItmJsonRegistrer from '../../../../itm-core/src/lib/json_registrer';
   `
 })
 export class GridPlaygroundViewComponent {
-  readonly grid = this._models.pipe(
+  readonly grid = this._view.files.pipe(
     distinctUntilKeyChanged('grid'),
     mergeMap(({grid}) => grid ? this._jsonRegistrer.buildGrid(grid) : of(null)),
   );
 
-  readonly target = this._models.pipe(
+  readonly target = this._view.files.pipe(
     distinctUntilKeyChanged('target'),
     map(({target}) => target || {}),
   );
 
   constructor(
     private _jsonRegistrer: ItmJsonRegistrer,
-    @Inject(ITM_DEMO_JSON_PLAYGROUND_MODELS)
-    private _models: Observable<{ [key: string]: Object }>
+    @Inject(JSON_PLAYGROUND_VIEW_DATA)
+    private _view: JsonPlaygroundViewData<{ grid: ItmGrid.Config, target: {} }>
   ) { }
 }

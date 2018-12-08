@@ -10,7 +10,7 @@
       <ul>
         <li *ngFor="let hashRoute of route.hashRoutes">
           <a
-            [routerLink]="hashRoute.link" [fragment]="hashRoute.fragment"
+            [routerLink]="route.link" [fragment]="hashRoute.fragment"
             [class.active]="hashRoute.active | async">
             {{hashRoute.text | translate}}
           </a>

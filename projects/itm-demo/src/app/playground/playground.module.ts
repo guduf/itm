@@ -6,9 +6,11 @@ import { EditorService } from './editor.service';
 import { Routes, RouterModule } from '@angular/router';
 import { AjvErrorsComponent } from './ajv_errors.component';
 import { PageComponent } from '../shared/page.component';
-import { GRID_PLAYGROUNDS } from './grid_playground';
-import { JsonPlaygroundComponent } from './json_playground.component';
+import { GRID_PLAYGROUND_VIEW } from './grid_playground';
+import { JsonPlaygroundViewComponent } from './json_playground.component';
 import { GridPlaygroundViewComponent } from './grid_playground_view.component';
+import { TABLE_PLAYGROUND_VIEW } from './table_playground';
+import { TablePlaygroundViewComponent } from './table_playground_view.component';
 
 const ROUTES: Routes = [
   {
@@ -17,11 +19,18 @@ const ROUTES: Routes = [
     children: [
       {
         path: 'grid',
-        component: JsonPlaygroundComponent,
+        component: JsonPlaygroundViewComponent,
         data: {
-          viewComp: GridPlaygroundViewComponent,
-          playgrounds: GRID_PLAYGROUNDS,
-          hashRoutes: Object.keys(GRID_PLAYGROUNDS)
+          playgroundView: GRID_PLAYGROUND_VIEW,
+          hashRoutes: Object.keys(GRID_PLAYGROUND_VIEW.playgrounds)
+        }
+      },
+      {
+        path: 'table',
+        component: JsonPlaygroundViewComponent,
+        data: {
+          playgroundView: TABLE_PLAYGROUND_VIEW,
+          hashRoutes: Object.keys(TABLE_PLAYGROUND_VIEW.playgrounds)
         }
       },
       {path: '**', redirectTo: '/playground/grid', pathMatch: 'full'}
@@ -38,14 +47,16 @@ const ROUTES: Routes = [
   declarations: [
     JsonEditorComponent,
     AjvErrorsComponent,
-    JsonPlaygroundComponent,
-    GridPlaygroundViewComponent
+    JsonPlaygroundViewComponent,
+    GridPlaygroundViewComponent,
+    TablePlaygroundViewComponent
   ],
   providers: [
     EditorService
   ],
   entryComponents: [
-    GridPlaygroundViewComponent
+    GridPlaygroundViewComponent,
+    TablePlaygroundViewComponent
   ]
 })
 export class PlaygroundModule { }

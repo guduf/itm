@@ -3,6 +3,8 @@
   "page.playground.grid": "Grid",
   "page.playground.grid.simple": "Simple grid",
   "page.playground.grid.control": "Grid controls",
+  "page.playground.table": "Table",
+  "page.playground.table.simple": "Simple table",
   "playground.editor": "Editor",
   "playground.view": "View"
 }

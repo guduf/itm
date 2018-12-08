@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
 import { SimpleChanges } from '@angular/core';
 
 export interface JsonEditorModel {
-  schema: 'grid' | 'target';
+  schema: 'grid' | 'target'  | 'targets';
   content: string | Object;
 }
 
@@ -56,8 +56,7 @@ export class JsonEditorComponent<T extends Object = Object> implements AfterView
   }
 
   ngOnChanges({model: modelChanges}: SimpleChanges) {
-    if (modelChanges.isFirstChange) return;
-    this._subscr.unsubscribe();
+    if (!modelChanges.isFirstChange) this._createEditor();
   }
 
   ngOnDestroy() {
@@ -65,6 +64,7 @@ export class JsonEditorComponent<T extends Object = Object> implements AfterView
   }
 
   private _createEditor(): void {
+    if (this._subscr) this._subscr.unsubscribe();
     const el = this.editorRef.nativeElement;
     const model = this.model || {} as JsonEditorModel;
     const schema = (this.model.schema || 'target') + '.json';

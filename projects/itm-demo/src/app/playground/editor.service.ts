@@ -5,11 +5,21 @@ import { ErrorObject } from 'ajv';
 import { Injectable, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as _m from 'monaco-editor';
+import { Map, List } from 'immutable';
 import { Observable, defer, forkJoin } from 'rxjs';
 import { map, reduce, concatAll } from 'rxjs/operators';
 import { JSONSchema7 } from 'json-schema';
 
-const JSON_SCHEMAS = ['target.json', 'area.json', 'field.json', 'control.json', 'grid.json'];
+const JSON_SCHEMAS = [
+  'target.json',
+  'targets.json',
+  'area.json',
+  'field.json',
+  'column.json',
+  'control.json',
+  'grid.json',
+  'table.json'
+];
 
 const JSON_SCHEMAS_ENDPOINT = '/assets/schemas';
 
@@ -37,7 +47,7 @@ export type EditorModel<T extends Object = Object> = ValidEditorModel<T> | Inval
 export class EditorService {
   get loaded() { return this._loaded; }
 
-  private readonly _ajv = new Ajv();
+  private _validators: Map<string, Ajv.ValidateFunction>;
   private _monaco: typeof _m;
 
   private _loaded = false;
@@ -63,13 +73,14 @@ export class EditorService {
           ...opts,
           model
         });
+        const validator = this._validators.get(filename);
         const handleChange = () => {
           let value: any;
           try { value = JSON.parse(model.getValue()); }
           catch { value = null; }
-          this._ajv.validate(filename, value);
-          if (!value || this._ajv.errors) return (
-            emitter.next({valid: false, errors: this._ajv.errors})
+          validator(value);
+          if (!value || validator.errors) return (
+            emitter.next({valid: false, errors: validator.errors})
           );
           return emitter.next({valid: true, value});
         };
@@ -87,16 +98,21 @@ export class EditorService {
   load(): Promise<true> {
     if (this._loading) return this._loading;
     this._loading = this._run(async () => {
-      if (this._loaded) return true as true;
-      const script = document.createElement('script');
-      script.src = '/monaco/runtime.js';
-      const onLoad = new Promise(resolve => script.onload = resolve);
-      document.body.appendChild(script);
-      await onLoad;
-      await (window as any).initMonaco();
-      this._monaco = (window as any).monaco;
-      await this._loadJsonSchemas();
-      return this._loaded = true as true;
+      try {
+        if (this._loaded) return true as true;
+        const script = document.createElement('script');
+        script.src = '/monaco/runtime.js';
+        const onLoad = new Promise(resolve => script.onload = resolve);
+        document.body.appendChild(script);
+        await onLoad;
+        await (window as any).initMonaco();
+        this._monaco = (window as any).monaco;
+        await this._loadJsonSchemas();
+        return this._loaded = true as true;
+      }
+      catch (err) {
+        console.error('Failed to load. ' + err.message, err);
+      }
     });
     return this._loading;
   }
@@ -120,15 +136,26 @@ export class EditorService {
       reduce((acc, val) => ({...acc, ...val})),
       map(schemas => this._resolveSchemas(schemas).slice(1)),
       map(schemas => {
-        const monacoSchemas = schemas.map(schema => {
-          const uri = schema.$id;
-          const filename = uri.match(/(\w+)(?:\.json)?#?$/)[1] + '.json';
-          this._ajv.addSchema(schema, filename);
-          return {uri, schema, fileMatch: [filename, `*.${filename}`]};
-        });
+        const ajv = new Ajv();
+        const {validators, monacoSchemas} = schemas.reduce(
+          (acc, schema) => {
+            const uri = schema.$id;
+            const filename = uri.match(/(\w+)(?:\.json)?#?$/)[1] + '.json';
+            const monacoSchema = {uri, schema, fileMatch: [filename, `*.${filename}`]};
+            return {
+              validators: acc.validators.set(filename, ajv.compile(schema)),
+              monacoSchemas: acc.monacoSchemas.push(monacoSchema)
+            };
+          },
+          {
+            validators: Map<string, Ajv.ValidateFunction>(),
+            monacoSchemas: List<any>()
+          }
+        );
+        this._validators = validators;
         this._monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
           validate: true,
-          schemas: monacoSchemas
+          schemas: monacoSchemas.toArray()
         });
       })
     )

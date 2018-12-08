@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "table.json",
+  "type": "object",
+  "description": "The configuration for a table.",
+  "properties": {
+    "$ref": {
+      "description": "The area configurations for the table.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "control": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/control" },
+              "minItems": 1
+            },
+            "field": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/field" },
+              "minItems": 1
+            }
+          },
+          "patternProperties": {
+            "^[a-z]\\w+$": { "$ref": "#/definitions/areas" }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        { "$ref": "#/definitions/areas" }
+      ]
+    },
+    "template": {
+      "description": "The template of the grid.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/template-item" },
+            "minItems": 1
+          },
+          "minItems": 1
+        },
+        {
+          "type": "string",
+          "minLength": 4
+        }
+      ]
+    }
+  },
+  "required": [
+    "areas", "template"
+  ],
+  "definitions": {
+    "grid": { "$ref": "grid.json" },
+    "control": { "$ref": "control.json" }
+  }
+}

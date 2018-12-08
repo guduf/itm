@@ -10,9 +10,15 @@
       "minLength": 1,
       "maxLength": 32,
       "pattern": "^[a-z]\\w{0,31}$"
+    },
+    "grid": {
+      "$ref": "#/definitions/grid"
     }
   },
   "required": [
     "key"
-  ]
+  ],
+  "definitions": {
+    "grid": { "$ref": "grid.json" }
+  }
 }
