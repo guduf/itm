@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, InjectionToken } from '@angular/core';
 import { fromEvent, from } from 'rxjs';
 import { filter, first, map } from 'rxjs/operators';
 
@@ -50,6 +50,8 @@ interface ItmPipeSandboxMessage {
   action: string;
   [key: string]: any;
 }
+
+export const ITM_PIPE_SANDBOX = new InjectionToken('ITM_PIPE_SANDBOX');
 
 @Injectable()
 export class ItmPipeSandbox {

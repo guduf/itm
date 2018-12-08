@@ -1,10 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { of } from 'rxjs';
+import { distinctUntilKeyChanged, map, mergeMap } from 'rxjs/operators';
 
+import { ItmJsonRegistrer, ItmTableFactory } from '../itm';
 import { JSON_PLAYGROUND_VIEW_DATA, JsonPlaygroundViewData } from './json_playground.component';
-import { distinctUntilKeyChanged, map, mergeMap, tap } from 'rxjs/operators';
-import ItmJsonRegistrer from '../../../../itm-core/src/lib/json_registrer';
-import { ItmTableFactory } from 'projects/itm-core/src/public_api';
 import { TableJsonPlaygroundFiles } from './table_playground';
 
 @Component({

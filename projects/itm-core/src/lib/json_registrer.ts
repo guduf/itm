@@ -1,18 +1,19 @@
 import { Injectable, Inject } from '@angular/core';
 import { Map } from 'immutable';
+import { from, Observable } from 'rxjs';
+import { map, mergeMap, reduce } from 'rxjs/operators';
 
 import Area from './area';
 import AreaFactory from './area_factory';
 import Grid from './grid';
 import GridFactory from './grid_factory';
-import PipeSandbox from './pipe_sandbox';
-import { from, Observable } from 'rxjs';
-import { map, mergeMap, reduce } from 'rxjs/operators';
+import PipeSandbox, { ITM_PIPE_SANDBOX } from './pipe_sandbox';
 import Registrer, { ITM_REGISTRER } from './registrer';
 
 @Injectable()
 export class ItmJsonRegistrer {
   constructor(
+    @Inject(ITM_PIPE_SANDBOX)
     private _pipeSandbox: PipeSandbox,
     @Inject(ITM_REGISTRER)
     private _rgstr: Registrer

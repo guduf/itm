@@ -1,6 +1,7 @@
-import { ItmControl } from '../../../../itm-core/src/public_api';
 import { JsonPlaygroundView } from './json_playground.component';
 import { GridPlaygroundViewComponent } from './grid_playground_view.component';
+
+import { ItmControl } from '../itm';
 
 type GridJsonPlaygroundView = JsonPlaygroundView;
 

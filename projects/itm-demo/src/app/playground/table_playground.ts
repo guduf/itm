@@ -1,6 +1,7 @@
-import { ItmTable } from '../../../../itm-core/src/public_api';
 import { JsonPlaygroundView } from './json_playground.component';
 import { TablePlaygroundViewComponent } from './table_playground_view.component';
+
+import { ItmTable } from '../itm';
 
 export interface TableJsonPlaygroundFiles {
   table: ItmTable.Config;

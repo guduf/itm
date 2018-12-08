@@ -11,7 +11,7 @@ import { ItmGridComponent } from './grid.component';
 import { ItmJsonRegistrer } from './json_registrer';
 import { ItmMaterialModule } from './material.module';
 import { ItmMenuComponent } from './menu.component';
-import { ItmPipeSandbox } from './pipe_sandbox';
+import { ItmPipeSandbox, ITM_PIPE_SANDBOX } from './pipe_sandbox';
 import { ItmTableComponent } from './table.component';
 import { ITM_TYPE_PIPES } from './type.pipes';
 import { ITM_REGISTRER_PROVIDER } from './registrer';
@@ -43,7 +43,7 @@ const EXPORTED_DECLARATIONS = [
 const PROVIDERS = [
   ITM_REGISTRER_PROVIDER,
   ItmJsonRegistrer,
-  ItmPipeSandbox
+  {provide: ITM_PIPE_SANDBOX, useClass: ItmPipeSandbox}
 ];
 
 /** The core module of the library. */

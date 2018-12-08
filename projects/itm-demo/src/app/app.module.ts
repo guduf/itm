@@ -11,11 +11,10 @@ import { PlaygroundModule } from './playground/playground.module';
 import { SharedModule } from './shared/shared.module';
 
 export function loadHomeModule() { return HomeModule; }
-export function loadPlaygroundModule() { return PlaygroundModule; }
 
 const ROUTES: Routes = [
-  {path: 'playground', loadChildren: loadPlaygroundModule},
-  {path: '**', loadChildren: loadHomeModule}
+  {path: 'playground', loadChildren: './playground/playground.module#PlaygroundModule'},
+  {path: '**', loadChildren: './home/home.module#HomeModule'}
 ];
 
 @NgModule({

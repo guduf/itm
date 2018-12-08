@@ -1,6 +1,7 @@
-import { ItmTarget } from '../../../../itm-core/src/public_api';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { TemplateRef, ViewChild, HostListener, Component } from '@angular/core';
+
+import { ItmTarget } from '../itm';
 
 @Component({
   selector: 'itm-demo-radar-example',

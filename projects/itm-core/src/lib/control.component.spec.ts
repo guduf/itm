@@ -1,16 +1,17 @@
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material';
 import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 import { of } from 'rxjs';
 
-import { ITM_CONTROL_REF } from './control_ref';
+import ControlFactory from './control_factory';
+import ControlRef, { ITM_CONTROL_REF } from './control_ref';
 import { ItmControlComponent } from './control.component';
 import { ItmFieldLabel } from './field';
 
 describe('ItmControlComponent', () => {
   const fieldLabel = of('test');
-
-  const ngControl = new FormControl(63);
+  const control = ControlFactory({key: 'id'});
+  const controlRef = new ControlRef(control, {id: 63});
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -23,7 +24,7 @@ describe('ItmControlComponent', () => {
       ],
       providers: [
         {provide: ItmFieldLabel, useValue: fieldLabel},
-        {provide: ITM_CONTROL_REF, useValue: ngControl}
+        {provide: ITM_CONTROL_REF, useValue: controlRef}
       ]
     });
     TestBed.compileComponents();
