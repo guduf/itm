@@ -93,6 +93,10 @@
                 {
                   "replace": "projects/itm-demo/src/environments/environment.ts",
                   "with": "projects/itm-demo/src/environments/environment.prod.ts"
+                },
+                {
+                  "replace": "projects/itm-demo/src/itm.ts",
+                  "with": "projects/itm-demo/src/itm.prod.ts"
                 }
               ],
               "optimization": true,
@@ -117,7 +121,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "itm-demo:build"
+            "browserTarget": "itm-demo:build",
+            "disableHostCheck": true
           },
           "configurations": {
             "production": {

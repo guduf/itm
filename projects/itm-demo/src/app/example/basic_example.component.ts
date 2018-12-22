@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { ItmGrid } from '../itm';
+import { ItmGrid } from '../../itm';
 import { RadarExampleComponent } from './radar_example.component';
 
 @Component({

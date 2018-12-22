@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 import { JSON_PLAYGROUND_VIEW_DATA, JsonPlaygroundViewData } from './json_playground.component';
 import { distinctUntilKeyChanged, map, mergeMap } from 'rxjs/operators';
 
-import { ItmGrid, ItmJsonRegistrer } from '../itm';
+import { ItmGrid, ItmJsonRegistrer } from '../../itm';
 
 @Component({
   selector: 'itm-demo-grid-playground-view',

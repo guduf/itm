@@ -4,7 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { ItmCoreModule } from '../itm';
+import { ItmCoreModule } from '../../itm';
 import { MaterialModule } from './material.module';
 import { PageComponent } from './page.component';
 

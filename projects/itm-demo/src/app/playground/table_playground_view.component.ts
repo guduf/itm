@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { of } from 'rxjs';
 import { distinctUntilKeyChanged, map, mergeMap } from 'rxjs/operators';
 
-import { ItmJsonRegistrer, ItmTableFactory } from '../itm';
+import { ItmJsonRegistrer, ItmTableFactory } from '../../itm';
 import { JSON_PLAYGROUND_VIEW_DATA, JsonPlaygroundViewData } from './json_playground.component';
 import { TableJsonPlaygroundFiles } from './table_playground';
 
