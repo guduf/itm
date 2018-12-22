@@ -1,0 +1,13 @@
+**/docker-compose.yml
+**/Dockerfile
+
+.editorconfig
+.vs-code
+
+*.sketch
+
+**/coverage
+**/dist
+**/tmp
+**/out-tsc
+**/node_modules
