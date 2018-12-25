@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: docker/itm-demo/Dockerfile
-      args:
-        buildno: 1
     image: itm-demo
     ports:
       - "8080:80"

@@ -1,0 +1,82 @@
+.tsd-page-title {
+  padding-top: 7rem;
+}
+
+#tsd-search .field input {
+  top: -100px;
+}
+
+.app-header {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  width: 100%;
+  height: 4rem;
+  padding: 1rem;
+  color: white;
+  background-color: #212121;
+}
+
+.app-header > nav {
+  display: flex;
+  flex-flow: row nowrap;
+  margin: -1rem 0;
+  line-height: 2rem;
+}
+
+
+.app-header > nav > a {
+  padding: 1rem;
+}
+
+.app-header > nav > a.active {
+  background-color: #43a047;
+}
+
+.app-header a {
+  color: inherit;
+}
+
+.app-header h1 {
+  display: inline-block;
+  height: 2rem;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  margin: 0;
+}
+
+.app-header h1  a, span {
+  display: block;
+}
+
+.app-header h1 a {
+  letter-spacing: 1px;
+  line-height: 2rem;
+  font-family: 'Bitter';
+  font-size: 26px;
+  color: #66bb6a;
+}
+
+.app-header a[aria-label=github] {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  height: 2rem;
+}
+
+.app-header a[aria-label=github] > span {
+  margin-right: 0.25rem;
+  vertical-align: top;
+  line-height: 2rem;
+  color: #757575;
+}
+
+.app-header a[aria-label=github] > img {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+}

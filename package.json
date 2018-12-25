@@ -8,17 +8,18 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "core:doc": "typedoc --out dist/doc projects/itm-core/src --theme doc",
+    "core:doc": "typedoc --out dist/doc projects/itm-core/src --theme doc/theme",
     "core:build": "ng build itm-core",
     "core:test": "ng test itm-core",
     "demo:monaco:clean": "rimraf projects/itm-demo/tmp/monaco && mkdir -p projects/itm-demo/tmp/monaco",
     "demo:monaco:compile": "webpack-cli --config projects/itm-demo/monaco.webpack.config.js",
     "demo:monaco:build": "npm run demo:monaco:clean && npm run demo:monaco:compile",
+    "demo:monaco:prod": "npm run demo:monaco:clean && npm run demo:monaco:compile",
     "demo:compile": "ng build itm-demo",
     "demo:serve": "ng serve itm-demo",
     "demo:dev": "npm run demo:monaco:build && npm run demo:serve",
     "demo:build": "npm run demo:monaco:build && npm run demo:compile",
-    "demo:prod": "npm run core:build -- --prod && npm run demo:build -- --prod"
+    "demo:prod": "npm run core:build -- --prod && npm run demo:monaco:prod && npm run demo:compile -- --prod"
   },
   "private": true,
   "dependencies": {
@@ -46,7 +47,6 @@
     "prismjs": "^1.15.0",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.3.3",
-    "typedoc": "^0.13.0",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
@@ -76,6 +76,7 @@
     "tsickle": "^0.33.1",
     "tslib": "^1.9.0",
     "tslint": "~5.9.1",
+    "typedoc": "^0.13.0",
     "typescript": "~3.1.3",
     "webpack": "4.9.2",
     "webpack-cli": "^3.1.2",
