@@ -7,7 +7,6 @@ COPY projects/ ./projects/
 RUN npm run demo:prod
 COPY README.md ./
 COPY doc/ ./doc/
-RUN ls -al
 RUN npm run core:doc
 
 FROM nginx:stable as server
