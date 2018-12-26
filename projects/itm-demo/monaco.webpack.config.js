@@ -27,7 +27,8 @@ const promiseShim = `
 `;
 
 module.exports = {
-	mode: process.argv.indexOf('--prod') >= 0 ? 'production' : 'development',
+  // TODO - Fix production mode
+	mode: 'development',
 	entry: {
 		'runtime': '.runtime',
 		'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker.js',
@@ -50,7 +51,6 @@ module.exports = {
     new VirtualModulesPlugin({
       'node_modules/.runtime': runtime,
       'node_modules/.promise.shim': promiseShim
-    }),
-    new webpack.optimize.LimitChunkCountPlugin({maxChunks: 10})
+    })
   ]
 };

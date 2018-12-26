@@ -3,7 +3,11 @@ WORKDIR /usr/share/itm/
 COPY package*.json /usr/share/itm/
 RUN npm i --silent
 COPY angular.json ts*.json ./
-COPY projects/ ./projects/
+COPY projects/itm-core/ ./projects/itm-core/
+RUN npm run core:prod
+COPY projects/itm-demo/monaco.webpack.config.js ./projects/itm-demo/
+RUN npm run demo:monaco:prod
+COPY projects/itm-demo/ ./projects/itm-demo/
 RUN npm run demo:prod
 COPY README.md ./
 COPY doc/ ./doc/

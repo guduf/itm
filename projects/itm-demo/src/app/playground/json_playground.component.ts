@@ -19,7 +19,7 @@ import {
   Observable,
   Subscription
 } from 'rxjs';
-import { map, tap, distinctUntilKeyChanged, observeOn, reduce, share } from 'rxjs/operators';
+import { map, tap, distinctUntilKeyChanged, observeOn, filter } from 'rxjs/operators';
 
 import { EditorModel, InvalidEditorModel } from './editor.service';
 import { JsonEditorModel } from './json_editor.component';
@@ -78,18 +78,21 @@ export class JsonPlaygroundViewComponent<F = { grid: Object; target: Object; }> 
       map(({playgrounds}) => playgrounds),
     );
     const fragmentObs = combineLatest(playgroundsObs, this._route.fragment).pipe(
+      observeOn(asyncScheduler),
+      filter(([playgrounds, fragment]) => {
+        if (fragment) return true;
+        this._router.navigate(['.'], {
+          relativeTo: this._route,
+          fragment: Object.keys(playgrounds)[0]
+        });
+      }),
       map(([playgrounds, fragment]) => {
         const files = Object.keys(playgrounds).reduce(
           (acc, key) => ({...acc, [key]: playgrounds[key].files}),
           {}
         );
-        if (!fragment) this._router.navigate(
-          ['.'],
-          {relativeTo: this._route, fragment: Object.keys(files)[0]}
-        );
         return typeof files[fragment] === 'object' ? files[fragment] : {};
       }),
-      observeOn(asyncScheduler),
       tap(files => {
         this.models.next({} as F);
         this.files = Object.keys(files).reduce(
